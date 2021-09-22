@@ -12,4 +12,5 @@ export type ProvincePassive = {
   value: number;
   description?: string;
   data?: any;
+  setAsCountryPassive?: boolean;
 };

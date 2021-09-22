@@ -1,30 +1,4 @@
-export enum ItemType {
-  DIVISIONS,
-  TANKS,
-  AIRCRAFTS,
-  WARSHIPS,
-  OIL,
-}
-
-export enum ItemPrice {
-  DIVISIONS = 375,
-  TANKS = 980,
-  AIRCRAFTS = 1375,
-  WARSHIPS = 1215,
-  OIL = 975,
-}
-
-export type Item = {
-  type: ItemType;
-  price: number;
-  max: number;
-  min: number;
-};
-
-export type Order = {
-  item: Item;
-  qty: number;
-};
+import { Item, ItemPrice, ItemType } from '../../modules/shop/shop.typing';
 
 export const divisionsItem: Item = {
   type: ItemType.DIVISIONS,

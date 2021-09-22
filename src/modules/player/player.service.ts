@@ -206,8 +206,12 @@ export class PlayerService {
     }
 
     if (player.id === game.owner.id) {
-      return ResponseHelper.error({
-        message: 'You cannot join a game where you are the owner',
+      player.currentGameId = game.id;
+      await playerRepository().save(player);
+
+      return ResponseHelper.success({
+        message: `Player ${player.nickname} joined the game`,
+        data: game,
       });
     }
 
@@ -248,6 +252,16 @@ export class PlayerService {
       });
     }
 
+    if (game.stage !== GameStage.PICKING_PHASE) {
+      return ResponseHelper.error({
+        message: 'Game stage is not in picking phase',
+        data: {
+          gameId: data.gameId,
+          gameStage: game.stage,
+        },
+      });
+    }
+
     let player =
       game.owner.id === data.playerId
         ? game.owner
@@ -274,7 +288,7 @@ export class PlayerService {
 
     if (!country) {
       return ResponseHelper.error({
-        message: 'Country not found',
+        message: 'Country not found or already taken',
         data: {
           countryId: data.countryId,
         },
@@ -282,7 +296,6 @@ export class PlayerService {
     }
 
     player.alreadyPlayed = true;
-    player.countries = [country];
     country.isAi = false;
     country.owner = player;
 

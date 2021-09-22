@@ -126,6 +126,28 @@ export class GameController {
     });
   }
 
+  static async nextTurn(req: Request, res: Response) {
+    const serviceData = await GameService.nextTurn({
+      ...req.body,
+      playerId: req.user.id,
+      gameId: req.headers['game-id'] as string,
+    });
+
+    if (serviceData.error) {
+      return HttpResponseHelper.badRequest({
+        res,
+        message: serviceData.message,
+        data: serviceData.data,
+      });
+    }
+
+    return HttpResponseHelper.success({
+      res,
+      message: serviceData.message,
+      data: serviceData.data,
+    });
+  }
+
   static async forceNextTurn(req: Request, res: Response) {
     const serviceData = await GameService.forceNextTurn({
       playerId: req.user.id,

@@ -48,4 +48,5 @@ export type CountryPassive = {
   value: number;
   description?: string;
   data?: any;
+  requiredProvinces?: string[];
 };

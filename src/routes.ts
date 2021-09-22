@@ -2,6 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import { GameController } from './modules/game/game.controller';
 import { PlayerController } from './modules/player/player.controller';
+import { ShopController } from './modules/shop/shop.controller';
 
 const router = express.Router();
 
@@ -31,7 +32,6 @@ router.put(
 );
 
 // Game routes
-
 router.get(
   '/games/start',
   passport.authenticate('jwt', { session: false }),
@@ -48,6 +48,12 @@ router.get(
   '/games/force-next-turn',
   passport.authenticate('jwt', { session: false }),
   GameController.forceNextTurn
+);
+
+router.post(
+  '/games/next-turn',
+  passport.authenticate('jwt', { session: false }),
+  GameController.nextTurn
 );
 
 router.get(
@@ -72,6 +78,25 @@ router.post(
   '/games',
   passport.authenticate('jwt', { session: false }),
   GameController.create
+);
+
+// Shop routes
+router.post(
+  '/shop/order',
+  passport.authenticate('jwt', { session: false }),
+  ShopController.buy
+);
+
+router.post(
+  '/shop/get-order-price',
+  passport.authenticate('jwt', { session: false }),
+  ShopController.getOrderPrice
+);
+
+router.post(
+  '/shop/get-improvement-province-price',
+  passport.authenticate('jwt', { session: false }),
+  ShopController.getProvincesImprovementPrice
 );
 
 export { router };

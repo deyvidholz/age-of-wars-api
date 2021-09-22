@@ -6,6 +6,7 @@ import {
   Personality,
 } from '../../data/templates/personalities.template';
 import { GeneralHelper } from '../../helpers/general.helper';
+import { MathHelper } from '../../helpers/math.helper';
 import { Action } from '../action/action.typing';
 import { Game } from '../game/game.entity';
 import { Player } from '../player/player.entity';
@@ -179,5 +180,21 @@ export class Country {
 
   getNameAsConstant?(): string {
     return GeneralHelper.getStringAsScreamingSnakeCase(this.name);
+  }
+
+  updateEstimatedArmy() {
+    let minPercentage = 7;
+    let maxPercentage = 7;
+
+    const keys = Object.keys(this.estimatedArmy);
+
+    for (const key of keys) {
+      this.estimatedArmy[key] = MathHelper.getEstimated(
+        minPercentage,
+        maxPercentage,
+        this.army[key],
+        true
+      );
+    }
   }
 }

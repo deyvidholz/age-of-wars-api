@@ -1,3 +1,5 @@
 {
-  "ignore": ["node_modules", "src/data/json"]
+  "delay": 300,
+  "watch": ["src/*", ".env", "./*.ts"],
+  "ignore": ["node_modules", "src/data/json", "test/*"]
 }

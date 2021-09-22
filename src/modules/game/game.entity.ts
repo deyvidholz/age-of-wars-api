@@ -75,6 +75,7 @@ export class Game {
       return player;
     });
 
+    this.stage === GameStage.RUNNING;
     this.stageCount++;
 
     // TODO country actions

@@ -41,6 +41,14 @@ export class MathHelper {
     return percentageValue;
   }
 
+  static subtractByPercentage(
+    currentPrice: number,
+    percentage: number
+  ): number {
+    let subtractValue = MathHelper.getPercetageValue(currentPrice, percentage);
+    return currentPrice - subtractValue;
+  }
+
   static getRandomIndex(data: any[]): any {
     return Math.floor(Math.random() * data.length);
   }
@@ -67,6 +75,7 @@ export class MathHelper {
       minPercentage,
       maxPercentage
     );
+
     const finalValue = MathHelper.getPercetageValue(
       value,
       randomPercentage,
@@ -78,5 +87,13 @@ export class MathHelper {
     }
 
     return finalValue;
+  }
+
+  static fixDecimals(num: number, decimals: number = 2): number {
+    if (isNaN(num)) {
+      return 0;
+    }
+
+    return Number(num.toFixed(decimals));
   }
 }
