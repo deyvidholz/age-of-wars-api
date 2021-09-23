@@ -11,11 +11,13 @@ import { Action } from '../action/action.typing';
 import { Game } from '../game/game.entity';
 import { Player } from '../player/player.entity';
 import { Demand } from '../war/war.typing';
+import { CountryHelper } from './country.helper';
 import {
   Aggressiveness,
   Army,
   CountryInfo,
   CountrySimplified,
+  Decision,
   Economy,
   EstimatedArmy,
   Incoming,
@@ -24,6 +26,7 @@ import {
   Opinions,
   Province,
   Resource,
+  SetOpinionOfActionParam,
 } from './country.typing';
 
 @Entity({ name: 'countries' })
@@ -159,6 +162,12 @@ export class Country {
 
   @Column({
     type: 'json',
+    default: '[]',
+  })
+  decisions?: Decision[];
+
+  @Column({
+    type: 'json',
     default: '{}',
   })
   militaryPower?: MilitaryPower[];
@@ -196,5 +205,133 @@ export class Country {
         true
       );
     }
+  }
+
+  isAlliedWith(countryId: string): boolean {
+    return this.allies.some((ally) => ally.id === countryId);
+  }
+
+  isEnemyOf(countryId: string): boolean {
+    return this.enemies.some((enemy) => enemy.id === countryId);
+  }
+
+  isAtWarWith(countryId: string): boolean {
+    return this.inWarWith.some((country) => country.id === countryId);
+  }
+
+  isIndependenceGuaranteedBy(countryId: string): boolean {
+    return this.independenceGuaranteedBy.some(
+      (target) => target.id === countryId
+    );
+  }
+
+  isGuaranteeingIndependenceOf(countryId: string): boolean {
+    return this.guaranteeingIndependence.some(
+      (target) => target.id === countryId
+    );
+  }
+
+  hasIndependenceGuaranteeRelations(countryId: string): boolean {
+    return (
+      this.isIndependenceGuaranteedBy(countryId) ||
+      this.isGuaranteeingIndependenceOf(countryId)
+    );
+  }
+
+  getOpinionOf(countryName: string): CountrySimplified | undefined {
+    return this.opinions[countryName];
+  }
+
+  setOpinionOf(
+    countryName: string,
+    value: number,
+    action: SetOpinionOfActionParam
+  ) {
+    const country = this.opinions[countryName];
+
+    if (!country) {
+      return;
+    }
+
+    switch (action) {
+      case SetOpinionOfActionParam.SET:
+        country.value = value;
+        break;
+
+      case SetOpinionOfActionParam.SUM:
+        country.value += value;
+        break;
+
+      case SetOpinionOfActionParam.SUBTRACT:
+        country.value -= value;
+        break;
+    }
+
+    CountryHelper.fixOpinion(country);
+  }
+
+  addAlly(country: CountrySimplified) {
+    if (this.isAlliedWith(country.id)) {
+      return;
+    }
+
+    this.allies.push(country);
+  }
+
+  addEnemy(country: CountrySimplified) {
+    if (this.isEnemyOf(country.id)) {
+      return;
+    }
+
+    this.enemies.push(country);
+  }
+
+  addInWarWith(country: CountrySimplified) {
+    if (this.isAtWarWith(country.id)) {
+      return;
+    }
+
+    this.inWarWith.push(country);
+  }
+
+  removeAlly(countryId: string) {
+    this.allies = this.allies.filter((ally) => ally.id !== countryId);
+  }
+
+  removeEnemy(countryId: string) {
+    this.enemies = this.enemies.filter((enemy) => enemy.id !== countryId);
+  }
+
+  removeInWarWith(countryId: string) {
+    this.inWarWith = this.inWarWith.filter((target) => target.id !== countryId);
+  }
+
+  getCountrySimplifiedData(): CountrySimplified {
+    return {
+      flag: this.flag,
+      name: this.name,
+      id: this.id,
+    };
+  }
+
+  getMilitaryPower(): MilitaryPower {
+    const mpSum = {
+      aircrafts: this.army.aircrafts * 4.75,
+      divisions: this.army.divisions * 1.88,
+      tanks: this.army.tanks * 2.42,
+      warships: this.army.warships * 5.9,
+    };
+
+    const total = MathHelper.sumNumbers(
+      mpSum.aircrafts,
+      mpSum.divisions,
+      mpSum.tanks,
+      mpSum.warships
+    );
+
+    return {
+      ...mpSum,
+      total,
+    };
   }
 }

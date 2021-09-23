@@ -90,7 +90,14 @@ export type ProvinceToImprove = {
 };
 
 export type Opinions = {
-  [key: string]: CountrySimplified & { value: number };
+  [key: string]: Opinion;
+};
+
+export type Opinion = {
+  id?: string;
+  flag: string;
+  name: string;
+  value: number;
 };
 
 export type OpinionsAfterGenerate = {
@@ -102,5 +109,23 @@ export type Message = {
   color?: string;
   title?: string;
   description: string;
-  data: any;
+  data?: any;
+};
+
+export enum SetOpinionOfActionParam {
+  SUM = 'SUM',
+  SUBTRACT = 'SUBTRACT',
+  SET = 'SET',
+}
+
+export enum DecisionType {
+  ACCEPT_JOIN_WAR = 'ACCEPT_JOIN_WAR',
+  REFUSE_JOIN_WAR = 'REFUSE_JOIN_WAR',
+}
+
+export type Decision = {
+  types: DecisionType[];
+  requester?: CountrySimplified;
+  target?: CountrySimplified;
+  data?: any;
 };
