@@ -5,20 +5,35 @@ import {
   ProvinceSimplified,
 } from '../country/country.typing';
 
+export type Losses = {
+  divisions: number;
+  tanks: number;
+  aircrafts: number;
+  warships: number;
+  balance: number;
+};
+
+export type WarParticipant = {
+  id: string;
+  name: string;
+  flag: string;
+  losses: Losses;
+};
+
 export type WarDetails = {
   attacker: {
+    id: string;
     name: string;
     flag: string;
-    allies?: WarParticipant[];
-    militaryPower: any[];
-    losses: any[];
+    allies: WarParticipant[];
+    losses: Losses;
   };
   victim: {
+    id: string;
     name: string;
     flag: string;
-    allies?: WarParticipant[];
-    militaryPower: any[];
-    losses: any[];
+    allies: WarParticipant[];
+    losses: Losses;
   };
 };
 
@@ -27,14 +42,6 @@ export type WarMessage = {
   message: string;
   icon: string;
   iconColor: string;
-};
-
-export type WarParticipant = {
-  id: string;
-  flag: string;
-  name: string;
-  army: Army;
-  estimatedArmy: EstimatedArmy;
 };
 
 export type Demand = {
@@ -48,4 +55,10 @@ export enum DemandType {
   PROVINCE = 'PROVINCE',
   BALANCE = 'BALANCE',
   OIL = 'OIL',
+}
+
+export enum WarStage {
+  PREPARING = 'PREPARING',
+  FIGHTING = 'FIGHTING',
+  OVER = 'OVER',
 }
