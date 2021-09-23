@@ -74,7 +74,7 @@ export class GameController {
             })),
             countries: game.countries.map((country) => country.name),
             wars: game.wars,
-          } as Game)
+          } as unknown as Game)
       );
     }
 
@@ -131,6 +131,7 @@ export class GameController {
       ...req.body,
       playerId: req.user.id,
       gameId: req.headers['game-id'] as string,
+      countryId: req.headers['country-id'] as string,
     });
 
     if (serviceData.error) {
@@ -139,6 +140,14 @@ export class GameController {
         message: serviceData.message,
         data: serviceData.data,
       });
+    }
+
+    if (req.query.exclude && typeof req.query.exclude === 'object') {
+      const attributesToExclude = req.query.exclude as string[];
+
+      for (const attribute of attributesToExclude) {
+        delete serviceData.data[attribute];
+      }
     }
 
     return HttpResponseHelper.success({

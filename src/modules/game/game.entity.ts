@@ -10,7 +10,7 @@ import {
 import { Country } from '../country/country.entity';
 import { Player } from '../player/player.entity';
 import { War } from '../war/war.entity';
-import { GameOptions, GameStage } from './game.typing';
+import { Coalition, GameOptions, GameStage } from './game.typing';
 
 @Entity({ name: 'games' })
 export class Game {
@@ -40,11 +40,17 @@ export class Game {
     eager: true,
     cascade: true,
   })
-  countries: any[];
+  countries: Country[];
 
   @ManyToMany(() => War, { eager: true })
   @JoinTable()
   wars: War[];
+
+  @Column({
+    type: 'json',
+    default: '[]',
+  })
+  coalitions: Coalition[];
 
   @Column({ type: 'json', default: '{}' })
   options: GameOptions;
