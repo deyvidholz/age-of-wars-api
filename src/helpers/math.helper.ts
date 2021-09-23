@@ -96,4 +96,11 @@ export class MathHelper {
 
     return Number(num.toFixed(decimals));
   }
+
+  static sumNumbers(...numbers: number[]) {
+    return (arguments as unknown as number[]).reduce(
+      (prev, next) => prev + next,
+      0
+    );
+  }
 }
