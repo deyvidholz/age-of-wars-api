@@ -115,15 +115,17 @@ export class ShopHelper {
     );
   }
 
-  static getProvinceImprovementPrice(
-    data: GetProvinceImprovementPriceParam
-  ): ImproveProvincePreOrder[] {
+  static getProvinceImprovementPrice(data: GetProvinceImprovementPriceParam): {
+    totalPrice: number;
+    preOrders: ImproveProvincePreOrder[];
+  } {
     const unityPrices: ProvinceLevels = {
       production: +process.env.PRODUCTION_IMPROVEMENT_UNITY_PRICE,
       taxation: +process.env.TAXATION_IMPROVEMENT_UNITY_PRICE,
     };
 
     const preOrders: ImproveProvincePreOrder[] = [];
+    let totalPrice: number = 0;
 
     for (const provinceOrderItem of data.order.items) {
       let productionIncomingPerLevel =
@@ -193,10 +195,11 @@ export class ShopHelper {
         preOrder.taxation.newIncomingValue
       );
 
+      totalPrice += preOrder.totalPrice;
       preOrders.push(preOrder);
     }
 
-    return preOrders;
+    return { totalPrice: MathHelper.fixDecimals(totalPrice), preOrders };
   }
 }
 

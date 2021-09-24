@@ -3,6 +3,7 @@ import {
   Economy,
   EstimatedArmy,
   ProvinceSimplified,
+  Resource,
 } from '../country/country.typing';
 
 export type Losses = {
@@ -44,12 +45,30 @@ export type WarMessage = {
   iconColor: string;
 };
 
+export type PeaceRequest = {
+  offerS?: Offer[];
+  demandS?: Demand[];
+};
+
+export type Offer = {
+  type: OfferType;
+  economy?: Economy;
+  resources: Resource;
+  provinces: ProvinceSimplified[];
+};
+
 export type Demand = {
   type: DemandType;
   economy?: Economy;
+  resources: Resource;
   provinces: ProvinceSimplified[];
-  isOffer?: boolean;
 };
+
+export enum OfferType {
+  PROVINCE = 'PROVINCE',
+  BALANCE = 'BALANCE',
+  OIL = 'OIL',
+}
 
 export enum DemandType {
   PROVINCE = 'PROVINCE',

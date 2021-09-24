@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Country } from '../country/country.entity';
 import { WarDetails, WarMessage, WarParticipant, WarStage } from './war.typing';
 
 @Entity({ name: 'wars' })
@@ -20,4 +21,13 @@ export class War {
 
   @Column({ type: 'json' })
   details: WarDetails;
+
+  isParticipating(countryId: string): boolean {
+    return (
+      this.details.attacker.id === countryId ||
+      this.details.victim.id === countryId ||
+      this.details.attacker.allies.some((a) => a.id === countryId) ||
+      this.details.victim.allies.some((a) => a.id === countryId)
+    );
+  }
 }

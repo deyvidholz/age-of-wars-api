@@ -253,6 +253,8 @@ export class Country {
       return;
     }
 
+    value = Math.abs(value);
+
     switch (action) {
       case SetOpinionOfActionParam.SET:
         country.value = value;
@@ -275,6 +277,10 @@ export class Country {
       return;
     }
 
+    if (country.id === this.id) {
+      return;
+    }
+
     this.allies.push(country);
   }
 
@@ -283,11 +289,19 @@ export class Country {
       return;
     }
 
+    if (country.id === this.id) {
+      return;
+    }
+
     this.enemies.push(country);
   }
 
   addInWarWith(country: CountrySimplified) {
     if (this.isAtWarWith(country.id)) {
+      return;
+    }
+
+    if (country.id === this.id) {
       return;
     }
 
@@ -304,6 +318,15 @@ export class Country {
 
   removeInWarWith(countryId: string) {
     this.inWarWith = this.inWarWith.filter((target) => target.id !== countryId);
+  }
+
+  removeIndependenceGuaranteeingRelations(countryId: string) {
+    this.independenceGuaranteedBy = this.independenceGuaranteedBy.filter(
+      (target) => target.id !== countryId
+    );
+    this.guaranteeingIndependence = this.guaranteeingIndependence.filter(
+      (target) => target.id !== countryId
+    );
   }
 
   getCountrySimplifiedData(): CountrySimplified {

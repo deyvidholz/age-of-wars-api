@@ -1,11 +1,197 @@
+import 'dotenv/config';
+import {
+  ErrorResponse,
+  ResponseHelper,
+  SuccessResponse,
+} from '../../../helpers/response.helper';
 import { Country } from '../../country/country.entity';
+import { SetOpinionOfActionParam } from '../../country/country.typing';
+import { Game } from '../../game/game.entity';
+import { War } from '../../war/war.entity';
+import { warRepository } from '../../war/war.repository';
+import { Losses } from '../../war/war.typing';
+import { DeclareWarActionHelper } from '../helpers/declare-war-action.helper';
 
 type DeclareWarParam = {
+  game: Game;
   country: Country;
-  target: Country;
+  targetId: string;
   callToWar: string[];
-  gameId: string;
-  gameStageCount: number;
 };
 
-export async function declareWarAction(data: DeclareWarParam) {}
+export async function declareWarAction(
+  data: DeclareWarParam
+): Promise<SuccessResponse | ErrorResponse> {
+  const { game, country } = data;
+
+  const target: Country = game.countries.find(
+    (country: Country) => country.id === data.targetId
+  );
+
+  if (!target) {
+    return ResponseHelper.error({
+      message: 'Target country not found',
+      data: {
+        id: data.targetId,
+      },
+    });
+  }
+
+  if (country.id === target.id) {
+    return ResponseHelper.error({
+      message: 'You cannot declare war on your own country',
+    });
+  }
+
+  if (country.isAlliedWith(target.id)) {
+    return ResponseHelper.error({
+      message: 'You cannot declare war on a allied country',
+    });
+  }
+
+  if (country.isAtWarWith(target.id)) {
+    return ResponseHelper.error({
+      message: 'You are already at war with this country',
+    });
+  }
+
+  if (country.hasIndependenceGuaranteeRelations(target.id)) {
+    target.removeIndependenceGuaranteeingRelations(country.id);
+    country.removeIndependenceGuaranteeingRelations(target.id);
+  }
+
+  country.setOpinionOf(
+    target.name,
+    +process.env.SUBTRACT_OPINION_WHEN_DECLARE_WAR,
+    SetOpinionOfActionParam.SUBTRACT
+  );
+
+  target.setOpinionOf(
+    country.name,
+    +process.env.SUBTRACT_OPINION_WHEN_DECLARE_WAR_TARGET,
+    SetOpinionOfActionParam.SUBTRACT
+  );
+
+  // Adding as enemy and inWarWith
+  country.addEnemy({
+    flag: target.flag,
+    name: target.name,
+    id: target.id,
+  });
+
+  country.addInWarWith({
+    flag: target.flag,
+    name: target.name,
+    id: target.id,
+  });
+
+  target.addEnemy({
+    flag: country.flag,
+    name: country.name,
+    id: country.id,
+  });
+
+  target.addInWarWith({
+    flag: country.flag,
+    name: country.name,
+    id: country.id,
+  });
+
+  const refusedJoinWar = {
+    country: [],
+    target: [],
+  };
+
+  for (const countryId of data.callToWar) {
+    const requestedCountry: Country = game.countries.find(
+      (c: Country) => c.id === countryId
+    );
+
+    if (!requestedCountry) {
+      continue;
+    }
+
+    DeclareWarActionHelper.sendCallToWar({
+      country,
+      refusedJoinWar,
+      requestedCountry,
+      target,
+    });
+  }
+
+  for (const ally of target.allies) {
+    const requestedCountry: Country = game.countries.find(
+      (c: Country) => c.id === ally.id
+    );
+
+    if (!requestedCountry) {
+      continue;
+    }
+
+    DeclareWarActionHelper.sendCallToWar({
+      country: target,
+      refusedJoinWar,
+      requestedCountry,
+      target: country,
+    });
+  }
+
+  if (refusedJoinWar.country.length) {
+    country.messages.push({
+      description: `Some countries cannot join our war`,
+      data: [...refusedJoinWar.country],
+    });
+  }
+
+  if (refusedJoinWar.target.length) {
+    target.messages.push({
+      description: `Some countries cannot join our war`,
+      data: [...refusedJoinWar.target],
+    });
+  }
+
+  const lossesTemplate: Losses = {
+    aircrafts: 0,
+    balance: 0,
+    divisions: 0,
+    tanks: 0,
+    warships: 0,
+  };
+
+  // TODO calculate based on military power diff
+  const startAtStage: number = game.stageCount + 2;
+  const endAtStage: number = startAtStage + 2;
+
+  const war: War = warRepository().create({
+    endAtStage,
+    startAtStage,
+    gameId: game.id,
+    details: {
+      attacker: {
+        flag: country.flag,
+        id: country.id,
+        name: country.name,
+        allies: [],
+        losses: { ...lossesTemplate },
+      },
+      victim: {
+        flag: target.flag,
+        id: target.id,
+        name: target.name,
+        allies: [],
+        losses: { ...lossesTemplate },
+      },
+    },
+  });
+
+  if (!game.wars) {
+    game.wars = [];
+  }
+
+  game.wars.push(war);
+
+  return ResponseHelper.success({
+    message: `${country.name} declared war on ${target.name}`,
+    data: war,
+  });
+}

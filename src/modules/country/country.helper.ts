@@ -1,4 +1,5 @@
-import { Opinion } from './country.typing';
+import { Country } from './country.entity';
+import { Message, Opinion } from './country.typing';
 
 export class CountryHelper {
   static fixOpinion(opinion: Opinion): Opinion {
@@ -11,5 +12,11 @@ export class CountryHelper {
     }
 
     return opinion;
+  }
+
+  static addMessages(countries: Country[], message: Message) {
+    for (const country of countries) {
+      country.messages.push(message);
+    }
   }
 }

@@ -3,6 +3,7 @@ import {
   ResponseHelper,
   SuccessResponse,
 } from '../../helpers/response.helper';
+import { Country } from '../country/country.entity';
 import { countryRepository } from '../country/country.repository';
 import { ShopHelper } from './shop.helper';
 import {
@@ -16,7 +17,8 @@ import {
 
 export class ShopService {
   static async buy(data: OrderParam): Promise<SuccessResponse | ErrorResponse> {
-    const country = await countryRepository().findOne(data.countryId);
+    const country =
+      data.country || (await countryRepository().findOne(data.countryId));
 
     if (!country) {
       return ResponseHelper.success({
@@ -24,7 +26,7 @@ export class ShopService {
       });
     }
 
-    if (country.owner.id !== data.playerId) {
+    if (country.isAi && country.owner.id !== data.playerId) {
       return ResponseHelper.success({
         message: 'You cannot buy items to a country that you are not the owner',
       });
@@ -155,8 +157,9 @@ export class ShopService {
 }
 
 type OrderParam = {
-  playerId: string;
-  countryId: string;
+  playerId?: string;
+  countryId?: string;
+  country?: Country;
   order: Order;
 };
 

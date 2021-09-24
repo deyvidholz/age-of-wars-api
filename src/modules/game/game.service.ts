@@ -5,6 +5,7 @@ import {
   SuccessResponse,
 } from '../../helpers/response.helper';
 import { V1CountryHelper } from '../../helpers/v1-countries.helper';
+import { ActionService } from '../action/action.service';
 import { Action } from '../action/action.typing';
 import { Country } from '../country/country.entity';
 import { countryRepository } from '../country/country.repository';
@@ -299,6 +300,7 @@ export class GameService {
       game.owner.id === data.playerId
         ? game.owner
         : game.players.find((p) => p.id === data.playerId);
+
     const playerIsParticipating = player && player.currentGameId === game.id;
 
     if (!playerIsParticipating) {
@@ -314,12 +316,33 @@ export class GameService {
       });
     }
 
-    // TODO set player country actions
+    let country: Country;
+
+    if (data.countryId) {
+      country = game.countries.find((c) => c.id === data.countryId);
+
+      if (!country) {
+        return ResponseHelper.error({
+          message: 'Country not found',
+        });
+      }
+
+      country.actions =
+        data.actions?.map((action) => ({
+          ...action,
+          playerId: player.id,
+          countryId: country.id,
+          gameId: game.id,
+        })) || [];
+    }
 
     player.alreadyPlayed = true;
-    game.setNextTurn();
 
-    await gameRepository().save(game);
+    const isNextTurn = game.setNextTurn();
+
+    if (isNextTurn) {
+      await gameRepository().save(game);
+    }
 
     return ResponseHelper.success({
       message: `Player ${player.nickname} called next turn`,
@@ -368,6 +391,7 @@ type KickPlayerParam = {
 
 type NextTurnParam = {
   playerId: string;
+  countryId: string;
   gameId: string;
   actions: Action[];
 };

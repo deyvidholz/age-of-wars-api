@@ -7,6 +7,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { ActionService } from '../action/action.service';
 import { Country } from '../country/country.entity';
 import { Player } from '../player/player.entity';
 import { War } from '../war/war.entity';
@@ -68,22 +69,33 @@ export class Game {
     );
   }
 
-  setNextTurn(force: boolean = false) {
+  setNextTurn(force: boolean = false): boolean {
     if (this.hasEverybodyPlayed() || force) {
       this._setNextTurn();
+      return true;
     }
+
+    return false;
   }
 
-  private _setNextTurn() {
+  private async _setNextTurn() {
     this.owner.alreadyPlayed = false;
+
     this.players = this.players.map((player) => {
       player.alreadyPlayed = false;
       return player;
     });
 
-    this.stage === GameStage.RUNNING;
+    this.countries = this.countries.map((country) => {
+      country.messages = [];
+      return country;
+    });
+
+    this.stage = GameStage.RUNNING;
     this.stageCount++;
 
-    // TODO country actions
+    await ActionService.runActions({
+      game: this,
+    });
   }
 }
