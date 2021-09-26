@@ -83,6 +83,7 @@ export type CountryProvinceV1 = {
   isIsland?: boolean;
   isIslands?: boolean;
   oilProduction?: number;
+  incoming?: any;
 };
 
 export type CountryAllyV1 = {

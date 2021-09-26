@@ -128,6 +128,7 @@ export enum DecisionType {
 }
 
 export type Decision = {
+  id: string;
   types: DecisionType[];
   requester?: CountrySimplified;
   target?: CountrySimplified;

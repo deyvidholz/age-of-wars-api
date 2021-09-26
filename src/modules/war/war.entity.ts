@@ -30,4 +30,19 @@ export class War {
       this.details.victim.allies.some((a) => a.id === countryId)
     );
   }
+
+  isWarOwner(countryId: string): boolean {
+    return (
+      this.details.attacker.id === countryId ||
+      this.details.victim.id === countryId
+    );
+  }
+
+  removeParticipant(countryId: string) {
+    this.details.attacker.allies ===
+      this.details.attacker.allies.filter((ally) => ally.id !== countryId);
+
+    this.details.victim.allies ===
+      this.details.victim.allies.filter((ally) => ally.id !== countryId);
+  }
 }

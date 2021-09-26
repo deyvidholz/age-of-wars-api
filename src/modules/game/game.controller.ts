@@ -27,6 +27,27 @@ export class GameController {
     });
   }
 
+  static async find(req: Request, res: Response) {
+    const serviceData = await GameService.find({
+      playerId: req.user.id,
+      gameId: req.params.gameId,
+    });
+
+    if (serviceData.error) {
+      return HttpResponseHelper.badRequest({
+        res,
+        message: serviceData.message,
+        data: serviceData.data,
+      });
+    }
+
+    return HttpResponseHelper.success({
+      res,
+      message: serviceData.message,
+      data: serviceData.data,
+    });
+  }
+
   static async delete(req: Request, res: Response) {
     const serviceData = await GameService.delete({
       playerId: req.user.id,

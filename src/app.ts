@@ -5,6 +5,7 @@ import express, { Application } from 'express';
 import { Server } from 'http';
 import { createConnection } from 'typeorm';
 import * as socketio from 'socket.io';
+import path from 'path';
 import passport from 'passport';
 import passportJWT from 'passport-jwt';
 import { router } from './routes';
@@ -36,6 +37,7 @@ export class App {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cors());
+    this.app.use('/', express.static(path.join(__dirname, '..', 'public')));
   }
 
   private initSocketIo(server: Server) {

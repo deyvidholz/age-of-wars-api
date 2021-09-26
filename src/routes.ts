@@ -1,12 +1,11 @@
 import express from 'express';
 import passport from 'passport';
+import { CountryController } from './modules/country/country.controller';
 import { GameController } from './modules/game/game.controller';
 import { PlayerController } from './modules/player/player.controller';
 import { ShopController } from './modules/shop/shop.controller';
 
 const router = express.Router();
-
-router.get('/', (req, res) => res.send('Hello world'));
 
 // Player routes
 router.post('/players/auth', PlayerController.auth);
@@ -32,6 +31,12 @@ router.put(
 );
 
 // Game routes
+router.get(
+  '/games/find/:gameId',
+  passport.authenticate('jwt', { session: false }),
+  GameController.find
+);
+
 router.get(
   '/games/start',
   passport.authenticate('jwt', { session: false }),
@@ -97,6 +102,13 @@ router.post(
   '/shop/get-improvement-province-price',
   passport.authenticate('jwt', { session: false }),
   ShopController.getProvincesImprovementPrice
+);
+
+// Country routes
+router.get(
+  '/countries/provinces/:mapRef',
+  passport.authenticate('jwt', { session: false }),
+  CountryController.getProvince
 );
 
 export { router };

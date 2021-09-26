@@ -1,27 +1,27 @@
 import { Request, Response } from 'express';
+import { HttpResponseHelper } from '../../helpers/http-response.helper';
+import { CountryService } from './country.service';
 
 export class CountryController {
-  static async changeFocus(req: Request, res: Response) {}
+  static async getProvince(req: Request, res: Response) {
+    const serviceData = await CountryService.getProvince({
+      provinceMapRef: req.params.mapRef,
+      playerId: req.user.id,
+      gameId: req.headers['game-id'] as string,
+    });
 
-  static async createCoalition(req: Request, res: Response) {}
+    if (serviceData.error) {
+      return HttpResponseHelper.badRequest({
+        res,
+        message: serviceData.message,
+        data: serviceData.data,
+      });
+    }
 
-  static async declareWar(req: Request, res: Response) {}
-
-  static async dismissArmy(req: Request, res: Response) {}
-
-  static async guaranteeIndependence(req: Request, res: Response) {}
-
-  static async improveRelations(req: Request, res: Response) {}
-
-  static async joinWar(req: Request, res: Response) {}
-
-  static async removeIndependenceGuarantee(req: Request, res: Response) {}
-
-  static async requestAlly(req: Request, res: Response) {}
-
-  static async sendInsult(req: Request, res: Response) {}
-
-  static async shop(req: Request, res: Response) {}
-
-  static async stopRelationsImprovement(req: Request, res: Response) {}
+    return HttpResponseHelper.success({
+      res,
+      message: serviceData.message,
+      data: serviceData.data,
+    });
+  }
 }

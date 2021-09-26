@@ -45,12 +45,18 @@ export type WarMessage = {
   iconColor: string;
 };
 
+export enum PeaceRequestType {
+  OFFER = 'OFFER',
+  DEMAND = 'DEMAND',
+}
+
 export type PeaceRequest = {
-  offerS?: Offer[];
-  demandS?: Demand[];
+  offers?: Offer[];
+  demands?: Demand[];
 };
 
 export type Offer = {
+  peaceRequestType: PeaceRequestType;
   type: OfferType;
   economy?: Economy;
   resources: Resource;
@@ -58,6 +64,7 @@ export type Offer = {
 };
 
 export type Demand = {
+  peaceRequestType: PeaceRequestType;
   type: DemandType;
   economy?: Economy;
   resources: Resource;

@@ -1,3 +1,4 @@
+import { v4 } from 'uuid';
 import {
   ErrorResponse,
   ResponseHelper,
@@ -52,11 +53,13 @@ export async function requestPeaceAction(
   }
 
   const decision: Decision = {
+    id: v4(),
     types: [
       DecisionType.ACCEPT_PEACE_REQUEST,
       DecisionType.REFUSE_PEACE_REQUEST,
     ],
     data: {
+      warId: war.id,
       peaceRequest: data.peaceRequest,
     },
   };
@@ -64,10 +67,20 @@ export async function requestPeaceAction(
   let targetName = '{targetName}';
   if (war.details.attacker.id === country.id) {
     // Send peace request to victim
+    decision.target = {
+      id: victim.id,
+      flag: victim.flag,
+      name: victim.name,
+    };
     victim.decisions.push(decision);
     targetName = victim.name;
   } else {
     // Send peace request to attacker
+    decision.target = {
+      id: attacker.id,
+      flag: attacker.flag,
+      name: attacker.name,
+    };
     attacker.decisions.push(decision);
     targetName = attacker.name;
   }

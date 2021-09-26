@@ -1,3 +1,4 @@
+import { colors } from '../data/templates/colors.template';
 import { CountryPassive } from '../data/templates/country-passives.template';
 import { Focus } from '../data/templates/focuses.template';
 import { Personality } from '../data/templates/personalities.template';
@@ -17,9 +18,18 @@ import {
 } from '../modules/country/country.typing';
 import { GameHelper } from './game.helper';
 import { GeneralHelper } from './general.helper';
+import { MathHelper } from './math.helper';
 
 export class V1CountryHelper {
   static getPreparedCountries(countriesV1: CountryV1[]) {
+    const inUseColors = countriesV1
+      .filter((country) => country.colour && country.colour != '#FFFFFF')
+      ?.map((country) => country.colour);
+
+    const availableColors = [
+      ...colors.filter((color) => !inUseColors.includes(color)),
+    ];
+
     const countries: Country[] = countriesV1.map((country) => {
       const aggressiveness: Aggressiveness = {
         current: country.aggressiveness || 0,
@@ -56,10 +66,12 @@ export class V1CountryHelper {
         passives.push(passive);
       }
 
-      // const provinces: Province[] = country.provinces as unknown as Province[] || []
       const provinces: Province[] = GameHelper.getParsedCountryProvinces({
         provinces: country.provinces,
       });
+
+      const colorIndex = MathHelper.getRandomIndex(availableColors);
+      const color = availableColors[colorIndex];
 
       const preparedCountry: Country = {
         army: country.army as Army,
@@ -68,6 +80,7 @@ export class V1CountryHelper {
         name: country.name,
         tag: country.tag,
         flag: country.img,
+        color,
         personality,
         focus,
         aggressiveness,
@@ -86,8 +99,10 @@ export class V1CountryHelper {
         ...countryLegacyDataSupport,
       };
 
-      if (country.colour) {
+      if (country.colour && country.colour !== '#FFFFFF') {
         preparedCountry.color = country.colour;
+      } else {
+        availableColors.splice(colorIndex, 1);
       }
 
       return preparedCountry;

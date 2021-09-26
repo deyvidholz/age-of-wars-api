@@ -215,6 +215,7 @@ export class GameHelper {
         oilProduction: province.oilProduction,
         passives,
         description: province.description || null,
+        incoming: {},
       } as Province;
     });
   }

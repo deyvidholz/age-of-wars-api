@@ -1,3 +1,4 @@
+import { v4 } from 'uuid';
 import {
   ErrorResponse,
   ResponseHelper,
@@ -39,6 +40,7 @@ export async function requestAllyAction(
   }
 
   const decision: Decision = {
+    id: v4(),
     types: [DecisionType.ACCEPT_ALLY_REQUEST, DecisionType.REFUSE_ALLY_REQUEST],
     requester: {
       flag: country.flag,

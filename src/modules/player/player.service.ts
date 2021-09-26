@@ -72,6 +72,7 @@ export class PlayerService {
     return ResponseHelper.success({
       message: 'Successfully authenticated',
       data: {
+        playerId: player.id,
         jwt: {
           token,
           expiration: decoded.exp,

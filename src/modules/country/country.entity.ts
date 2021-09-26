@@ -357,4 +357,16 @@ export class Country {
       total,
     };
   }
+
+  isControlledByPlayer(playerId?: string): boolean {
+    if (this.isAi) {
+      return false;
+    }
+
+    if (playerId) {
+      return this.owner.id === playerId;
+    }
+
+    return true;
+  }
 }

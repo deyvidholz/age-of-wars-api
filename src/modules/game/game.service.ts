@@ -60,7 +60,25 @@ export class GameService {
 
     return ResponseHelper.success({
       message: 'Game created successfully',
-      data: game,
+      data: { game },
+    });
+  }
+
+  static async find(data: FindParam) {
+    const game = await gameRepository().findOne({
+      id: data.gameId,
+      owner: { id: data.playerId },
+    });
+
+    if (!game) {
+      return ResponseHelper.error({
+        message: `Game not found`,
+        data,
+      });
+    }
+
+    return ResponseHelper.success({
+      data: { game },
     });
   }
 
@@ -357,6 +375,11 @@ type CreateParam = {
     name: string;
     options?: GameOptions;
   };
+};
+
+type FindParam = {
+  playerId: string;
+  gameId: string;
 };
 
 type DeleteParam = {
