@@ -1758,55 +1758,7 @@ export const countriesWorldAOWV1: CountryV1[] = [
     messages: [],
     demands_rights: [],
   },
-  {
-    id: 'BS',
-    tag: 'BHS',
-    name: 'The Bahamas',
-    img: 'bahamas.png',
-    owner: 'IA',
-    colour: '#FFFFFF',
-    army: {
-      divisions: 0,
-      aircrafts: 0,
-      warships: 0,
-    },
-    info: {
-      continent: Continent.NORTH_AMERICA,
-    },
-    levels: {
-      tech_military: 10,
-    },
-    economy: {
-      money: 0,
-    },
-    passives: [{ type: CountryPassiveTypeV1.INCOMING, amount: 40 }],
-    provinces: [
-      {
-        id: 'BS',
-        name: 'Nassau',
-        capital: true,
-        oilProduction: 6,
-        details: {
-          population: 1000000,
-        },
-        development: {
-          production: 2,
-          taxation: 2,
-        },
-        passives: [],
-        hasCoast: true,
-        hasIslands: true,
-        isIsland: true,
-      },
-    ],
-    allies: [],
-    enemies: [],
-    inWarWith: [],
-    opinions: [],
-    actions: [],
-    messages: [],
-    demands_rights: [],
-  },
+
   {
     id: 'JM',
     tag: 'JAM',
@@ -10632,7 +10584,7 @@ export const countriesWorldAOWV1: CountryV1[] = [
     actions: [],
     messages: [],
     demands_rights: [],
-    guaranteeing_of: ['Andorra'],
+    guaranteeing_of: [],
   },
 
   {
@@ -11004,56 +10956,7 @@ export const countriesWorldAOWV1: CountryV1[] = [
     actions: [],
     messages: [],
     demands_rights: [],
-    guaranteeing_of: ['Andorra'],
-  },
-
-  {
-    id: 'AD',
-    tag: 'AND',
-    name: 'Andorra',
-    img: 'andorra.png',
-    owner: 'IA',
-    colour: '#FFFFFF',
-    army: {
-      divisions: 1,
-      aircrafts: 2,
-      warships: 0,
-    },
-    info: {
-      continent: Continent.EUROPE,
-    },
-    levels: {
-      tech_military: 10,
-    },
-    economy: {
-      money: 0,
-    },
-    passives: [{ type: CountryPassiveTypeV1.INCOMING, amount: 433 }],
-    provinces: [
-      {
-        id: 'AD',
-        img: 'pamplona.jpg',
-        name: 'Pamplona',
-        capital: true,
-        oilProduction: 3,
-        details: {
-          population: 1000000,
-        },
-        development: {
-          production: 10,
-          taxation: 10,
-        },
-        passives: [{ type: 'increase_incoming', amount: 2 }],
-      },
-    ],
-    allies: [],
-    enemies: [],
-    inWarWith: [],
-    opinions: [],
-    actions: [],
-    messages: [],
-    demands_rights: [],
-    guaranteeing: ['France', 'Spain'],
+    guaranteeing_of: [],
   },
 
   {
