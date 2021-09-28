@@ -33,6 +33,10 @@ export type Economy = {
   balance: number;
 };
 
+export type Production = {
+  oil: number;
+};
+
 export type Resource = {
   oil: number;
 };
@@ -56,7 +60,9 @@ export type CountrySimplified = {
   name: string;
 };
 
-export type Incoming = Economy & Resource;
+export type Incoming = Economy & Resource & { name?: string };
+
+export type ProvinceIncoming = Incoming & ProvinceLevels & { mapRef?: string };
 
 export type ProvinceLevels = {
   production: number;

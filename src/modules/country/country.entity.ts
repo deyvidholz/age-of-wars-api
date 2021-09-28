@@ -1,4 +1,11 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { CountryPassive } from '../../data/templates/country-passives.template';
 import { economicFocus, Focus } from '../../data/templates/focuses.template';
 import {
@@ -24,7 +31,9 @@ import {
   Message,
   MilitaryPower,
   Opinions,
+  Production,
   Province,
+  ProvinceIncoming,
   Resource,
   SetOpinionOfActionParam,
 } from './country.typing';
@@ -170,13 +179,13 @@ export class Country {
     type: 'json',
     default: '{}',
   })
-  militaryPower?: MilitaryPower[];
+  militaryPower?: MilitaryPower;
 
   @Column({
     type: 'json',
     default: '{}',
   })
-  incoming?: Incoming[];
+  incoming?: Incoming;
 
   @Column({ default: 0 })
   totalProvinces?: number;
@@ -194,6 +203,13 @@ export class Country {
   updateEstimatedArmy() {
     let minPercentage = 7;
     let maxPercentage = 7;
+
+    this.estimatedArmy = {
+      aircrafts: 0,
+      divisions: 0,
+      tanks: 0,
+      warships: 0,
+    };
 
     const keys = Object.keys(this.estimatedArmy);
 
@@ -337,27 +353,6 @@ export class Country {
     };
   }
 
-  getMilitaryPower(): MilitaryPower {
-    const mpSum = {
-      aircrafts: this.army.aircrafts * 4.75,
-      divisions: this.army.divisions * 1.88,
-      tanks: this.army.tanks * 2.42,
-      warships: this.army.warships * 5.9,
-    };
-
-    const total = MathHelper.sumNumbers(
-      mpSum.aircrafts,
-      mpSum.divisions,
-      mpSum.tanks,
-      mpSum.warships
-    );
-
-    return {
-      ...mpSum,
-      total,
-    };
-  }
-
   isControlledByPlayer(playerId?: string): boolean {
     if (this.isAi) {
       return false;
@@ -368,5 +363,65 @@ export class Country {
     }
 
     return true;
+  }
+
+  getMilitaryPower(): MilitaryPower {
+    return CountryHelper.getMilitaryPower(this.army);
+  }
+
+  getIncoming(): { incoming: Incoming; provincesIncoming: ProvinceIncoming[] } {
+    return CountryHelper.getIncoming({
+      passives: this.passives,
+      provinces: this.provinces,
+      focus: this.focus,
+      personality: this.personality,
+    });
+  }
+
+  @BeforeInsert()
+  private beforeInsert() {
+    this.beforeChange();
+  }
+
+  @BeforeUpdate()
+  private beforeUpdate() {
+    this.beforeChange();
+  }
+
+  private beforeChange() {
+    const incomings = this.getIncoming();
+
+    for (const province of this.provinces) {
+      const incoming = incomings.provincesIncoming.find(
+        (i) => i.mapRef === province.mapRef
+      );
+
+      // Removing unnecessary properties
+      delete incoming.mapRef;
+      delete incoming.name;
+
+      province.incoming = incoming;
+
+      if (!incoming) {
+        province.incoming = CountryHelper.getProvinceIncoming({
+          levels: province.levels,
+          oilProduction: province.oilProduction,
+          passives: province.passives,
+        });
+      }
+    }
+
+    this.economy.balance += incomings.incoming.balance;
+    this.resources.oil += this.incoming.oil;
+
+    if (this.name === 'Brazil') {
+      console.log('this.economy.balance', this.economy.balance);
+    }
+
+    this.incoming = incomings.incoming;
+    this.militaryPower = this.getMilitaryPower();
+    this.economy.balance = this.incoming.balance;
+
+    this.updateEstimatedArmy();
   }
 }

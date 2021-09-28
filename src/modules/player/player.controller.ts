@@ -47,6 +47,7 @@ export class PlayerController {
   static async update(req: Request, res: Response) {
     const serviceData = await PlayerService.update({
       ...req.body,
+      id: req.user.id,
     });
 
     if (serviceData.error) {

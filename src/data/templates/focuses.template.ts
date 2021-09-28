@@ -28,7 +28,7 @@ export const focusesConfig = {
 export const economicFocus: Focus = {
   type: FocusType.ECONOMY,
   name: 'Economic',
-  color: 'green',
+  color: '#00E676',
   icon: 'mdi-cash',
   description: '',
   passives: [
@@ -44,7 +44,7 @@ export const economicFocus: Focus = {
 export const warFocus: Focus = {
   type: FocusType.WAR,
   name: 'War',
-  color: 'red',
+  color: '#F44336',
   icon: 'mdi-pistol',
   description: '',
   passives: [
@@ -72,7 +72,7 @@ export const warFocus: Focus = {
 export const defensiveFocus: Focus = {
   type: FocusType.DEFENSE,
   name: 'Defensive',
-  color: 'blue',
+  color: '#2196F3',
   icon: 'mdi-shield',
   description: '',
   passives: [
@@ -94,7 +94,7 @@ export const defensiveFocus: Focus = {
 export const strategicFocus: Focus = {
   type: FocusType.STRATEGY,
   name: 'Strategic',
-  color: 'orange',
+  color: '#FF9800',
   icon: 'mdi-lightbulb',
   description: '',
   passives: [

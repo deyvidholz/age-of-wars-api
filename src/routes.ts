@@ -38,13 +38,13 @@ router.get(
 );
 
 router.get(
-  '/games/start',
+  '/games/start/:gameId',
   passport.authenticate('jwt', { session: false }),
   GameController.startGame
 );
 
 router.get(
-  '/games/start-picking-phase',
+  '/games/start-picking-phase/:gameId',
   passport.authenticate('jwt', { session: false }),
   GameController.startPickingPhase
 );

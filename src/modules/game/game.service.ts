@@ -116,7 +116,7 @@ export class GameService {
     });
 
     return ResponseHelper.success({
-      data: games,
+      data: { games },
     });
   }
 
@@ -166,12 +166,12 @@ export class GameService {
       return country;
     });
 
-    await playerRepository().save(game.players);
+    await playerRepository().save([...game.players, game.owner]);
     await gameRepository().save(game);
 
     return ResponseHelper.success({
       message: 'Game started',
-      data: game,
+      data: { game },
     });
   }
 
@@ -196,16 +196,18 @@ export class GameService {
 
     game.stage = GameStage.PICKING_PHASE;
     game.owner.alreadyPlayed = false;
+
     game.countries = game.countries.map((country: Country) => {
       country.isAi = true;
       country.owner = null;
       return country;
     });
+
     await gameRepository().save(game);
 
     return ResponseHelper.success({
       message: 'Started picking phase successfully',
-      data: game,
+      data: { game },
     });
   }
 
@@ -233,7 +235,7 @@ export class GameService {
 
     return ResponseHelper.success({
       message: `Game is now on stage ${game.stageCount}`,
-      data: game,
+      data: { game },
     });
   }
 
@@ -364,7 +366,7 @@ export class GameService {
 
     return ResponseHelper.success({
       message: `Player ${player.nickname} called next turn`,
-      data: game,
+      data: { game },
     });
   }
 }

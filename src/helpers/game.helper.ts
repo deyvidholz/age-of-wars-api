@@ -96,32 +96,6 @@ export class GameHelper {
     return opinions;
   }
 
-  static getEstimatedArmies(data: ArmyParam): EstimatedArmy {
-    const min = -10;
-    const max = 10;
-
-    const estimated = {
-      divisions: MathHelper.getEstimated(min, max, data.army.divisions),
-      tanks: MathHelper.getEstimated(min, max, data.army.tanks),
-      aircrafts: MathHelper.getEstimated(min, max, data.army.aircrafts),
-      warships: MathHelper.getEstimated(min, max, data.army.warships),
-    };
-
-    // Preventing negative armies
-    Object.keys(estimated).forEach((key) => {
-      if (estimated[key] < 0) {
-        estimated[key] = 0;
-      }
-    });
-
-    return {
-      divisions: estimated.divisions,
-      tanks: estimated.tanks,
-      aircrafts: estimated.aircrafts,
-      warships: estimated.warships,
-    };
-  }
-
   static getSimplifiedCountry(
     data: GetSimplifiedCountryParam
   ): CountrySimplified {
@@ -195,7 +169,7 @@ export class GameHelper {
         });
 
         if (!passive) {
-          return null;
+          continue;
         }
 
         passives.push(passive);
@@ -212,7 +186,7 @@ export class GameHelper {
         },
         mapRef: province.id,
         name: province.name,
-        oilProduction: province.oilProduction,
+        oilProduction: province.oilProduction || 0,
         passives,
         description: province.description || null,
         incoming: {},

@@ -13,6 +13,7 @@ import {
   Army,
   Continent,
   Economy,
+  Production,
   Province,
   Resource,
 } from '../modules/country/country.typing';

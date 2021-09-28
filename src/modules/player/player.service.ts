@@ -126,7 +126,7 @@ export class PlayerService {
         'games',
         'countries',
       ],
-      where: { username: data.username },
+      where: { id: data.id },
       relations: [],
     });
 
@@ -212,7 +212,7 @@ export class PlayerService {
 
       return ResponseHelper.success({
         message: `Player ${player.nickname} joined the game`,
-        data: game,
+        data: { game },
       });
     }
 
@@ -283,6 +283,16 @@ export class PlayerService {
       });
     }
 
+    const currentCountry = game.countries.find(
+      (country) => !country.isAi && country.owner.id === player.id
+    );
+
+    if (currentCountry) {
+      return ResponseHelper.error({
+        message: `You already picked a country (${currentCountry.name})`,
+      });
+    }
+
     const country: Country = game.countries.find(
       (country: Country) => country.isAi && country.id === data.countryId
     );
@@ -300,11 +310,27 @@ export class PlayerService {
     country.isAi = false;
     country.owner = player;
 
+    const countryWithoutProvinces = { ...country, provinces: [] };
+
     await gameRepository().save(game);
+
+    const availableCountries = game.countries
+      .filter((country) => country.isAi)
+      .map((country) => {
+        country.provinces = [];
+        return country;
+      });
+
+    const availableColors = availableCountries.map((country) => country.color);
 
     return ResponseHelper.success({
       message: `Player ${player.nickname} picked ${country.name}`,
-      data: game,
+      data: {
+        country: countryWithoutProvinces,
+        game,
+        availableCountries,
+        availableColors,
+      },
     });
   }
 }
@@ -321,7 +347,7 @@ type CreateParam = {
 };
 
 type UpdateParam = {
-  username: string;
+  id: string;
   nickname: string;
   password: string;
   currentPassword: string;

@@ -75,9 +75,9 @@ export class GameController {
     });
 
     if (req.query['only-id'] !== undefined) {
-      serviceData.data = serviceData.data.map((game) => game.id);
+      serviceData.data.games = serviceData.data.games.map((game) => game.id);
     } else if (req.query['simplified'] !== undefined) {
-      serviceData.data = (serviceData.data as Game[]).map(
+      serviceData.data.games = (serviceData.data.games as Game[]).map(
         (game) =>
           ({
             id: game.id,
@@ -108,7 +108,7 @@ export class GameController {
   static async startGame(req: Request, res: Response) {
     const serviceData = await GameService.startGame({
       playerId: req.user.id,
-      gameId: req.headers['game-id'] as string,
+      gameId: req.params.gameId,
     });
 
     if (serviceData.error) {
@@ -129,7 +129,7 @@ export class GameController {
   static async startPickingPhase(req: Request, res: Response) {
     const serviceData = await GameService.startPickingPhase({
       playerId: req.user.id,
-      gameId: req.headers['game-id'] as string,
+      gameId: req.params.gameId,
     });
 
     if (serviceData.error) {
