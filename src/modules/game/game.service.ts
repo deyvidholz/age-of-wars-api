@@ -375,6 +375,7 @@ type CreateParam = {
   playerId: string;
   game: {
     name: string;
+    password?: string;
     options?: GameOptions;
   };
 };

@@ -50,10 +50,10 @@ export class CountryHelper {
 
     const mp: MilitaryPower = {
       total: 0,
-      aircrafts: army.aircrafts * mpPerAircraft,
-      divisions: army.divisions * mpPerDivision,
-      tanks: army.tanks * mpPerTank,
-      warships: army.warships * mpPerWarship,
+      aircrafts: (army.aircrafts || 0) * mpPerAircraft,
+      divisions: (army.divisions || 0) * mpPerDivision,
+      tanks: (army.tanks || 0) * mpPerTank,
+      warships: (army.warships || 0) * mpPerWarship,
     };
 
     mp.total = MathHelper.sumNumbers(

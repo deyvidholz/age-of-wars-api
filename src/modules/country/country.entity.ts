@@ -411,17 +411,16 @@ export class Country {
       }
     }
 
-    this.economy.balance += incomings.incoming.balance;
-    this.resources.oil += this.incoming.oil;
-
-    if (this.name === 'Brazil') {
-      console.log('this.economy.balance', this.economy.balance);
-    }
-
     this.incoming = incomings.incoming;
     this.militaryPower = this.getMilitaryPower();
-    this.economy.balance = this.incoming.balance;
 
     this.updateEstimatedArmy();
+  }
+
+  reduceAggressiveness(value) {
+    this.aggressiveness.current += value;
+    if (this.aggressiveness.current < 0) {
+      this.aggressiveness.current = 0;
+    }
   }
 }

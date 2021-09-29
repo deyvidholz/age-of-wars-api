@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import {
   ErrorResponse,
   ResponseHelper,
@@ -16,7 +17,14 @@ import { shopAction } from './services/shop-action.service';
 
 export class ActionService {
   static async runActions(data: RunActionsParam) {
+    const aggressivenessReduction =
+      +process.env.AGGRESSIVENESS_REDUCTION_PER_STAGE;
+
     for (const country of data.game.countries) {
+      country.economy.balance += country.incoming.balance || 0;
+      country.resources.oil += country.incoming.oil || 0;
+      country.reduceAggressiveness(aggressivenessReduction);
+
       country.messages = [];
 
       if (!country.actions.length) {

@@ -4367,22 +4367,6 @@ export const countriesWorldAOWV1: CountryV1[] = [
         hasCoast: true,
         hasIslands: true,
       },
-      {
-        id: 'KR-49',
-        name: 'Jeju',
-        capital: false,
-        details: {
-          population: 1000000,
-        },
-        development: {
-          production: 32,
-          taxation: 32,
-        },
-        passives: [],
-        hasCoast: true,
-        hasIslands: true,
-        isIsland: true,
-      },
     ],
     allies: [],
     enemies: [],
@@ -5677,54 +5661,54 @@ export const countriesWorldAOWV1: CountryV1[] = [
     messages: [],
     demands_rights: [],
   },
-  {
-    id: 'BN',
-    tag: 'BRN',
-    name: 'Brunei',
-    img: 'brunei.png',
-    owner: 'IA',
-    colour: '#FFFFFF',
-    army: {
-      divisions: 0,
-      aircrafts: 0,
-      warships: 0,
-    },
-    info: {
-      continent: Continent.ASIA,
-    },
-    levels: {
-      tech_military: 10,
-    },
-    economy: {
-      money: 0,
-    },
-    passives: [{ type: CountryPassiveTypeV1.INCOMING, amount: 30 }],
-    provinces: [
-      {
-        id: 'BN',
-        name: 'Bandar Seri Begawan',
-        capital: true,
-        oilProduction: 14,
-        details: {
-          population: 1000000,
-        },
-        development: {
-          production: 12,
-          taxation: 16,
-        },
-        passives: [],
-        hasCoast: true,
-        hasIslands: true,
-      },
-    ],
-    allies: [],
-    enemies: [],
-    inWarWith: [],
-    opinions: [],
-    actions: [],
-    messages: [],
-    demands_rights: [],
-  },
+  // {
+  //   id: 'BN',
+  //   tag: 'BRN',
+  //   name: 'Brunei',
+  //   img: 'brunei.png',
+  //   owner: 'IA',
+  //   colour: '#FFFFFF',
+  //   army: {
+  //     divisions: 0,
+  //     aircrafts: 0,
+  //     warships: 0,
+  //   },
+  //   info: {
+  //     continent: Continent.ASIA,
+  //   },
+  //   levels: {
+  //     tech_military: 10,
+  //   },
+  //   economy: {
+  //     money: 0,
+  //   },
+  //   passives: [{ type: CountryPassiveTypeV1.INCOMING, amount: 30 }],
+  //   provinces: [
+  //     {
+  //       id: 'BN',
+  //       name: 'Bandar Seri Begawan',
+  //       capital: true,
+  //       oilProduction: 14,
+  //       details: {
+  //         population: 1000000,
+  //       },
+  //       development: {
+  //         production: 12,
+  //         taxation: 16,
+  //       },
+  //       passives: [],
+  //       hasCoast: true,
+  //       hasIslands: true,
+  //     },
+  //   ],
+  //   allies: [],
+  //   enemies: [],
+  //   inWarWith: [],
+  //   opinions: [],
+  //   actions: [],
+  //   messages: [],
+  //   demands_rights: [],
+  // },
   /*{
     id: 'SG',
     tag: 'SGP',
@@ -14241,51 +14225,6 @@ export const countriesWorldAOWV1: CountryV1[] = [
         },
         passives: [{ type: 'increase_incoming', amount: 10 }],
       },
-      {
-        id: 'GR-F',
-        name: 'Ionian Islands',
-        capital: false,
-        details: {
-          population: 1000000,
-        },
-        development: {
-          production: 13,
-          taxation: 13,
-        },
-        passives: [],
-        hasCoast: true,
-        isIsland: true,
-      },
-      {
-        id: 'GR-K',
-        name: 'North Aegian',
-        capital: false,
-        details: {
-          population: 1000000,
-        },
-        development: {
-          production: 12,
-          taxation: 15,
-        },
-        passives: [],
-        hasCoast: true,
-        isIsland: true,
-      },
-      {
-        id: 'GR-L',
-        name: 'South Aegian',
-        capital: false,
-        details: {
-          population: 1000000,
-        },
-        development: {
-          production: 13,
-          taxation: 16,
-        },
-        passives: [],
-        hasCoast: true,
-        isIsland: true,
-      },
     ],
     opinions: [{ name: 'Turkey', opinion: -187 }],
   },
@@ -16548,21 +16487,6 @@ export const countriesWorldAOWV1: CountryV1[] = [
         passives: [],
       },
       {
-        id: 'EG-KFS',
-        name: 'Al Ismailiyah',
-        capital: false,
-        oilProduction: 45,
-        details: {
-          population: 1000000,
-        },
-        development: {
-          production: 26,
-          taxation: 20,
-        },
-        passives: [],
-        hasCoast: true,
-      },
-      {
         id: 'EG-BH',
         name: 'Al Buhayrah',
         capital: false,
@@ -16573,21 +16497,6 @@ export const countriesWorldAOWV1: CountryV1[] = [
         development: {
           production: 25,
           taxation: 25,
-        },
-        passives: [],
-        hasCoast: true,
-      },
-      {
-        id: 'EG-ALX',
-        name: 'Al Iskandariyah',
-        capital: false,
-        oilProduction: 45,
-        details: {
-          population: 1000000,
-        },
-        development: {
-          production: 30,
-          taxation: 27,
         },
         passives: [],
         hasCoast: true,

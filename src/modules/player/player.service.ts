@@ -306,13 +306,20 @@ export class PlayerService {
       });
     }
 
+    if (game.options.blacklistedCountries.includes(country.name)) {
+      return ResponseHelper.error({
+        message: 'This country is not allowed to pick',
+        data: {
+          blacklistedCountries: game.options.blacklistedCountries,
+        },
+      });
+    }
+
     player.alreadyPlayed = true;
     country.isAi = false;
     country.owner = player;
 
-    const countryWithoutProvinces = { ...country, provinces: [] };
-
-    await gameRepository().save(game);
+    const totalPlayers = game.players.length + 1;
 
     const availableCountries = game.countries
       .filter((country) => country.isAi)
@@ -320,6 +327,23 @@ export class PlayerService {
         country.provinces = [];
         return country;
       });
+
+    if (game.options.maxPlayers === -1) {
+      if (totalPlayers >= availableCountries.length) {
+        return ResponseHelper.error({
+          message: 'Players limit reached',
+        });
+      }
+    } else if (totalPlayers >= game.options.maxPlayers) {
+      return ResponseHelper.error({
+        message: 'Players limit reached',
+      });
+    }
+
+    const countryWithoutProvinces = { ...country, provinces: [] };
+
+    game.setNextTurn();
+    await gameRepository().save(game);
 
     const availableColors = availableCountries.map((country) => country.color);
 

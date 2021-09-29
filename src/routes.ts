@@ -111,4 +111,13 @@ router.get(
   CountryController.getProvince
 );
 
+router.get(
+  '/countries/rankings/:rankingType/:countryId?',
+  passport.authenticate('jwt', { session: false }),
+  CountryController.getCountriesSortedByRanking
+);
+
+// Others
+router.get('/available-countries', CountryController.getV1AvailabeCountries);
+
 export { router };
