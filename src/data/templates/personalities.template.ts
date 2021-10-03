@@ -5,9 +5,9 @@ import {
 } from './country-passives.template';
 
 export enum PersonalityType {
-  AGGRESSIVE = 'Aggressive',
-  NEUTRAL = 'Neutral',
-  PACIFIC = 'Pacific',
+  AGGRESSIVE = 'AGGRESSIVE',
+  NEUTRAL = 'NEUTRAL',
+  PACIFIC = 'PACIFIC',
 }
 
 export type Personality = {
@@ -22,7 +22,7 @@ export const personalitiesConfig = {
   propertyName: 'personalities',
 };
 
-export const pacificPersonality = {
+export const pacificPersonality: Personality = {
   type: PersonalityType.PACIFIC,
   color: '#2196F3',
   icon: 'mdi-charity',
@@ -31,18 +31,19 @@ export const pacificPersonality = {
       type: CountryPassiveType.INCREASE_TARGET_AGGRESSION_WHEN_ATTACKED,
       valueType: CountryPassiveValueType.STATIC,
       value: 200,
+      description: 'Increase aggression of attacker by +200',
     },
   ],
 };
 
-export const neutralPersonality = {
+export const neutralPersonality: Personality = {
   type: PersonalityType.NEUTRAL,
   color: '#FDD835',
   icon: 'mdi-axis-arrow',
   passives: [],
 };
 
-export const aggressivePersonality = {
+export const aggressivePersonality: Personality = {
   type: PersonalityType.AGGRESSIVE,
   color: '#C62828',
   icon: 'mdi-fire',
@@ -51,6 +52,7 @@ export const aggressivePersonality = {
       type: CountryPassiveType.INCREASE_AGGRESSION_WHEN_ATTACK,
       valueType: CountryPassiveValueType.PERCENT,
       value: 30,
+      description: 'Increase aggression when attack by +30',
     },
   ],
 };

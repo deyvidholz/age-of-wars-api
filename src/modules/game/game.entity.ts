@@ -43,8 +43,7 @@ export class Game {
   })
   countries: Country[];
 
-  @ManyToMany(() => War, { eager: true })
-  @JoinTable()
+  @OneToMany(() => War, (war) => war.game, { eager: true })
   wars: War[];
 
   @Column({
@@ -97,5 +96,10 @@ export class Game {
     await ActionService.runActions({
       game: this,
     });
+
+    console.log('');
+    console.log('');
+    console.log('');
+    console.log('gwars', this.wars);
   }
 }

@@ -41,7 +41,7 @@ export class ActionService {
               country,
               callToWar: action.data?.callToWar || [],
               game: data.game,
-              targetId: action.targetId,
+              targetId: action.data?.targetId,
             });
             break;
 
@@ -115,6 +115,14 @@ export class ActionService {
               country,
               game: data.game,
               order: action.data?.order,
+            });
+            break;
+
+          case ActionType.GUARANTEE_INDEPENDENCE:
+            response = await requestAllyAction({
+              country,
+              game: data.game,
+              targetId: action.data?.targetId,
             });
             break;
         }

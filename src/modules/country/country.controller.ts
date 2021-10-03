@@ -52,15 +52,123 @@ export class CountryController {
     });
   }
 
-  static getV1AvailabeCountries(req: Request, res: Response) {
-    const countries = countriesWorldAOWV1.map((country) => country.name);
-    countries.sort((a: any, b: any) => b.name - a.name);
+  static async getV1AvailabeCountries(req: Request, res: Response) {
+    const serviceData = await CountryService.getV1AvailabeCountries();
+
+    if (serviceData.error) {
+      return HttpResponseHelper.badRequest({
+        res,
+        message: serviceData.message,
+        data: serviceData.data,
+      });
+    }
 
     return HttpResponseHelper.success({
       res,
-      data: {
-        countries,
-      },
+      message: serviceData.message,
+      data: serviceData.data,
+    });
+  }
+
+  static async getAvailableFocuses(req: Request, res: Response) {
+    const serviceData = await CountryService.getAvailableFocuses();
+
+    if (serviceData.error) {
+      return HttpResponseHelper.badRequest({
+        res,
+        message: serviceData.message,
+        data: serviceData.data,
+      });
+    }
+
+    return HttpResponseHelper.success({
+      res,
+      message: serviceData.message,
+      data: serviceData.data,
+    });
+  }
+
+  static async getAvailablePersonalities(req: Request, res: Response) {
+    const serviceData = await CountryService.getAvailablePersonalities();
+
+    if (serviceData.error) {
+      return HttpResponseHelper.badRequest({
+        res,
+        message: serviceData.message,
+        data: serviceData.data,
+      });
+    }
+
+    return HttpResponseHelper.success({
+      res,
+      message: serviceData.message,
+      data: serviceData.data,
+    });
+  }
+
+  static async getCountry(req: Request, res: Response) {
+    const serviceData = await CountryService.getCountry({
+      playerId: req.user.id,
+      gameId: req.headers['game-id'] as string,
+      countryId: req.params.countryId,
+    });
+
+    if (serviceData.error) {
+      return HttpResponseHelper.badRequest({
+        res,
+        message: serviceData.message,
+        data: serviceData.data,
+      });
+    }
+
+    return HttpResponseHelper.success({
+      res,
+      message: serviceData.message,
+      data: serviceData.data,
+    });
+  }
+
+  static async getWarSimulation(req: Request, res: Response) {
+    const serviceData = await CountryService.getWarSimulation({
+      ...req.body,
+      playerId: req.user.id,
+      gameId: req.headers['game-id'] as string,
+    });
+
+    if (serviceData.error) {
+      return HttpResponseHelper.badRequest({
+        res,
+        message: serviceData.message,
+        data: serviceData.data,
+      });
+    }
+
+    return HttpResponseHelper.success({
+      res,
+      message: serviceData.message,
+      data: serviceData.data,
+    });
+  }
+
+  static async getCountries(req: Request, res: Response) {
+    const serviceData = await CountryService.getCountries({
+      ...req.body,
+      playerId: req.user.id,
+      gameId: req.headers['game-id'] as string,
+    });
+
+    if (serviceData.error) {
+      return HttpResponseHelper.badRequest({
+        res,
+        message: serviceData.message,
+        data: serviceData.data,
+      });
+    }
+
+    return HttpResponseHelper.success({
+      res,
+      message: serviceData.message,
+      data: serviceData.data,
     });
   }
 }

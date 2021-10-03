@@ -413,12 +413,27 @@ export class Country {
 
     this.incoming = incomings.incoming;
     this.militaryPower = this.getMilitaryPower();
+    this.totalProvinces = this.provinces.length;
 
     this.updateEstimatedArmy();
   }
 
-  reduceAggressiveness(value) {
+  addAggressiveness(value: number) {
+    if (value < 0) {
+      value = Math.abs(value);
+    }
+
     this.aggressiveness.current += value;
+    this.aggressiveness.total += value;
+  }
+
+  reduceAggressiveness(value: number) {
+    if (value > 0) {
+      value = -Math.abs(value);
+    }
+
+    this.aggressiveness.current += value;
+
     if (this.aggressiveness.current < 0) {
       this.aggressiveness.current = 0;
     }

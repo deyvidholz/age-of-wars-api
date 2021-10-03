@@ -13,7 +13,7 @@ export enum ItemPrice {
   TANKS = 980,
   AIRCRAFTS = 1375,
   WARSHIPS = 1215,
-  OIL = 975,
+  OIL = 25,
 }
 
 export type Item = {

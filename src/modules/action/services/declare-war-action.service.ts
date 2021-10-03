@@ -165,7 +165,6 @@ export async function declareWarAction(
   const war: War = warRepository().create({
     endAtStage,
     startAtStage,
-    gameId: game.id,
     details: {
       attacker: {
         flag: country.flag,
@@ -182,11 +181,15 @@ export async function declareWarAction(
         losses: { ...lossesTemplate },
       },
     },
+    game: data.game,
   });
 
   if (!game.wars) {
     game.wars = [];
   }
+
+  // TODO test without this line
+  await warRepository().save(war);
 
   game.wars.push(war);
 

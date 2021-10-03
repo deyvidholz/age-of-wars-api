@@ -64,7 +64,7 @@ export const warFocus: Focus = {
       type: CountryPassiveType.DECREASE_AGGRESSIVENESS_OFFENSIVE_WARS,
       value: 15,
       valueType: CountryPassiveValueType.PERCENT,
-      description: 'Reduce 15% of casualties in offensive wars',
+      description: 'Reduce 15% of aggressiveness gain in offensive wars',
     },
   ],
 };

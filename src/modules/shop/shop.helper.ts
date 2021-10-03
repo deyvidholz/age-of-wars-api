@@ -22,14 +22,12 @@ export class ShopHelper {
     const finalItem = order.items.reduce(
       (previousItem: OrderItem, currentItem: OrderItem) => ({
         ...currentItem,
-        price:
-          previousItem.price * previousItem.qty +
-          currentItem.price * currentItem.qty,
+        totalPrice: previousItem.totalPrice + currentItem.totalPrice,
       }),
-      { itemType: ItemType.DIVISIONS, qty: 0, price: 0 }
+      { itemType: ItemType.DIVISIONS, totalPrice: 0, qty: 0, price: 0 }
     );
 
-    return finalItem.price;
+    return finalItem.totalPrice;
   }
 
   static setTotalPrice(order: Order, passives?: CountryPassive[]): Order {

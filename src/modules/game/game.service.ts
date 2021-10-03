@@ -58,6 +58,51 @@ export class GameService {
 
     await gameRepository().save(game);
 
+    // Setting countries ids (allies, enemies, etc)
+    for (const country of game.countries) {
+      country.allies.map((target) => {
+        target.id = game.countries.find(
+          (country) => country.name === target.name
+        ).id;
+
+        return target;
+      });
+
+      country.enemies.map((target) => {
+        target.id = game.countries.find(
+          (country) => country.name === target.name
+        ).id;
+
+        return target;
+      });
+
+      country.inWarWith.map((target) => {
+        target.id = game.countries.find(
+          (country) => country.name === target.name
+        ).id;
+
+        return target;
+      });
+
+      country.guaranteeingIndependence.map((target) => {
+        target.id = game.countries.find(
+          (country) => country.name === target.name
+        ).id;
+
+        return target;
+      });
+
+      country.independenceGuaranteedBy.map((target) => {
+        target.id = game.countries.find(
+          (country) => country.name === target.name
+        ).id;
+
+        return target;
+      });
+    }
+
+    await gameRepository().save(game);
+
     return ResponseHelper.success({
       message: 'Game created successfully',
       data: { game },

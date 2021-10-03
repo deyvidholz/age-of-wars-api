@@ -32,6 +32,16 @@ export class ShopController {
       countryId: req.headers['country-id'],
     });
 
+    if (req.query.getAsObject === '' || req.query.getAsObject) {
+      const items = {};
+
+      for (const item of serviceData.data.items) {
+        items[item.itemType] = item;
+      }
+
+      serviceData.data.items = items;
+    }
+
     if (serviceData.error) {
       return HttpResponseHelper.badRequest({
         res,

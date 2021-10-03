@@ -117,7 +117,31 @@ router.get(
   CountryController.getCountriesSortedByRanking
 );
 
+router.get(
+  '/countries/:countryId',
+  passport.authenticate('jwt', { session: false }),
+  CountryController.getCountry
+);
+
+router.post(
+  '/countries/war-simulation',
+  passport.authenticate('jwt', { session: false }),
+  CountryController.getWarSimulation
+);
+
+router.post(
+  '/countries',
+  passport.authenticate('jwt', { session: false }),
+  CountryController.getCountries
+);
+
 // Others
 router.get('/available-countries', CountryController.getV1AvailabeCountries);
+router.get('/available-focuses', CountryController.getAvailableFocuses);
+
+router.get(
+  '/available-personalities',
+  CountryController.getAvailablePersonalities
+);
 
 export { router };

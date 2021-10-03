@@ -1,5 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Country } from '../country/country.entity';
+import { Game } from '../game/game.entity';
 import { WarDetails, WarMessage, WarParticipant, WarStage } from './war.typing';
 
 @Entity({ name: 'wars' })
@@ -8,7 +16,7 @@ export class War {
   id: string;
 
   @Column()
-  gameId: string;
+  gameId?: string;
 
   @Column({ default: WarStage.PREPARING })
   stage: WarStage;
@@ -21,6 +29,25 @@ export class War {
 
   @Column({ type: 'json' })
   details: WarDetails;
+
+  @ManyToOne(() => Game, (game) => game.wars)
+  game?: Game;
+
+  @BeforeInsert()
+  private beforeInsert() {
+    this.beforeChange();
+  }
+
+  @BeforeUpdate()
+  private beforeUpdate() {
+    this.beforeChange();
+  }
+
+  private beforeChange() {
+    if (!this.gameId) {
+      this.gameId === this.gameId;
+    }
+  }
 
   isParticipating(countryId: string): boolean {
     return (

@@ -28,7 +28,10 @@ export async function changeFocusAction(
     });
   }
 
-  if (game.stageCount % +process.env.ALLOW_CHANGE_FOCUS_EVERY_STAGE !== 0) {
+  if (
+    game.stageCount > 3 &&
+    game.stageCount % +process.env.ALLOW_CHANGE_FOCUS_EVERY_STAGE !== 0
+  ) {
     return ResponseHelper.error({
       message: 'Cannot change focus now',
     });

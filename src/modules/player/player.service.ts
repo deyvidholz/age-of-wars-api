@@ -321,12 +321,9 @@ export class PlayerService {
 
     const totalPlayers = game.players.length + 1;
 
-    const availableCountries = game.countries
-      .filter((country) => country.isAi)
-      .map((country) => {
-        country.provinces = [];
-        return country;
-      });
+    const availableCountries = [
+      ...game.countries.filter((country) => country.isAi),
+    ];
 
     if (game.options.maxPlayers === -1) {
       if (totalPlayers >= availableCountries.length) {

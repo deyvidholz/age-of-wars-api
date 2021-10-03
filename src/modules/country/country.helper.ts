@@ -254,6 +254,90 @@ export class CountryHelper {
 
     return MathHelper.getPercetageValue(data.value, data.percentage, true);
   }
+
+  // TODO improve performance (reduce maps)
+  static sumWarMilitaryPowers(
+    data: SumMilitaryPowersParam
+  ): SumMilitaryPowersReturn {
+    const attackersMPs = data.attackers.map(
+      (attacker) => attacker.militaryPower
+    );
+
+    const victimsMPs = data.victims.map((victim) => victim.militaryPower);
+
+    const attackersArmies = data.attackers.map((attacker) => attacker.army);
+    const victimsArmies = data.victims.map((victim) => victim.army);
+
+    const attackerArmyTotals: Army = CountryHelper.sumArmies(attackersArmies);
+    const victimArmyTotals: Army = CountryHelper.sumArmies(victimsArmies);
+
+    const attackerMpTotals: MilitaryPower =
+      CountryHelper.sumMilitaryPowers(attackersMPs);
+
+    const victimMpTotals: MilitaryPower =
+      CountryHelper.sumMilitaryPowers(victimsMPs);
+
+    let totals: SumMilitaryPowersReturn = {
+      attackers: {
+        armies: {
+          totals: attackerArmyTotals,
+        },
+        militaryPower: {
+          totals: attackerMpTotals,
+        },
+      },
+      victims: {
+        armies: {
+          totals: victimArmyTotals,
+        },
+        militaryPower: {
+          totals: victimMpTotals,
+        },
+      },
+    };
+
+    return totals;
+  }
+
+  static sumMilitaryPowers(mps: MilitaryPower[]): MilitaryPower {
+    const mp = mps.reduce(
+      (a, b) => ({
+        aircrafts: a.aircrafts + b.aircrafts,
+        divisions: a.divisions + b.divisions,
+        tanks: a.tanks + b.tanks,
+        warships: a.warships + b.warships,
+        total: a.total + b.total,
+      }),
+      {
+        aircrafts: 0,
+        divisions: 0,
+        tanks: 0,
+        total: 0,
+        warships: 0,
+      }
+    );
+
+    return mp;
+  }
+
+  static sumArmies(armies: Army[]): Army {
+    const army = armies.reduce(
+      (a, b) => ({
+        divisions: a.divisions + b.divisions,
+        tanks: a.tanks + b.tanks,
+        aircrafts: a.aircrafts + b.aircrafts,
+        warships: a.warships + b.warships,
+      }),
+      {
+        divisions: 0,
+        tanks: 0,
+        aircrafts: 0,
+        warships: 0,
+      }
+    );
+
+    return army;
+  }
 }
 
 type GetProvinceIncomingParam = {
@@ -274,4 +358,28 @@ type ApplyIncrementPassiveParam = {
   value: number;
   percentage: number;
   valueIncrementType: CountryPassiveValueType;
+};
+
+type SumMilitaryPowersParam = {
+  attackers: Country[];
+  victims: Country[];
+};
+
+type SumMilitaryPowersReturn = {
+  attackers: {
+    armies: {
+      totals: Army;
+    };
+    militaryPower: {
+      totals: MilitaryPower;
+    };
+  };
+  victims: {
+    armies: {
+      totals: Army;
+    };
+    militaryPower: {
+      totals: MilitaryPower;
+    };
+  };
 };
