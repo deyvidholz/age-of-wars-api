@@ -214,7 +214,7 @@ export class GameHelper {
       valueType: CountryPassiveValueType.PERCENT,
       description:
         passiveType === ProvincePassiveType.INCREMENT_INCOMING
-          ? `Add +${data.passive.amount} incoming`
+          ? `Add +${data.passive.amount}% incoming`
           : '',
     };
   }
