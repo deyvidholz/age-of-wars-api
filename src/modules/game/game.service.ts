@@ -11,6 +11,7 @@ import { Country } from '../country/country.entity';
 import { countryRepository } from '../country/country.repository';
 import { Player } from '../player/player.entity';
 import { playerRepository } from '../player/player.repository';
+import { warRepository } from '../war/war.repository';
 import { gameOptions } from './game.defaults';
 import { gameRepository } from './game.repository';
 import { GameOptions, GameStage } from './game.typing';
@@ -112,7 +113,6 @@ export class GameService {
   static async find(data: FindParam) {
     const game = await gameRepository().findOne({
       id: data.gameId,
-      owner: { id: data.playerId },
     });
 
     if (!game) {
@@ -145,6 +145,9 @@ export class GameService {
       });
     }
 
+    await warRepository().delete({
+      game: { id: game.id },
+    });
     await countryRepository().delete({
       game: { id: game.id },
     });
@@ -166,6 +169,7 @@ export class GameService {
   }
 
   static async startGame(data: StartGameParam) {
+    console.log('startGame');
     const game = await gameRepository().findOne({
       where: {
         id: data.gameId,
@@ -184,8 +188,10 @@ export class GameService {
 
     // Reseting players data
     for (const player of game.players) {
-      player.currentGameId =
-        player.currentGameId === game.id ? null : player.currentGameId;
+      if (player.currentGameId === game.id) {
+        player.alreadyPlayed = false;
+        player.currentGameId = null;
+      }
 
       player.countries = player.countries?.filter(
         (country: Country) => country.game.id !== game.id
@@ -211,6 +217,7 @@ export class GameService {
       return country;
     });
 
+    game.players = [];
     await playerRepository().save([...game.players, game.owner]);
     await gameRepository().save(game);
 
@@ -275,7 +282,7 @@ export class GameService {
       });
     }
 
-    game.setNextTurn(true);
+    await game.setNextTurn(true);
     await gameRepository().save(game);
 
     return ResponseHelper.success({
@@ -402,15 +409,58 @@ export class GameService {
     }
 
     player.alreadyPlayed = true;
-
-    const isNextTurn = game.setNextTurn();
+    const isNextTurn = await game.setNextTurn();
 
     if (isNextTurn) {
+      game.owner.alreadyPlayed = false;
+
+      game.players = game.players.map((player) => {
+        player.alreadyPlayed = false;
+        return player;
+      });
+
+      // await ActionService.runActions({
+      //   game,
+      // });
+
+      await playerRepository().save([...game.players, game.owner]);
       await gameRepository().save(game);
+    } else {
+      await playerRepository().save(player);
+
+      if (country) {
+        await countryRepository().save(country);
+      }
     }
 
     return ResponseHelper.success({
       message: `Player ${player.nickname} called next turn`,
+      data: { game, isNextTurn },
+    });
+  }
+
+  static async leaveGame(
+    data: LeaveGameParam
+  ): Promise<SuccessResponse | ErrorResponse> {
+    const game = await gameRepository().findOne({
+      where: {
+        id: data.gameId,
+      },
+    });
+
+    if (!game) {
+      return ResponseHelper.error({
+        message: 'Game not found',
+        data: {
+          gameId: data.gameId,
+        },
+      });
+    }
+
+    game.players = game.players.filter((player) => player.id !== data.playerId);
+    await gameRepository().save(game);
+
+    return ResponseHelper.success({
       data: { game },
     });
   }
@@ -465,4 +515,9 @@ type NextTurnParam = {
   countryId: string;
   gameId: string;
   actions: Action[];
+};
+
+type LeaveGameParam = {
+  playerId: string;
+  gameId: string;
 };

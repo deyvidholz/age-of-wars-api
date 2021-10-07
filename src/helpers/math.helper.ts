@@ -32,6 +32,9 @@ export class MathHelper {
     percentage: number,
     sum: boolean = false
   ) {
+    value = Number(value);
+    percentage = Number(percentage);
+
     const percentageValue = (value * percentage) / 100;
 
     if (sum) {
@@ -71,6 +74,12 @@ export class MathHelper {
     value: number,
     convertToInt: boolean = true
   ) {
+    value = Number(value) || 0;
+
+    if (isNaN(value)) {
+      value = 0;
+    }
+
     const randomPercentage = MathHelper.getRandomNumber(
       minPercentage,
       maxPercentage
@@ -83,7 +92,7 @@ export class MathHelper {
     );
 
     if (convertToInt) {
-      return Number(finalValue.toFixed(0));
+      return Math.trunc(finalValue);
     }
 
     return finalValue;

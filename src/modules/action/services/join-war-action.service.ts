@@ -78,6 +78,7 @@ export async function joinWarAction(
     });
 
     country.messages.push({
+      stage: data.game.stageCount,
       description: `We are at war against ${victim.name}`,
     });
 
@@ -106,6 +107,7 @@ export async function joinWarAction(
     });
 
     country.messages.push({
+      stage: data.game.stageCount,
       description: `We are at war against ${attacker.name}`,
     });
   } else {

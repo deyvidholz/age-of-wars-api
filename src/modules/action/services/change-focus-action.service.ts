@@ -39,6 +39,15 @@ export async function changeFocusAction(
 
   country.focus = { ...focus };
 
+  country.messages.push({
+    stage: data.game.stageCount,
+    title: `We changed our focus to ${focus.name}`,
+    description: null,
+    data: {
+      focus,
+    },
+  });
+
   return ResponseHelper.success({
     message: `${country.name} changed its focus to ${focus.type}`,
     data: country.focus,

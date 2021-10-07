@@ -17,6 +17,7 @@ import { shopAction } from './services/shop-action.service';
 
 export class ActionService {
   static async runActions(data: RunActionsParam) {
+    console.log('running actions');
     const aggressivenessReduction =
       +process.env.AGGRESSIVENESS_REDUCTION_PER_STAGE;
 
@@ -25,14 +26,21 @@ export class ActionService {
       country.resources.oil += country.incoming.oil || 0;
       country.reduceAggressiveness(aggressivenessReduction);
 
-      country.messages = [];
+      for (const message of country.messages) {
+        if (!message.stage) {
+          message.stage = data.game.stageCount;
+        }
+      }
+
+      country.messages = country.messages.filter(
+        (message) => message.stage >= data.game.stageCount
+      );
 
       if (!country.actions.length) {
         continue;
       }
 
       for (const action of country.actions) {
-        console.log('action', action);
         let response: SuccessResponse | ErrorResponse;
 
         switch (action.type) {
@@ -127,9 +135,16 @@ export class ActionService {
             break;
         }
 
-        console.log('response', response);
+        if (!response) {
+          response = {
+            message: 'Invalid Action Type',
+            error: true,
+          };
+        }
+
         if (response.error) {
           country.messages.push({
+            stage: data.game.stageCount,
             description: response.message,
             data: response.data || null,
           });

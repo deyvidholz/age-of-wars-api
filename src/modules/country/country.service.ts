@@ -314,7 +314,7 @@ export class CountryService {
     }
 
     const isPlayerOwner =
-      data.playerId && !country.isAi && data.playerId === country.owner.id;
+      data.playerId && !country.isAi && data.playerId === country.owner?.id;
 
     if (isPlayerOwner) {
       country.estimatedArmy = country.army;

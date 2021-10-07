@@ -110,6 +110,7 @@ export async function acceptPeaceRequestAction(
   );
 
   country.messages.push({
+    stage: data.game.stageCount,
     description: `We accepted ${target.name}'s peace request`,
     data: {
       target: {
@@ -121,6 +122,7 @@ export async function acceptPeaceRequestAction(
   });
 
   target.messages.push({
+    stage: data.game.stageCount,
     description: `${country.name} accepted our peace request`,
     data: {
       country: {
@@ -145,6 +147,7 @@ export async function acceptPeaceRequestAction(
   if (war.isWarOwner(country.id) && war.isWarOwner(target.id)) {
     // War is Over
     country.messages.push({
+      stage: data.game.stageCount,
       description: `Our war against ${target.name} is over`,
       data: {
         target: target.getCountrySimplifiedData(),
@@ -152,6 +155,7 @@ export async function acceptPeaceRequestAction(
     });
 
     target.messages.push({
+      stage: data.game.stageCount,
       description: `Our war against ${country.name} is over`,
       data: {
         country: country.getCountrySimplifiedData(),

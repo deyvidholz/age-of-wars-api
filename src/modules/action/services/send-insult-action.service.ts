@@ -34,6 +34,7 @@ export async function sendInsultAction(
   target.setOpinionOf(country.name, 60, SetOpinionOfActionParam.SUBTRACT);
 
   country.messages.push({
+    stage: data.game.stageCount,
     description: `We insulted ${target.name}, their opinon of us is now ${
       target.opinions[country.name]
     }`,
@@ -47,6 +48,7 @@ export async function sendInsultAction(
   });
 
   target.messages.push({
+    stage: data.game.stageCount,
     description: `${country.name} insulted us, our opinion of them is now ${
       target.opinions[country.name]
     }`,

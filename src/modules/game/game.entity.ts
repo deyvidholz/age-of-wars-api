@@ -1,4 +1,5 @@
 import {
+  AfterLoad,
   Column,
   Entity,
   JoinTable,
@@ -18,7 +19,10 @@ export class Game {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Player, (player) => player.games, { eager: true })
+  @ManyToOne(() => Player, (player) => player.games, {
+    eager: true,
+    cascade: true,
+  })
   owner: Player;
 
   @Column({ default: GameStage.CLOSED })
@@ -43,7 +47,7 @@ export class Game {
   })
   countries: Country[];
 
-  @OneToMany(() => War, (war) => war.game, { eager: true })
+  @OneToMany(() => War, (war) => war.game, { eager: true, cascade: true })
   wars: War[];
 
   @Column({
@@ -62,15 +66,14 @@ export class Game {
   }
 
   hasEverybodyPlayed(): boolean {
-    return (
-      this.players.filter((player) => player.alreadyPlayed).length ===
-      this.players.length
+    return ![...this.players, this.owner].some(
+      (player) => !player.alreadyPlayed
     );
   }
 
-  setNextTurn(force: boolean = false): boolean {
+  async setNextTurn(force: boolean = false): Promise<boolean> {
     if (this.hasEverybodyPlayed() || force) {
-      this._setNextTurn();
+      await this._setNextTurn();
       return true;
     }
 
@@ -78,28 +81,11 @@ export class Game {
   }
 
   private async _setNextTurn() {
-    this.owner.alreadyPlayed = false;
-
-    this.players = this.players.map((player) => {
-      player.alreadyPlayed = false;
-      return player;
-    });
-
-    this.countries = this.countries.map((country) => {
-      country.messages = [];
-      return country;
-    });
-
     this.stage = GameStage.RUNNING;
     this.stageCount++;
 
     await ActionService.runActions({
       game: this,
     });
-
-    console.log('');
-    console.log('');
-    console.log('');
-    console.log('gwars', this.wars);
   }
 }

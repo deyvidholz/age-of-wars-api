@@ -17,6 +17,11 @@ import {
 
 export class ShopService {
   static async buy(data: OrderParam): Promise<SuccessResponse | ErrorResponse> {
+    data.order.items = data.order.items.map((item) => ({
+      ...item,
+      qty: Number(item.qty),
+    }));
+
     const country =
       data.country || (await countryRepository().findOne(data.countryId));
 

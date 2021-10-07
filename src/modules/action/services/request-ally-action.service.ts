@@ -52,7 +52,8 @@ export async function requestAllyAction(
   target.decisions.push(decision);
 
   target.messages.push({
-    description: `${target.name} wants to be our ally`,
+    stage: data.game.stageCount,
+    description: `${country.name} wants to be our ally`,
     data: {
       country: {
         flag: country.flag,
@@ -63,6 +64,7 @@ export async function requestAllyAction(
   });
 
   country.messages.push({
+    stage: data.game.stageCount,
     description: `You requested ${target.name} to be your ally`,
     data: {
       target: {

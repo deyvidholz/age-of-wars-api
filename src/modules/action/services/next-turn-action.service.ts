@@ -38,7 +38,7 @@ export async function nextTurnAction(
 
   return ResponseHelper.success({
     message: `${country.name} is ready for the next stage`,
-    data: { actions: data.actions, nextTurn: game.setNextTurn() },
+    data: { actions: data.actions, nextTurn: await game.setNextTurn() },
   });
 }
 

@@ -73,6 +73,7 @@ export class PlayerService {
       message: 'Successfully authenticated',
       data: {
         playerId: player.id,
+        playerNickname: player.nickname,
         jwt: {
           token,
           expiration: decoded.exp,
@@ -179,9 +180,10 @@ export class PlayerService {
     const game = await gameRepository().findOne({
       where: {
         id: data.gameId,
-        owner: { id: data.playerId },
       },
     });
+
+    console.log(game.players);
 
     if (!game) {
       return ResponseHelper.error({
@@ -222,15 +224,16 @@ export class PlayerService {
       });
     }
 
-    game.players.push(player);
+    player.alreadyPlayed = false;
     player.currentGameId = game.id;
+    game.players.push(player);
 
     await playerRepository().save(player);
     await gameRepository().save(game);
 
     return ResponseHelper.success({
       message: `Player ${player.nickname} joined the game`,
-      data: game,
+      data: { game },
     });
   }
 
@@ -339,7 +342,20 @@ export class PlayerService {
 
     const countryWithoutProvinces = { ...country, provinces: [] };
 
-    game.setNextTurn();
+    const isNextTurn = await game.setNextTurn();
+
+    if (isNextTurn) {
+      game.owner.alreadyPlayed = false;
+
+      game.players = game.players.map((player) => {
+        player.alreadyPlayed = false;
+        return player;
+      });
+      await playerRepository().save([...game.players, game.owner]);
+    } else {
+      await playerRepository().save(player);
+    }
+
     await gameRepository().save(game);
 
     const availableColors = availableCountries.map((country) => country.color);

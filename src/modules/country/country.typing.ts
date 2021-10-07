@@ -111,6 +111,7 @@ export type OpinionsAfterGenerate = {
 };
 
 export type Message = {
+  stage?: number;
   icon?: string;
   color?: string;
   title?: string;
