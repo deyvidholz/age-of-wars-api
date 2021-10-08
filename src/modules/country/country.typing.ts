@@ -114,8 +114,8 @@ export type Message = {
   stage?: number;
   icon?: string;
   color?: string;
-  title?: string;
-  description: string;
+  title: string;
+  description?: string;
   data?: any;
 };
 

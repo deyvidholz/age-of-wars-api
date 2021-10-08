@@ -69,7 +69,7 @@ export async function joinWarAction(
     }
 
     CountryHelper.addMessages([...attackerAllies, attacker], {
-      description: `${country.name} joined the war on our side`,
+      title: `${country.name} joined the war on our side`,
       data: {
         id: country.id,
         flag: country.flag,
@@ -79,7 +79,7 @@ export async function joinWarAction(
 
     country.messages.push({
       stage: data.game.stageCount,
-      description: `We are at war against ${victim.name}`,
+      title: `We are at war against ${victim.name}`,
     });
 
     const warParticipant = WarHelper.getWarParticipantMounted(country);
@@ -98,7 +98,7 @@ export async function joinWarAction(
     }
 
     CountryHelper.addMessages([...victimAllies, victim], {
-      description: `${country.name} joined the war on our side`,
+      title: `${country.name} joined the war on our side`,
       data: {
         id: country.id,
         flag: country.flag,
@@ -108,7 +108,7 @@ export async function joinWarAction(
 
     country.messages.push({
       stage: data.game.stageCount,
-      description: `We are at war against ${attacker.name}`,
+      title: `We are at war against ${attacker.name}`,
     });
   } else {
     return ResponseHelper.error({

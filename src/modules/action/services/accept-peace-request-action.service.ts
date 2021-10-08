@@ -111,7 +111,7 @@ export async function acceptPeaceRequestAction(
 
   country.messages.push({
     stage: data.game.stageCount,
-    description: `We accepted ${target.name}'s peace request`,
+    title: `We accepted ${target.name}'s peace request`,
     data: {
       target: {
         id: target.id,
@@ -123,7 +123,7 @@ export async function acceptPeaceRequestAction(
 
   target.messages.push({
     stage: data.game.stageCount,
-    description: `${country.name} accepted our peace request`,
+    title: `${country.name} accepted our peace request`,
     data: {
       country: {
         id: country.id,
@@ -136,7 +136,7 @@ export async function acceptPeaceRequestAction(
   CountryHelper.addMessages(
     [...participants.attackers, ...participants.victims],
     {
-      description: `${country.name} accepted a peace request from ${target.name}`,
+      title: `${country.name} accepted a peace request from ${target.name}`,
       data: {
         country: country.getCountrySimplifiedData(),
         target: target.getCountrySimplifiedData(),
@@ -148,7 +148,7 @@ export async function acceptPeaceRequestAction(
     // War is Over
     country.messages.push({
       stage: data.game.stageCount,
-      description: `Our war against ${target.name} is over`,
+      title: `Our war against ${target.name} is over`,
       data: {
         target: target.getCountrySimplifiedData(),
       },
@@ -156,7 +156,7 @@ export async function acceptPeaceRequestAction(
 
     target.messages.push({
       stage: data.game.stageCount,
-      description: `Our war against ${country.name} is over`,
+      title: `Our war against ${country.name} is over`,
       data: {
         country: country.getCountrySimplifiedData(),
       },
@@ -165,7 +165,7 @@ export async function acceptPeaceRequestAction(
     CountryHelper.addMessages(
       [...participants.attackers, ...participants.victims],
       {
-        description: `${country.name} x ${target.name} war is over`,
+        title: `${country.name} x ${target.name} war is over`,
         data: {
           country: country.getCountrySimplifiedData(),
           target: target.getCountrySimplifiedData(),

@@ -145,7 +145,7 @@ export class ActionService {
         if (response.error) {
           country.messages.push({
             stage: data.game.stageCount,
-            description: response.message,
+            title: response.message,
             data: response.data || null,
           });
         }

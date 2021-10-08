@@ -82,7 +82,7 @@ export async function acceptAllyRequestAction(
 
   country.messages.push({
     stage: data.game.stageCount,
-    description: `${requester.name} accepted our ally request}`,
+    title: `${requester.name} accepted our ally request}`,
     data: {
       target: {
         id: requester.id,
@@ -94,7 +94,7 @@ export async function acceptAllyRequestAction(
 
   requester.messages.push({
     stage: data.game.stageCount,
-    description: `We and ${country.name} are now allied`,
+    title: `We and ${country.name} are now allied`,
     data: {
       target: {
         id: country.id,

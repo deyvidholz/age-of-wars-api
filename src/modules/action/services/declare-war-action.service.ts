@@ -139,7 +139,7 @@ export async function declareWarAction(
   if (refusedJoinWar.country.length) {
     country.messages.push({
       stage: data.game.stageCount,
-      description: `Some countries cannot join our war`,
+      title: `Some countries cannot join our war`,
       data: [...refusedJoinWar.country],
     });
   }
@@ -147,7 +147,7 @@ export async function declareWarAction(
   if (refusedJoinWar.target.length) {
     target.messages.push({
       stage: data.game.stageCount,
-      description: `Some countries cannot join our war`,
+      title: `Some countries cannot join our war`,
       data: [...refusedJoinWar.target],
     });
   }
@@ -198,7 +198,6 @@ export async function declareWarAction(
   country.messages.push({
     stage: data.game.stageCount,
     title: `We declared war on ${target.name}!`,
-    description: null,
     data: {
       target: target.getCountrySimplifiedData(),
     },
@@ -207,7 +206,6 @@ export async function declareWarAction(
   target.messages.push({
     stage: data.game.stageCount,
     title: `${country.name} declared war on us!`,
-    description: null,
     data: {
       target: country.getCountrySimplifiedData(),
     },

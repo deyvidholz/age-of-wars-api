@@ -40,7 +40,7 @@ export class DeclareWarActionHelper {
     }
 
     requestedCountry.messages.push({
-      description: `${country.name} is requested us to join their war against ${target.name}`,
+      title: `${country.name} is requested us to join their war against ${target.name}`,
     });
 
     requestedCountry.decisions.push({

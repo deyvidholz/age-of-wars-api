@@ -35,7 +35,7 @@ export async function sendInsultAction(
 
   country.messages.push({
     stage: data.game.stageCount,
-    description: `We insulted ${target.name}, their opinon of us is now ${
+    title: `We insulted ${target.name}, their opinon of us is now ${
       target.opinions[country.name]
     }`,
     data: {
@@ -49,7 +49,7 @@ export async function sendInsultAction(
 
   target.messages.push({
     stage: data.game.stageCount,
-    description: `${country.name} insulted us, our opinion of them is now ${
+    title: `${country.name} insulted us, our opinion of them is now ${
       target.opinions[country.name]
     }`,
     data: {
