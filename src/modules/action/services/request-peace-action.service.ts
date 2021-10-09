@@ -12,16 +12,16 @@ import { PeaceRequest } from '../../war/war.typing';
 export async function requestPeaceAction(
   data: RequestPeaceActionParam
 ): Promise<SuccessResponse | ErrorResponse> {
-  const { game } = data;
-  const country: Country = game.countries.find(
-    (country: Country) => country.id === data.countryId
+  const { game, country } = data;
+  const target: Country = game.countries.find(
+    (country: Country) => country.id === data.targetId
   );
 
-  if (!country) {
+  if (!target) {
     return ResponseHelper.error({
-      message: 'Country not found',
+      message: 'Target not found',
       data: {
-        id: data.countryId,
+        id: data.targetId,
       },
     });
   }
@@ -46,7 +46,7 @@ export async function requestPeaceAction(
     });
   }
 
-  if (!war.isParticipating(country.id)) {
+  if (!war.isParticipating(target.id)) {
     return ResponseHelper.error({
       message: 'You are not participating of this war',
     });
@@ -58,6 +58,7 @@ export async function requestPeaceAction(
       DecisionType.ACCEPT_PEACE_REQUEST,
       DecisionType.REFUSE_PEACE_REQUEST,
     ],
+    description: `Accept peace request from ${country.name}`,
     data: {
       warId: war.id,
       peaceRequest: data.peaceRequest,
@@ -65,7 +66,7 @@ export async function requestPeaceAction(
   };
 
   let targetName = '{targetName}';
-  if (war.details.attacker.id === country.id) {
+  if (war.details.attacker.id === target.id) {
     // Send peace request to victim
     decision.target = {
       id: victim.id,
@@ -86,14 +87,15 @@ export async function requestPeaceAction(
   }
 
   return ResponseHelper.success({
-    message: `${country.name} sent a peace request to ${targetName}`,
+    message: `${target.name} sent a peace request to ${targetName}`,
     data: { decision },
   });
 }
 
 type RequestPeaceActionParam = {
   peaceRequest: PeaceRequest;
-  countryId: string;
-  warId: string;
+  country: Country;
   game: Game;
+  targetId: string;
+  warId: string;
 };

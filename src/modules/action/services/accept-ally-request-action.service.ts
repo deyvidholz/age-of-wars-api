@@ -14,14 +14,7 @@ import { Game } from '../../game/game.entity';
 export async function acceptAllyRequestAction(
   data: AcceptAllyRequestActionParam
 ): Promise<SuccessResponse | ErrorResponse> {
-  const { country, decisionId, game, playerId } = data;
-
-  if (playerId && !country.isControlledByPlayer(playerId)) {
-    return ResponseHelper.error({
-      message: 'Player is not owner of this country',
-      data: { playerId },
-    });
-  }
+  const { country, decisionId, game } = data;
 
   const decision = country.decisions.find(
     (decision) => decision.id === decisionId
@@ -82,7 +75,7 @@ export async function acceptAllyRequestAction(
 
   country.messages.push({
     stage: data.game.stageCount,
-    title: `${requester.name} accepted our ally request}`,
+    title: `${requester.name} accepted our ally request`,
     data: {
       target: {
         id: requester.id,
@@ -111,7 +104,6 @@ export async function acceptAllyRequestAction(
 
 type AcceptAllyRequestActionParam = {
   decisionId: string;
-  playerId?: string;
   country: Country;
   game: Game;
 };

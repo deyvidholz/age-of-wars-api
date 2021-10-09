@@ -14,14 +14,7 @@ import { PeaceRequest, WarStage } from '../../war/war.typing';
 export async function acceptPeaceRequestAction(
   data: AcceptPeaceRequestActionParam
 ): Promise<SuccessResponse | ErrorResponse> {
-  const { country, game, peaceRequest, playerId, decisionId } = data;
-
-  if (playerId && !country.isControlledByPlayer(playerId)) {
-    return ResponseHelper.error({
-      message: 'Player is not owner of this country',
-      data: { playerId },
-    });
-  }
+  const { country, game, decisionId } = data;
 
   const decision = country.decisions.find(
     (decision) => decision.id === decisionId
@@ -40,6 +33,8 @@ export async function acceptPeaceRequestAction(
       data: { decision },
     });
   }
+
+  const peaceRequest: PeaceRequest = decision.data.peaceRequest;
 
   const target = game.countries.find(
     (country) => country.id === decision.target.id
@@ -186,9 +181,7 @@ export async function acceptPeaceRequestAction(
 }
 
 type AcceptPeaceRequestActionParam = {
-  peaceRequest: PeaceRequest;
   decisionId: string;
-  playerId: string;
   country: Country;
   game: Game;
 };

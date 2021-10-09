@@ -42,6 +42,7 @@ export async function requestAllyAction(
   const decision: Decision = {
     id: v4(),
     types: [DecisionType.ACCEPT_ALLY_REQUEST, DecisionType.REFUSE_ALLY_REQUEST],
+    description: `${country.name} wants to be our ally`,
     requester: {
       flag: country.flag,
       name: country.name,

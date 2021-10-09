@@ -97,61 +97,6 @@ export async function declareWarAction(
     id: country.id,
   });
 
-  const refusedJoinWar = {
-    country: [],
-    target: [],
-  };
-
-  for (const countryId of data.callToWar) {
-    const requestedCountry: Country = game.countries.find(
-      (c: Country) => c.id === countryId
-    );
-
-    if (!requestedCountry) {
-      continue;
-    }
-
-    DeclareWarActionHelper.sendCallToWar({
-      country,
-      refusedJoinWar,
-      requestedCountry,
-      target,
-    });
-  }
-
-  for (const ally of target.allies) {
-    const requestedCountry: Country = game.countries.find(
-      (c: Country) => c.id === ally.id
-    );
-
-    if (!requestedCountry) {
-      continue;
-    }
-
-    DeclareWarActionHelper.sendCallToWar({
-      country: target,
-      refusedJoinWar,
-      requestedCountry,
-      target: country,
-    });
-  }
-
-  if (refusedJoinWar.country.length) {
-    country.messages.push({
-      stage: data.game.stageCount,
-      title: `Some countries cannot join our war`,
-      data: [...refusedJoinWar.country],
-    });
-  }
-
-  if (refusedJoinWar.target.length) {
-    target.messages.push({
-      stage: data.game.stageCount,
-      title: `Some countries cannot join our war`,
-      data: [...refusedJoinWar.target],
-    });
-  }
-
   const lossesTemplate: Losses = {
     aircrafts: 0,
     balance: 0,
@@ -186,12 +131,69 @@ export async function declareWarAction(
     game: data.game,
   });
 
+  // Saving war in order to get warId
+  await warRepository().save(war);
+
+  const refusedJoinWar = {
+    country: [],
+    target: [],
+  };
+
+  for (const countryId of data.callToWar) {
+    const requestedCountry: Country = game.countries.find(
+      (c: Country) => c.id === countryId
+    );
+
+    if (!requestedCountry) {
+      continue;
+    }
+
+    DeclareWarActionHelper.sendCallToWar({
+      country,
+      refusedJoinWar,
+      requestedCountry,
+      target,
+      warId: war.id,
+    });
+  }
+
+  for (const ally of target.allies) {
+    const requestedCountry: Country = game.countries.find(
+      (c: Country) => c.id === ally.id
+    );
+
+    if (!requestedCountry) {
+      continue;
+    }
+
+    DeclareWarActionHelper.sendCallToWar({
+      country: target,
+      refusedJoinWar,
+      requestedCountry,
+      target: country,
+      warId: war.id,
+    });
+  }
+
+  if (refusedJoinWar.country.length) {
+    country.messages.push({
+      stage: data.game.stageCount,
+      title: `Some countries cannot join our war`,
+      data: [...refusedJoinWar.country],
+    });
+  }
+
+  if (refusedJoinWar.target.length) {
+    target.messages.push({
+      stage: data.game.stageCount,
+      title: `Some countries cannot join our war`,
+      data: [...refusedJoinWar.target],
+    });
+  }
+
   if (!game.wars) {
     game.wars = [];
   }
-
-  // TODO test without this line
-  await warRepository().save(war);
 
   game.wars.push(war);
 

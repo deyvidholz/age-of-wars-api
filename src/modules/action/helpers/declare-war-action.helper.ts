@@ -46,8 +46,10 @@ export class DeclareWarActionHelper {
     requestedCountry.decisions.push({
       id: v4(),
       types: [DecisionType.ACCEPT_JOIN_WAR, DecisionType.REFUSE_JOIN_WAR],
+      description: `Join war of ${country.name} against ${target.name}`,
       requester: country.getCountrySimplifiedData(),
       target: target.getCountrySimplifiedData(),
+      data: { warId: data.warId },
     });
   }
 }
@@ -55,6 +57,7 @@ export class DeclareWarActionHelper {
 type SendCallToWarParam = {
   country: Country;
   target: Country;
+  warId: string;
   requestedCountry: Country;
   refusedJoinWar: any; // TODO add typingh
 };

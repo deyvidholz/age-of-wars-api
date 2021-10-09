@@ -1,14 +1,14 @@
 import 'dotenv/config';
-import {
-  ErrorResponse,
-  ResponseHelper,
-  SuccessResponse,
-} from '../../helpers/response.helper';
+import { ErrorResponse, SuccessResponse } from '../../helpers/response.helper';
 import { Game } from '../game/game.entity';
-import { Action, ActionType } from './action.typing';
+import { ActionType } from './action.typing';
+import { acceptAllyRequestAction } from './services/accept-ally-request-action.service';
+import { acceptPeaceRequestAction } from './services/accept-peace-request-action.service';
 import { changeFocusAction } from './services/change-focus-action.service';
 import { declareWarAction } from './services/declare-war-action.service';
+import { dismissArmyAction } from './services/dismiss-army-action.service';
 import { improveProvincesAction } from './services/improve-provinces-action.service';
+import { improveRelationsAction } from './services/improve-relations-action.service';
 import { joinWarAction } from './services/join-war-action.service';
 import { nextTurnAction } from './services/next-turn-action.service';
 import { requestAllyAction } from './services/request-ally-action.service';
@@ -54,6 +54,11 @@ export class ActionService {
             break;
 
           case ActionType.ACCEPT_PEACE_REQUEST:
+            response = await acceptPeaceRequestAction({
+              country,
+              game: data.game,
+              decisionId: action.data.decisionId,
+            });
             break;
 
           case ActionType.CHANGE_FOCUS:
@@ -76,6 +81,11 @@ export class ActionService {
             break;
 
           case ActionType.IMPROVE_RELATIONS:
+            response = await improveRelationsAction({
+              country,
+              game: data.game,
+              targetId: action.data.targetId,
+            });
             break;
 
           case ActionType.JOIN_COALITION:
@@ -133,6 +143,20 @@ export class ActionService {
               targetId: action.data?.targetId,
             });
             break;
+
+          case ActionType.DISMISS_ARMY:
+            response = await dismissArmyAction({
+              country,
+              qty: action.data.qty,
+            });
+            break;
+
+          case ActionType.ACCEPT_ALLY_REQUEST:
+            response = await acceptAllyRequestAction({
+              country,
+              decisionId: action.data.decisionId,
+              game: data.game,
+            });
         }
 
         if (!response) {

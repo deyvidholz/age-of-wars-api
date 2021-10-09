@@ -155,6 +155,12 @@ export class Country {
     type: 'json',
     default: '[]',
   })
+  improvingRelationsOf: CountrySimplified[];
+
+  @Column({
+    type: 'json',
+    default: '[]',
+  })
   demands: Demand[];
 
   @Column({
@@ -241,6 +247,10 @@ export class Country {
     );
   }
 
+  isImprovingRelationsOf(countryId: string): boolean {
+    return this.improvingRelationsOf.some((target) => target.id === countryId);
+  }
+
   isGuaranteeingIndependenceOf(countryId: string): boolean {
     return this.guaranteeingIndependence.some(
       (target) => target.id === countryId
@@ -252,6 +262,18 @@ export class Country {
       this.isIndependenceGuaranteedBy(countryId) ||
       this.isGuaranteeingIndependenceOf(countryId)
     );
+  }
+
+  hasFriendlyRelations(countryId: string): boolean {
+    return (
+      this.hasIndependenceGuaranteeRelations(countryId) ||
+      this.isAlliedWith(countryId) ||
+      this.isImprovingRelationsOf(countryId)
+    );
+  }
+
+  hasBadRelations(countryId: string): boolean {
+    return this.isEnemyOf(countryId) || this.isAtWarWith(countryId);
   }
 
   getOpinionOf(countryName: string): CountrySimplified | undefined {
@@ -324,6 +346,18 @@ export class Country {
     this.inWarWith.push(country);
   }
 
+  addImproveRelations(country: CountrySimplified) {
+    if (this.isImprovingRelationsOf(country.id)) {
+      return;
+    }
+
+    if (country.id === this.id) {
+      return;
+    }
+
+    this.improvingRelationsOf.push(country);
+  }
+
   removeAlly(countryId: string) {
     this.allies = this.allies.filter((ally) => ally.id !== countryId);
   }
@@ -334,6 +368,12 @@ export class Country {
 
   removeInWarWith(countryId: string) {
     this.inWarWith = this.inWarWith.filter((target) => target.id !== countryId);
+  }
+
+  removeImproveRelations(country: CountrySimplified) {
+    this.improvingRelationsOf = this.improvingRelationsOf.filter(
+      (target) => target.id !== country.id
+    );
   }
 
   removeIndependenceGuaranteeingRelations(countryId: string) {
