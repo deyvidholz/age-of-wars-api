@@ -56,7 +56,7 @@ export async function acceptPeaceRequestAction(
     });
   }
 
-  if (!war.isParticipating(country.id)) {
+  if (!WarHelper.isParticipating(war, country.id)) {
     return ResponseHelper.error({
       message: `Country ${country.name} is not participating of this war`,
       data: { war },
@@ -139,7 +139,10 @@ export async function acceptPeaceRequestAction(
     }
   );
 
-  if (war.isWarOwner(country.id) && war.isWarOwner(target.id)) {
+  if (
+    WarHelper.isWarOwner(war, country.id) &&
+    WarHelper.isWarOwner(war, target.id)
+  ) {
     // War is Over
     country.messages.push({
       stage: data.game.stageCount,
@@ -171,7 +174,7 @@ export async function acceptPeaceRequestAction(
     game.wars = game.wars.filter((w) => w.id !== war.id);
     war.stage = WarStage.OVER;
   } else {
-    war.removeParticipant(target.id);
+    WarHelper.removeParticipant(war, target.id);
   }
 
   return ResponseHelper.success({

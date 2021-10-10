@@ -1,13 +1,11 @@
 import { Country } from '../country/country.entity';
 import { Game } from '../game/game.entity';
-import { War } from './war.entity';
 import {
-  Demand,
   DemandType,
-  Offer,
   OfferType,
   PeaceRequest,
   PeaceRequestType,
+  War,
   WarParticipant,
 } from './war.typing';
 
@@ -135,6 +133,32 @@ export class WarHelper {
           break;
       }
     }
+  }
+
+  static isParticipating(war: War, countryId: string): boolean {
+    return (
+      war.details.attacker.id === countryId ||
+      war.details.victim.id === countryId ||
+      war.details.attacker.allies.some((ally) => ally.id === countryId) ||
+      war.details.victim.allies.some((ally) => ally.id === countryId)
+    );
+  }
+
+  static isWarOwner(war: War, countryId: string): boolean {
+    return (
+      war.details.attacker.id === countryId ||
+      war.details.victim.id === countryId
+    );
+  }
+
+  static removeParticipant(war: War, countryId: string): War {
+    war.details.attacker.allies ===
+      war.details.attacker.allies.filter((ally) => ally.id !== countryId);
+
+    war.details.victim.allies ===
+      war.details.victim.allies.filter((ally) => ally.id !== countryId);
+
+    return war;
   }
 }
 

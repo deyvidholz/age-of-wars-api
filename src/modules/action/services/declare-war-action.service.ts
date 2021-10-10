@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { v4 } from 'uuid';
 import {
   ErrorResponse,
   ResponseHelper,
@@ -7,9 +8,7 @@ import {
 import { Country } from '../../country/country.entity';
 import { SetOpinionOfActionParam } from '../../country/country.typing';
 import { Game } from '../../game/game.entity';
-import { War } from '../../war/war.entity';
-import { warRepository } from '../../war/war.repository';
-import { Losses } from '../../war/war.typing';
+import { Losses, War, WarStage } from '../../war/war.typing';
 import { DeclareWarActionHelper } from '../helpers/declare-war-action.helper';
 
 type DeclareWarParam = {
@@ -107,12 +106,12 @@ export async function declareWarAction(
 
   // TODO calculate based on military power diff
   const startAtStage: number = game.stageCount + 2;
-  const endAtStage: number = startAtStage + 2;
 
-  const war: War = warRepository().create({
-    endAtStage,
+  const war: War = {
+    id: v4(),
     startAtStage,
     gameId: game.id,
+    stage: WarStage.PREPARING,
     details: {
       attacker: {
         flag: country.flag,
@@ -129,7 +128,7 @@ export async function declareWarAction(
         losses: { ...lossesTemplate },
       },
     },
-  });
+  };
 
   const refusedJoinWar = {
     country: [],
@@ -150,8 +149,7 @@ export async function declareWarAction(
       refusedJoinWar,
       requestedCountry,
       target,
-      attackerName: country.name,
-      victimName: target.name,
+      warId: war.id,
     });
   }
 
@@ -169,8 +167,7 @@ export async function declareWarAction(
       refusedJoinWar,
       requestedCountry,
       target: country,
-      attackerName: country.name,
-      victimName: target.name,
+      warId: war.id,
     });
   }
 
@@ -188,10 +185,6 @@ export async function declareWarAction(
       title: `Some countries cannot join our war`,
       data: [...refusedJoinWar.target],
     });
-  }
-
-  if (!game.wars) {
-    game.wars = [];
   }
 
   game.wars.push(war);

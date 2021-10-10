@@ -11,7 +11,7 @@ import {
 import { ActionService } from '../action/action.service';
 import { Country } from '../country/country.entity';
 import { Player } from '../player/player.entity';
-import { War } from '../war/war.entity';
+import { War } from '../war/war.typing';
 import { Coalition, GameOptions, GameStage } from './game.typing';
 
 @Entity({ name: 'games' })
@@ -47,7 +47,10 @@ export class Game {
   })
   countries: Country[];
 
-  @OneToMany(() => War, (war) => war.game, { eager: true, cascade: true })
+  @Column({
+    type: 'json',
+    default: '[]',
+  })
   wars: War[];
 
   @Column({

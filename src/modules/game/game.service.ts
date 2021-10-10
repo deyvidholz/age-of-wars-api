@@ -11,7 +11,6 @@ import { Country } from '../country/country.entity';
 import { countryRepository } from '../country/country.repository';
 import { Player } from '../player/player.entity';
 import { playerRepository } from '../player/player.repository';
-import { warRepository } from '../war/war.repository';
 import { gameOptions } from './game.defaults';
 import { gameRepository } from './game.repository';
 import { GameOptions, GameStage } from './game.typing';
@@ -145,9 +144,6 @@ export class GameService {
       });
     }
 
-    await warRepository().delete({
-      game: { id: game.id },
-    });
     await countryRepository().delete({
       game: { id: game.id },
     });

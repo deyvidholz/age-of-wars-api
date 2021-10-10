@@ -7,6 +7,7 @@ import {
 import { Country } from '../../country/country.entity';
 import { Decision, DecisionType } from '../../country/country.typing';
 import { Game } from '../../game/game.entity';
+import { WarHelper } from '../../war/war.helper';
 import { PeaceRequest } from '../../war/war.typing';
 
 export async function requestPeaceAction(
@@ -46,7 +47,7 @@ export async function requestPeaceAction(
     });
   }
 
-  if (!war.isParticipating(target.id)) {
+  if (!WarHelper.isParticipating(war, target.id)) {
     return ResponseHelper.error({
       message: 'You are not participating of this war',
     });

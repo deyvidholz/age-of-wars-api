@@ -88,3 +88,11 @@ export enum WarStage {
   FIGHTING = 'FIGHTING',
   OVER = 'OVER',
 }
+
+export type War = {
+  id: string;
+  gameId: string;
+  stage: WarStage;
+  startAtStage: number;
+  details: WarDetails;
+};

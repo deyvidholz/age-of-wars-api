@@ -446,6 +446,12 @@ export class AiService {
         return;
       }
 
+      let maxAiAlliesAllowed: number = +process.env.MAX_AI_ALLIES_ALLOWED;
+
+      if (target.allies.length >= maxAiAlliesAllowed) {
+        return;
+      }
+
       possibleTargets.push({
         country: target.getCountrySimplifiedData(),
         opinionValue: opinionRanking[i].opinionValue,
