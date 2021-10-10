@@ -183,8 +183,6 @@ export class PlayerService {
       },
     });
 
-    console.log(game.players);
-
     if (!game) {
       return ResponseHelper.error({
         message: 'Game not found',

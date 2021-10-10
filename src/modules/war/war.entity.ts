@@ -15,7 +15,7 @@ export class War {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ nullable: true })
   gameId?: string;
 
   @Column({ default: WarStage.PREPARING })
@@ -32,22 +32,6 @@ export class War {
 
   @ManyToOne(() => Game, (game) => game.wars)
   game?: Game;
-
-  @BeforeInsert()
-  private beforeInsert() {
-    this.beforeChange();
-  }
-
-  @BeforeUpdate()
-  private beforeUpdate() {
-    this.beforeChange();
-  }
-
-  private beforeChange() {
-    if (!this.gameId) {
-      this.gameId === this.gameId;
-    }
-  }
 
   isParticipating(countryId: string): boolean {
     return (

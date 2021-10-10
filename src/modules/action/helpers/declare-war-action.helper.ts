@@ -4,7 +4,14 @@ import { DecisionType } from '../../country/country.typing';
 
 export class DeclareWarActionHelper {
   static sendCallToWar(data: SendCallToWarParam) {
-    const { country, target, requestedCountry, refusedJoinWar } = data;
+    const {
+      country,
+      target,
+      requestedCountry,
+      refusedJoinWar,
+      attackerName,
+      victimName,
+    } = data;
 
     if (!requestedCountry.isAlliedWith(country.id)) {
       refusedJoinWar.country.push({
@@ -49,7 +56,7 @@ export class DeclareWarActionHelper {
       description: `Join war of ${country.name} against ${target.name}`,
       requester: country.getCountrySimplifiedData(),
       target: target.getCountrySimplifiedData(),
-      data: { warId: data.warId },
+      data: { attackerName, victimName },
     });
   }
 }
@@ -57,7 +64,8 @@ export class DeclareWarActionHelper {
 type SendCallToWarParam = {
   country: Country;
   target: Country;
-  warId: string;
+  attackerName: string;
+  victimName: string;
   requestedCountry: Country;
   refusedJoinWar: any; // TODO add typingh
 };

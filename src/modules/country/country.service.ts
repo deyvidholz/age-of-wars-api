@@ -9,6 +9,7 @@ import {
   ResponseHelper,
   SuccessResponse,
 } from '../../helpers/response.helper';
+import { Game } from '../game/game.entity';
 import { gameRepository } from '../game/game.repository';
 import { Country } from './country.entity';
 import { CountryHelper } from './country.helper';
@@ -79,12 +80,14 @@ export class CountryService {
       });
     }
 
-    const game = await gameRepository().findOne({
-      where: {
-        id: data.gameId,
-      },
-      select: ['id', 'countries'],
-    });
+    const game =
+      data.game ||
+      (await gameRepository().findOne({
+        where: {
+          id: data.gameId,
+        },
+        select: ['id', 'countries'],
+      }));
 
     if (!game) {
       return ResponseHelper.error({
@@ -209,11 +212,13 @@ export class CountryService {
           });
         }
 
-        const country = game.countries.find(
-          (country) =>
-            country.id === data.countryId ||
-            country.name?.toLowerCase() === data.countryId?.toLowerCase()
-        );
+        const country =
+          data.country ||
+          game.countries.find(
+            (country) =>
+              country.id === data.countryId ||
+              country.name?.toLowerCase() === data.countryId?.toLowerCase()
+          );
 
         if (!country) {
           return ResponseHelper.error({
@@ -360,7 +365,7 @@ export class CountryService {
 
   // TODO improve performance (reduce maps)
   static async getWarSimulation(data: GetWarSimulationParam) {
-    const game = await gameRepository().findOne(data.gameId);
+    const game = data.game || (await gameRepository().findOne(data.gameId));
 
     if (!game) {
       return ResponseHelper.error({
@@ -370,10 +375,12 @@ export class CountryService {
     }
 
     // Removing provinces to reduce payload size
-    game.countries = game.countries.map((country) => {
-      country.provinces = [];
-      return country;
-    });
+    if (data.removeProvinces) {
+      game.countries = game.countries.map((country) => {
+        country.provinces = [];
+        return country;
+      });
+    }
 
     const attacker: Country = game.countries.find(
       (country) => country.name === data.attacker
@@ -447,9 +454,11 @@ type GetProvinceParam = {
 
 type GetCountriesSortedByRankingParam = {
   gameId: string;
+  game?: Game;
   rankingType: RankingType;
   playerId?: string;
   countryId?: string;
+  country?: Country;
 };
 
 type GetCountryParam = {
@@ -466,9 +475,11 @@ type GetCountriesParam = {
 
 type GetWarSimulationParam = {
   gameId: string;
+  game?: Game;
   playerId?: string;
   attacker: string;
   target: string;
   include?: string[];
   exclude?: string[];
+  removeProvinces?: boolean;
 };

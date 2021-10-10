@@ -20,7 +20,7 @@ export enum ActionType {
 export type Action = {
   type: ActionType;
   playerId?: string;
-  gameId: string;
+  gameId?: string;
   countryId?: string;
   targetId?: string;
   data: ActionData;

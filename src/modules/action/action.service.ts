@@ -1,5 +1,7 @@
 import 'dotenv/config';
+import { MathHelper } from '../../helpers/math.helper';
 import { ErrorResponse, SuccessResponse } from '../../helpers/response.helper';
+import { AiService } from '../ai/ai.service';
 import { Game } from '../game/game.entity';
 import { ActionType } from './action.typing';
 import { acceptAllyRequestAction } from './services/accept-ally-request-action.service';
@@ -22,6 +24,23 @@ export class ActionService {
       +process.env.AGGRESSIVENESS_REDUCTION_PER_STAGE;
 
     for (const country of data.game.countries) {
+      if (country.isAi) {
+        let chance = 60;
+
+        if (country.incoming.balance > 600) {
+          chance = 100;
+        } else if (country.incoming.balance > 300) {
+          chance = 80;
+        }
+
+        if (MathHelper.chanceOf(chance)) {
+          await AiService.generateActions({
+            country,
+            game: data.game,
+          });
+        }
+      }
+
       country.economy.balance += country.incoming.balance || 0;
       country.resources.oil += country.incoming.oil || 0;
       country.reduceAggressiveness(aggressivenessReduction);

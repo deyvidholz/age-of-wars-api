@@ -58,7 +58,6 @@ const playerEventHandlers = (io: Server, socket: Socket) => {
       });
     }
 
-    console.log('emitting');
     socket.emit('player:join-game', serviceData.data);
     socket.to(payload.gameId).emit('player:join-game', serviceData.data);
   };

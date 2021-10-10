@@ -31,12 +31,6 @@ export class ShopService {
       });
     }
 
-    if (country.isAi && country.owner.id !== data.playerId) {
-      return ResponseHelper.success({
-        message: 'You cannot buy items to a country that you are not the owner',
-      });
-    }
-
     let order = ShopHelper.getTotalPrice(data.order, country.passives);
     let price = order.totalPrice;
 
@@ -83,17 +77,12 @@ export class ShopService {
   static async getOrderPrice(
     data: GetPriceParam
   ): Promise<SuccessResponse | ErrorResponse> {
-    const country = await countryRepository().findOne(data.countryId);
+    const country =
+      data.country || (await countryRepository().findOne(data.countryId));
 
     if (!country) {
       return ResponseHelper.success({
         message: 'Country not found',
-      });
-    }
-
-    if (country.owner.id !== data.playerId) {
-      return ResponseHelper.success({
-        message: 'You cannot do this',
       });
     }
 
@@ -109,7 +98,8 @@ export class ShopService {
   static async getProvincesImprovementPrice(
     data: GetProvincesImprovementPriceParam
   ): Promise<SuccessResponse | ErrorResponse> {
-    const country = await countryRepository().findOne(data.countryId);
+    const country =
+      data.country || (await countryRepository().findOne(data.countryId));
 
     if (!country) {
       return ResponseHelper.success({
@@ -117,7 +107,7 @@ export class ShopService {
       });
     }
 
-    if (country.owner.id !== data.playerId) {
+    if (data.playerId && country.owner.id !== data.playerId) {
       return ResponseHelper.success({
         message: 'You cannot buy items to a country that you are not the owner',
       });
@@ -169,13 +159,15 @@ type OrderParam = {
 };
 
 type GetPriceParam = {
-  playerId: string;
+  playerId?: string;
   countryId?: string;
+  country?: Country;
   items: OrderItem[];
 };
 
 type GetProvincesImprovementPriceParam = {
-  playerId: string;
+  playerId?: string;
   countryId: string;
+  country?: Country;
   provincesToImprove: UnparsedImproveProvinceOrderItem[];
 };

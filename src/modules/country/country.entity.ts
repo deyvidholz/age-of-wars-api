@@ -30,6 +30,7 @@ import {
   Incoming,
   Message,
   MilitaryPower,
+  Opinion,
   Opinions,
   Production,
   Province,
@@ -264,11 +265,21 @@ export class Country {
     );
   }
 
-  hasFriendlyRelations(countryId: string): boolean {
+  hasFriendlyRelations(
+    countryId: string,
+    includeImprovingRelations: boolean = true
+  ): boolean {
+    if (includeImprovingRelations) {
+      return (
+        this.hasIndependenceGuaranteeRelations(countryId) ||
+        this.isAlliedWith(countryId) ||
+        this.isImprovingRelationsOf(countryId)
+      );
+    }
+
     return (
       this.hasIndependenceGuaranteeRelations(countryId) ||
-      this.isAlliedWith(countryId) ||
-      this.isImprovingRelationsOf(countryId)
+      this.isAlliedWith(countryId)
     );
   }
 
@@ -276,7 +287,7 @@ export class Country {
     return this.isEnemyOf(countryId) || this.isAtWarWith(countryId);
   }
 
-  getOpinionOf(countryName: string): CountrySimplified | undefined {
+  getOpinionOf(countryName: string): Opinion | undefined {
     return this.opinions[countryName];
   }
 

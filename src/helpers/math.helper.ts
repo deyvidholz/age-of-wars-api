@@ -14,7 +14,7 @@ export class MathHelper {
     return Math.trunc(num);
   }
 
-  static chanceOf(chance: number) {
+  static chanceOf(chance: number): boolean {
     if (chance >= 100) return true;
     if (chance <= 0) return false;
 
@@ -52,7 +52,7 @@ export class MathHelper {
     return currentPrice - subtractValue;
   }
 
-  static getRandomIndex(data: any[]): any {
+  static getRandomIndex(data: any[]): number {
     return Math.floor(Math.random() * data.length);
   }
 

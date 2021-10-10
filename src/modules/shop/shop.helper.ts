@@ -108,8 +108,8 @@ export class ShopHelper {
     preOrder: ImproveProvincePreOrder
   ): number {
     return (
-      preOrder.production.price * preOrder.production.qty +
-      preOrder.taxation.price * preOrder.taxation.qty
+      (preOrder.production.price || 0) * (preOrder.production.qty || 0) +
+      (preOrder.taxation.price || 0) * (preOrder.taxation.qty || 0)
     );
   }
 

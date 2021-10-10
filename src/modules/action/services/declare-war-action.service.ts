@@ -112,6 +112,7 @@ export async function declareWarAction(
   const war: War = warRepository().create({
     endAtStage,
     startAtStage,
+    gameId: game.id,
     details: {
       attacker: {
         flag: country.flag,
@@ -128,11 +129,7 @@ export async function declareWarAction(
         losses: { ...lossesTemplate },
       },
     },
-    game: data.game,
   });
-
-  // Saving war in order to get warId
-  await warRepository().save(war);
 
   const refusedJoinWar = {
     country: [],
@@ -153,7 +150,8 @@ export async function declareWarAction(
       refusedJoinWar,
       requestedCountry,
       target,
-      warId: war.id,
+      attackerName: country.name,
+      victimName: target.name,
     });
   }
 
@@ -171,7 +169,8 @@ export async function declareWarAction(
       refusedJoinWar,
       requestedCountry,
       target: country,
-      warId: war.id,
+      attackerName: country.name,
+      victimName: target.name,
     });
   }
 

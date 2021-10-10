@@ -133,6 +133,7 @@ export class CountryController {
       ...req.body,
       playerId: req.user.id,
       gameId: req.headers['game-id'] as string,
+      removeProvinces: true,
     });
 
     if (serviceData.error) {
