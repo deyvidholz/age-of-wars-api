@@ -160,6 +160,32 @@ export class WarHelper {
 
     return war;
   }
+
+  static isAttacker(war: War, countryId: string) {
+    const attackers = [
+      ...war.details.attacker.allies,
+      {
+        id: war.details.attacker.id,
+        flag: war.details.attacker.flag,
+        name: war.details.attacker.name,
+      },
+    ];
+
+    return attackers.some((attacker) => attacker.id === countryId);
+  }
+
+  static isVictim(war: War, countryId: string) {
+    const victims = [
+      ...war.details.victim.allies,
+      {
+        id: war.details.victim.id,
+        flag: war.details.victim.flag,
+        name: war.details.victim.name,
+      },
+    ];
+
+    return victims.some((victim) => victim.id === countryId);
+  }
 }
 
 type GetParticipantsReturn = {

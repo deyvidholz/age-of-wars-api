@@ -165,7 +165,6 @@ export class GameService {
   }
 
   static async startGame(data: StartGameParam) {
-    console.log('startGame');
     const game = await gameRepository().findOne({
       where: {
         id: data.gameId,

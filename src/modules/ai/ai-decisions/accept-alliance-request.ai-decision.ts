@@ -28,7 +28,7 @@ export async function acceptAllianceRequestAiDecision(
   /**
    * With an opinion of 200 about requester, the chance of accepting the alliance request will be 50%.
    */
-  let chance: number = opinion.value / 4;
+  let chance: number = opinion.value <= 0 ? 0 : opinion.value / 4;
   let acceptAllianceRequest: boolean = false;
   let forceRefuse: boolean = false;
 

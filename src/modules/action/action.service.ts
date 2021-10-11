@@ -111,6 +111,7 @@ export class ActionService {
           case ActionType.JOIN_WAR:
             response = await joinWarAction({
               allyCountryId: action.data?.allyCountryId,
+              decisionId: action.data?.decisionId,
               country,
               game: data.game,
               warId: action.data?.warId,

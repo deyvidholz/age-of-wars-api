@@ -135,9 +135,9 @@ export async function declareWarAction(
     target: [],
   };
 
-  for (const countryId of data.callToWar) {
+  for (const countryName of data.callToWar) {
     const requestedCountry: Country = game.countries.find(
-      (c: Country) => c.id === countryId
+      (c: Country) => c.name === countryName
     );
 
     if (!requestedCountry) {

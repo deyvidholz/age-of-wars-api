@@ -11,7 +11,7 @@ import { WarHelper } from '../../war/war.helper';
 export async function joinWarAction(
   data: JoinWarActionParam
 ): Promise<SuccessResponse | ErrorResponse> {
-  const { game, country } = data;
+  const { game, country, decisionId } = data;
 
   const war = game.wars.find((w) => w.id === data.warId);
 
@@ -52,9 +52,6 @@ export async function joinWarAction(
     });
   }
 
-  const warParticipant = WarHelper.getWarParticipantMounted(country);
-  war.details.attacker.allies.push(warParticipant);
-
   if (war.details.attacker.id === data.allyCountryId) {
     // Join Attacker's side
     if (country.isAlliedWith(war.details.victim.id)) {
@@ -83,7 +80,10 @@ export async function joinWarAction(
     });
 
     const warParticipant = WarHelper.getWarParticipantMounted(country);
-    war.details.victim.allies.push(warParticipant);
+    war.details.attacker.allies.push(warParticipant);
+
+    country.addInWarWith(victim.getCountrySimplifiedData());
+    victim.addInWarWith(country.getCountrySimplifiedData());
   } else if (war.details.victim.id === data.allyCountryId) {
     // Join Victim's side
     if (country.isAlliedWith(war.details.attacker.id)) {
@@ -110,6 +110,12 @@ export async function joinWarAction(
       stage: data.game.stageCount,
       title: `We are at war against ${attacker.name}`,
     });
+
+    const warParticipant = WarHelper.getWarParticipantMounted(country);
+    war.details.victim.allies.push(warParticipant);
+
+    country.addInWarWith(attacker.getCountrySimplifiedData());
+    attacker.addInWarWith(country.getCountrySimplifiedData());
   } else {
     return ResponseHelper.error({
       message: 'Ally country not found',
@@ -119,6 +125,10 @@ export async function joinWarAction(
     });
   }
 
+  country.decisions = country.decisions.filter(
+    (decision) => decision.id !== decisionId
+  );
+
   return ResponseHelper.success({
     data: { war },
   });
@@ -127,6 +137,7 @@ export async function joinWarAction(
 type JoinWarActionParam = {
   allyCountryId: string;
   warId: string;
+  decisionId: string;
   country: Country;
   game: Game;
 };

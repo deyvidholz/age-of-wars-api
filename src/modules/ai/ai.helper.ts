@@ -21,14 +21,21 @@ export class AiHelper {
       case PersonalityType.AGGRESSIVE:
         if (!country.inWarWith.length) {
           availableActions.push(ActionType.SEND_INSULT);
-          // TODO uncomment line below
-          // availableActions.push(ActionType.DECLARE_WAR, ActionType.DECLARE_WAR);
+          // TODO bots are declaring to many wars
+          if (!country.inWarWith.length) {
+            availableActions.push(
+              ActionType.DECLARE_WAR,
+              ActionType.DECLARE_WAR
+            );
+          }
         }
         break;
       case PersonalityType.NEUTRAL:
         if (!country.inWarWith.length) {
           availableActions.push(ActionType.SEND_INSULT);
-          // availableActions.push(ActionType.DECLARE_WAR);
+          if (!country.inWarWith.length) {
+            availableActions.push(ActionType.DECLARE_WAR);
+          }
         }
         break;
     }

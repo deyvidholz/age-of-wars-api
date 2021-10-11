@@ -14,6 +14,7 @@ import { Game } from '../game/game.entity';
 import { ShopService } from '../shop/shop.service';
 import { ItemType, Order, OrderItem } from '../shop/shop.typing';
 import { acceptAllianceRequestAiDecision } from './ai-decisions/accept-alliance-request.ai-decision';
+import { acceptJoinWarAiDecision } from './ai-decisions/accept-join-war.ai-decision';
 import { AiHelper } from './ai.helper';
 
 export class AiService {
@@ -93,6 +94,11 @@ export class AiService {
           break;
 
         case ActionType.JOIN_WAR:
+          await acceptJoinWarAiDecision({
+            country,
+            game,
+            decision,
+          });
           break;
 
         case ActionType.ACCEPT_PEACE_REQUEST:
@@ -571,6 +577,10 @@ export class AiService {
       response.data.simulation.totals.victims.militaryPower.totals.total;
 
     if (MathHelper.getDiffPercentage(attackersTotalMP, victimsTotalMP) < 40) {
+      return;
+    }
+
+    if (target.inWarWith.length) {
       return;
     }
 
