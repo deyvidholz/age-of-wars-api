@@ -11,8 +11,8 @@ import {
 } from '../../country/country.typing';
 import { Game } from '../../game/game.entity';
 
-export async function acceptAllyRequestAction(
-  data: AcceptAllyRequestActionParam
+export async function refuseAllyRequestAction(
+  data: RefuseAllyRequestActionParam
 ): Promise<SuccessResponse | ErrorResponse> {
   const { country, decisionId, game } = data;
 
@@ -27,7 +27,7 @@ export async function acceptAllyRequestAction(
     });
   }
 
-  if (!decision.types.includes(DecisionMakeType.ACCEPT_ALLY_REQUEST)) {
+  if (!decision.types.includes(DecisionMakeType.REFUSE_ALLY_REQUEST)) {
     return ResponseHelper.error({
       message: 'Invalid decision type',
       data: { decision },
@@ -54,60 +54,26 @@ export async function acceptAllyRequestAction(
     country.removeIndependenceGuaranteeingRelations(requester.id);
   }
 
-  country.addAlly({
-    flag: requester.flag,
-    name: requester.name,
-    id: requester.id,
-  });
-
-  requester.addAlly({
-    flag: country.flag,
-    name: country.name,
-    id: country.id,
-  });
-
-  country.setOpinionOf(
-    requester.name,
-    +process.env.ADD_OPINION_WHEN_JOIN_ALLIANCE,
-    SetOpinionOfActionParam.SUM
-  );
-
   requester.setOpinionOf(
     country.name,
-    +process.env.ADD_OPINION_WHEN_TARGET_ACCEPT_JOIN_ALLIANCE,
-    SetOpinionOfActionParam.SUM
+    +process.env.SUBTRACT_OPINION_WHEN_TARGET_REFUSE_JOIN_ALLIANCE,
+    SetOpinionOfActionParam.SUBTRACT
   );
-
-  country.messages.push({
-    stage: data.game.stageCount,
-    title: `${requester.name} accepted our ally request`,
-    data: {
-      target: {
-        id: requester.id,
-        flag: requester.flag,
-        name: requester.name,
-      },
-    },
-  });
 
   requester.messages.push({
     stage: data.game.stageCount,
-    title: `We and ${country.name} are now allied`,
+    title: `${country.name} refused our ally request`,
     data: {
-      target: {
-        id: country.id,
-        flag: country.flag,
-        name: country.name,
-      },
+      target: country.getCountrySimplifiedData(),
     },
   });
 
   return ResponseHelper.success({
-    message: `${country.name} accepted ${requester.name} ally's request`,
+    message: `${country.name} refused ${requester.name} ally's request`,
   });
 }
 
-type AcceptAllyRequestActionParam = {
+type RefuseAllyRequestActionParam = {
   decisionId: string;
   country: Country;
   game: Game;

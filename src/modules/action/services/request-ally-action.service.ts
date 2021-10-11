@@ -5,8 +5,9 @@ import {
   SuccessResponse,
 } from '../../../helpers/response.helper';
 import { Country } from '../../country/country.entity';
-import { Decision, DecisionType } from '../../country/country.typing';
+import { Decision, DecisionMakeType } from '../../country/country.typing';
 import { Game } from '../../game/game.entity';
+import { ActionType } from '../action.typing';
 
 export async function requestAllyAction(
   data: RequestAllyActionParam
@@ -41,7 +42,11 @@ export async function requestAllyAction(
 
   const decision: Decision = {
     id: v4(),
-    types: [DecisionType.ACCEPT_ALLY_REQUEST, DecisionType.REFUSE_ALLY_REQUEST],
+    actionType: ActionType.ACCEPT_ALLY_REQUEST,
+    types: [
+      DecisionMakeType.ACCEPT_ALLY_REQUEST,
+      DecisionMakeType.REFUSE_ALLY_REQUEST,
+    ],
     description: `${country.name} wants to be our ally`,
     requester: {
       flag: country.flag,

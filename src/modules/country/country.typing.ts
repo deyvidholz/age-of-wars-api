@@ -1,4 +1,5 @@
 import { ProvincePassive } from '../../data/templates/province-passive.template';
+import { ActionType } from '../action/action.typing';
 
 export type Army = {
   aircrafts: number;
@@ -125,7 +126,7 @@ export enum SetOpinionOfActionParam {
   SET = 'SET',
 }
 
-export enum DecisionType {
+export enum DecisionMakeType {
   ACCEPT_JOIN_WAR = 'ACCEPT_JOIN_WAR',
   REFUSE_JOIN_WAR = 'REFUSE_JOIN_WAR',
   ACCEPT_PEACE_REQUEST = 'ACCEPT_PEACE_REQUEST',
@@ -136,7 +137,8 @@ export enum DecisionType {
 
 export type Decision = {
   id: string;
-  types: DecisionType[];
+  actionType: ActionType;
+  types: DecisionMakeType[];
   description: string;
   requester?: CountrySimplified;
   target?: CountrySimplified;

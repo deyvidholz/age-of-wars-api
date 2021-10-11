@@ -13,6 +13,7 @@ import { improveProvincesAction } from './services/improve-provinces-action.serv
 import { improveRelationsAction } from './services/improve-relations-action.service';
 import { joinWarAction } from './services/join-war-action.service';
 import { nextTurnAction } from './services/next-turn-action.service';
+import { refuseAllyRequestAction } from './services/refuse-ally-request-action.service';
 import { requestAllyAction } from './services/request-ally-action.service';
 import { sendInsultAction } from './services/send-insult-action.service';
 import { shopAction } from './services/shop-action.service';
@@ -25,20 +26,17 @@ export class ActionService {
 
     for (const country of data.game.countries) {
       if (country.isAi) {
-        let chance = 60;
+        // TODO add money verification for some generated actions
 
-        if (country.incoming.balance > 600) {
-          chance = 100;
-        } else if (country.incoming.balance > 300) {
-          chance = 80;
-        }
+        await AiService.runDecisions({
+          country,
+          game: data.game,
+        });
 
-        if (MathHelper.chanceOf(chance)) {
-          await AiService.generateActions({
-            country,
-            game: data.game,
-          });
-        }
+        await AiService.generateActions({
+          country,
+          game: data.game,
+        });
       }
 
       country.economy.balance += country.incoming.balance || 0;
@@ -172,6 +170,13 @@ export class ActionService {
 
           case ActionType.ACCEPT_ALLY_REQUEST:
             response = await acceptAllyRequestAction({
+              country,
+              decisionId: action.data.decisionId,
+              game: data.game,
+            });
+
+          case ActionType.REFUSE_ALLY_REQUEST:
+            response = await refuseAllyRequestAction({
               country,
               decisionId: action.data.decisionId,
               game: data.game,

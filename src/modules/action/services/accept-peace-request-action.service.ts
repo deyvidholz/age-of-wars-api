@@ -5,7 +5,7 @@ import {
 } from '../../../helpers/response.helper';
 import { Country } from '../../country/country.entity';
 import { CountryHelper } from '../../country/country.helper';
-import { DecisionType } from '../../country/country.typing';
+import { DecisionMakeType } from '../../country/country.typing';
 import { Game } from '../../game/game.entity';
 import { WarHelper } from '../../war/war.helper';
 import { PeaceRequest, WarStage } from '../../war/war.typing';
@@ -27,7 +27,7 @@ export async function acceptPeaceRequestAction(
     });
   }
 
-  if (!decision.types.includes(DecisionType.ACCEPT_PEACE_REQUEST)) {
+  if (!decision.types.includes(DecisionMakeType.ACCEPT_PEACE_REQUEST)) {
     return ResponseHelper.error({
       message: 'Invalid decision type',
       data: { decision },

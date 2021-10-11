@@ -5,10 +5,11 @@ import {
   SuccessResponse,
 } from '../../../helpers/response.helper';
 import { Country } from '../../country/country.entity';
-import { Decision, DecisionType } from '../../country/country.typing';
+import { Decision, DecisionMakeType } from '../../country/country.typing';
 import { Game } from '../../game/game.entity';
 import { WarHelper } from '../../war/war.helper';
 import { PeaceRequest } from '../../war/war.typing';
+import { ActionType } from '../action.typing';
 
 export async function requestPeaceAction(
   data: RequestPeaceActionParam
@@ -55,9 +56,10 @@ export async function requestPeaceAction(
 
   const decision: Decision = {
     id: v4(),
+    actionType: ActionType.ACCEPT_PEACE_REQUEST,
     types: [
-      DecisionType.ACCEPT_PEACE_REQUEST,
-      DecisionType.REFUSE_PEACE_REQUEST,
+      DecisionMakeType.ACCEPT_PEACE_REQUEST,
+      DecisionMakeType.REFUSE_PEACE_REQUEST,
     ],
     description: `Accept peace request from ${country.name}`,
     data: {

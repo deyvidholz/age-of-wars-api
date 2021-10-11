@@ -6,19 +6,14 @@ import {
 import { Focus, focuses } from '../../data/templates/focuses.template';
 import { PersonalityType } from '../../data/templates/personalities.template';
 import { MathHelper } from '../../helpers/math.helper';
-import { ErrorResponse, SuccessResponse } from '../../helpers/response.helper';
 import { ActionType } from '../action/action.typing';
 import { Country } from '../country/country.entity';
 import { CountryService } from '../country/country.service';
-import {
-  CountrySimplified,
-  Province,
-  ProvinceLevels,
-  RankingType,
-} from '../country/country.typing';
+import { CountrySimplified, RankingType } from '../country/country.typing';
 import { Game } from '../game/game.entity';
 import { ShopService } from '../shop/shop.service';
-import { Item, ItemType, Order, OrderItem } from '../shop/shop.typing';
+import { ItemType, Order, OrderItem } from '../shop/shop.typing';
+import { acceptAllianceRequestAiDecision } from './ai-decisions/accept-alliance-request.ai-decision';
 import { AiHelper } from './ai.helper';
 
 export class AiService {
@@ -81,6 +76,29 @@ export class AiService {
     //   console.log(country.actions);
     //   console.log('');
     // }
+  }
+
+  static async runDecisions(data: RunDecisionsParam) {
+    const { country, game } = data;
+
+    for (const decision of country.decisions) {
+      console.log('decision:actionType', country.name, decision.actionType);
+      switch (decision.actionType) {
+        case ActionType.ACCEPT_ALLY_REQUEST:
+          await acceptAllianceRequestAiDecision({
+            country,
+            game,
+            decision,
+          });
+          break;
+
+        case ActionType.JOIN_WAR:
+          break;
+
+        case ActionType.ACCEPT_PEACE_REQUEST:
+          break;
+      }
+    }
   }
 
   static changeFocus(data: ChangeFocusParam) {
@@ -560,15 +578,18 @@ export class AiService {
       type: ActionType.DECLARE_WAR,
       data: {
         targetId,
-        callToWar: [
-          // country.allies.map((ally) => ally.name)
-        ],
+        callToWar: [country.allies.map((ally) => ally.name)],
       },
     });
   }
 }
 
 type GenerateActionsParam = {
+  country: Country;
+  game: Game;
+};
+
+type RunDecisionsParam = {
   country: Country;
   game: Game;
 };

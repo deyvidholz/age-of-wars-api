@@ -1,6 +1,7 @@
 import { v4 } from 'uuid';
 import { Country } from '../../country/country.entity';
-import { DecisionType } from '../../country/country.typing';
+import { DecisionMakeType } from '../../country/country.typing';
+import { ActionType } from '../action.typing';
 
 export class DeclareWarActionHelper {
   static sendCallToWar(data: SendCallToWarParam) {
@@ -45,7 +46,11 @@ export class DeclareWarActionHelper {
 
     requestedCountry.decisions.push({
       id: v4(),
-      types: [DecisionType.ACCEPT_JOIN_WAR, DecisionType.REFUSE_JOIN_WAR],
+      actionType: ActionType.JOIN_WAR,
+      types: [
+        DecisionMakeType.ACCEPT_JOIN_WAR,
+        DecisionMakeType.REFUSE_JOIN_WAR,
+      ],
       description: `Join war of ${country.name} against ${target.name}`,
       requester: country.getCountrySimplifiedData(),
       target: target.getCountrySimplifiedData(),
