@@ -1,7 +1,9 @@
 import {
   Army,
+  CountrySimplified,
   Economy,
   EstimatedArmy,
+  MilitaryPower,
   ProvinceSimplified,
   Resource,
 } from '../country/country.typing';
@@ -12,6 +14,7 @@ export type Losses = {
   aircrafts: number;
   warships: number;
   balance: number;
+  country?: CountrySimplified;
 };
 
 export type WarParticipant = {
@@ -95,4 +98,29 @@ export type War = {
   stage: WarStage;
   startAtStage: number;
   details: WarDetails;
+  winner?: WarParticipantType;
+  isOver?: boolean;
 };
+
+export type WarComparedInfo = {
+  attackers: WarComparedInfoCountry[];
+  victims: WarComparedInfoCountry[];
+  attackersPowerDiff: MilitaryPower;
+  victimsPowerDiff: MilitaryPower;
+};
+
+export type WarComparedInfoCountry = {
+  country: CountrySimplified;
+  militaryPower: MilitaryPower;
+  powerDiffBetweenAllies: MilitaryPower;
+};
+
+export type LossesBySide = {
+  attackers: Losses;
+  victims: Losses;
+};
+
+export enum WarParticipantType {
+  ATTACKER = 'ATTACKER',
+  VICTIM = 'VICTIM',
+}

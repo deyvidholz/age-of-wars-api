@@ -23,10 +23,10 @@ export class AiHelper {
           availableActions.push(ActionType.SEND_INSULT);
           // TODO bots are declaring to many wars
           if (!country.inWarWith.length) {
-            availableActions.push(
-              ActionType.DECLARE_WAR,
-              ActionType.DECLARE_WAR
-            );
+            // availableActions.push(
+            //   ActionType.DECLARE_WAR,
+            //   ActionType.DECLARE_WAR
+            // );
           }
         }
         break;
@@ -34,7 +34,7 @@ export class AiHelper {
         if (!country.inWarWith.length) {
           availableActions.push(ActionType.SEND_INSULT);
           if (!country.inWarWith.length) {
-            availableActions.push(ActionType.DECLARE_WAR);
+            // availableActions.push(ActionType.DECLARE_WAR);
           }
         }
         break;

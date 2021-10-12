@@ -18,6 +18,7 @@ export enum ActionType {
   REFUSE_JOIN_WAR = 'REFUSE_JOIN_WAR',
   DISMISS_ARMY = 'DISMISS_ARMY',
   GUARANTEE_INDEPENDENCE = 'GUARANTEE_INDEPENDENCE',
+  DEMAND = 'DEMAND',
 }
 
 export type Action = {

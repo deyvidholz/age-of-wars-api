@@ -46,12 +46,12 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
       Canada: {
         flag: getFlag('Canada'),
         name: 'Canada',
-        value: 999,
+        value: 200,
       },
-      Mexico: {
-        flag: getFlag('Mexico'),
-        name: 'Mexico',
-        value: [800, 900],
+      Japan: {
+        flag: getFlag('Japan'),
+        name: 'Japan',
+        value: 200,
       },
     },
   },
@@ -64,6 +64,13 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
         name: 'United States',
       },
     ],
+    opinions: {
+      'United States': {
+        flag: getFlag('United States'),
+        name: 'United States',
+        value: 200,
+      },
+    },
   },
 };
 

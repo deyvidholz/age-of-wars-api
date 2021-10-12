@@ -90,5 +90,9 @@ export class Game {
     await ActionService.runActions({
       game: this,
     });
+
+    await ActionService.runWars({
+      game: this,
+    });
   }
 }

@@ -3,10 +3,10 @@ import Probability from 'probability-node';
 export class MathHelper {
   static percentDiff(number1: number, number2: number): number {
     if (number1 >= number2) {
-      return ((number1 - number2) / number1) * 100.0;
+      return ((number1 - number2) / number1) * 100;
     }
 
-    return -Math.abs(((number2 - number1) / number2) * 100.0);
+    return -Math.abs(((number2 - number1) / number2) * 100);
   }
 
   static getRandomNumber(min: number, max: number) {

@@ -21,10 +21,12 @@ export class AiService {
   static async generateActions(data: GenerateActionsParam) {
     const { country, game } = data;
 
-    const possibleActions = AiHelper.generateActionTypes({
-      country,
-      gameStageCount: game.stageCount,
-    });
+    const possibleActions =
+      [] ||
+      AiHelper.generateActionTypes({
+        country,
+        gameStageCount: game.stageCount,
+      });
 
     for (const actionType of possibleActions) {
       switch (actionType) {

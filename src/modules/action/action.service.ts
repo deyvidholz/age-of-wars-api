@@ -1,8 +1,13 @@
 import 'dotenv/config';
+import { v4 } from 'uuid';
 import { MathHelper } from '../../helpers/math.helper';
 import { ErrorResponse, SuccessResponse } from '../../helpers/response.helper';
 import { AiService } from '../ai/ai.service';
+import { CountryHelper } from '../country/country.helper';
+import { DecisionMakeType } from '../country/country.typing';
 import { Game } from '../game/game.entity';
+import { WarHelper } from '../war/war.helper';
+import { WarParticipantType } from '../war/war.typing';
 import { ActionType } from './action.typing';
 import { acceptAllyRequestAction } from './services/accept-ally-request-action.service';
 import { acceptPeaceRequestAction } from './services/accept-peace-request-action.service';
@@ -203,8 +208,127 @@ export class ActionService {
       country.actions = [];
     } // for (data.game.countries)
   }
+
+  static async runWars(data: RunWarsParam) {
+    const { game } = data;
+
+    for (const war of game.wars) {
+      if (war.isOver) {
+        continue;
+      }
+
+      const attackers = WarHelper.getAttackers(game, war);
+      const victims = WarHelper.getVictims(game, war);
+
+      const comparedInfo = WarHelper.getComparedInfo(
+        game,
+        war,
+        attackers,
+        victims
+      );
+      const lossesBySide = WarHelper.getLosses(game, war, comparedInfo);
+      const splittedLosses = WarHelper.getSpllitedLosses(
+        comparedInfo,
+        lossesBySide,
+        true
+      );
+
+      WarHelper.setLosses(game, war, splittedLosses);
+
+      const mps = CountryHelper.sumWarMilitaryPowers({
+        attackers,
+        victims,
+      });
+
+      const isOver: boolean =
+        mps.attackers.militaryPower.totals.total <= 0 ||
+        mps.victims.militaryPower.totals.total <= 0;
+
+      if (!isOver) {
+        continue;
+      }
+
+      console.log(
+        `${war.details.attacker.name} x ${war.details.victim.name} is over`
+      );
+      war.isOver = true;
+
+      let winner: WarParticipantType;
+
+      if (mps.attackers.militaryPower.totals.total <= 0) {
+        console.log('victim won!');
+        winner = WarParticipantType.VICTIM;
+
+        const provincesToFill: string[] = [];
+        for (const attacker of attackers) {
+          provincesToFill.push(
+            ...attacker.provinces.map((province) => province.mapRef)
+          );
+        }
+
+        for (const country of victims) {
+          country.decisions.push({
+            id: v4(),
+            actionType: ActionType.DEMAND,
+            types: [],
+            description: `You won the war against ${war.details.attacker.name} and can demand provinces/resources.`,
+            data: {
+              warId: war.id,
+              winner,
+              allies: victims
+                .filter((ally) => ally.id !== country.id)
+                .map(
+                  (ally) =>
+                    ally.getCountrySimplifiedData() && ally.id !== country.id
+                ),
+              targets: attackers.map((target) =>
+                target.getCountrySimplifiedData()
+              ),
+              provincesToFill,
+            },
+          });
+        }
+      } else if (mps.victims.militaryPower.totals.total <= 0) {
+        console.log('attacker won!');
+        winner = WarParticipantType.ATTACKER;
+
+        const provincesToFill: string[] = [];
+        for (const victim of victims) {
+          provincesToFill.push(
+            ...victim.provinces.map((province) => province.mapRef)
+          );
+        }
+
+        for (const country of attackers) {
+          country.decisions.push({
+            id: v4(),
+            actionType: ActionType.DEMAND,
+            types: [],
+            description: `You won the war against ${war.details.victim.name}.`,
+            data: {
+              warId: war.id,
+              winner,
+              allies: attackers
+                .filter((ally) => ally.id !== country.id)
+                .map((ally) => ally.getCountrySimplifiedData()),
+              targets: victims.map((target) =>
+                target.getCountrySimplifiedData()
+              ),
+              provincesToFill,
+            },
+          });
+        }
+      }
+
+      war.winner = winner;
+    }
+  }
 }
 
 type RunActionsParam = {
+  game: Game;
+};
+
+type RunWarsParam = {
   game: Game;
 };
