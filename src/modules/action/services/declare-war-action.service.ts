@@ -1,6 +1,11 @@
 import 'dotenv/config';
 import { v4 } from 'uuid';
 import {
+  aggressivePersonality,
+  neutralPersonality,
+  PersonalityType,
+} from '../../../data/templates/personalities.template';
+import {
   ErrorResponse,
   ResponseHelper,
   SuccessResponse,
@@ -104,7 +109,6 @@ export async function declareWarAction(
     warships: 0,
   };
 
-  // TODO calculate based on military power diff
   const startAtStage: number = game.stageCount + 2;
 
   const war: War = {
@@ -188,6 +192,22 @@ export async function declareWarAction(
   }
 
   game.wars.push(war);
+
+  if (country.personality.type === PersonalityType.PACIFIC) {
+    let changePacificPersonalityWhenReachTotalAggressivenessOf: number =
+      +process.env
+        .CHANGE_PACIFIC_PERSONALITY_WHEN_REACH_TOTAL_AGGRESSIVENESS_OF;
+
+    const reachedAggressiveness: boolean =
+      country.aggressiveness.total >=
+      changePacificPersonalityWhenReachTotalAggressivenessOf;
+
+    if (reachedAggressiveness) {
+      country.personality = aggressivePersonality;
+    } else {
+      country.personality = neutralPersonality;
+    }
+  }
 
   country.messages.push({
     stage: data.game.stageCount,

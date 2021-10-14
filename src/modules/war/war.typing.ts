@@ -22,6 +22,7 @@ export type WarParticipant = {
   name: string;
   flag: string;
   losses: Losses;
+  participation?: number;
 };
 
 export type WarDetails = {
@@ -31,6 +32,7 @@ export type WarDetails = {
     flag: string;
     allies: WarParticipant[];
     losses: Losses;
+    participation?: number;
   };
   victim: {
     id: string;
@@ -38,6 +40,7 @@ export type WarDetails = {
     flag: string;
     allies: WarParticipant[];
     losses: Losses;
+    participation?: number;
   };
 };
 
@@ -99,7 +102,6 @@ export type War = {
   startAtStage: number;
   details: WarDetails;
   winner?: WarParticipantType;
-  isOver?: boolean;
 };
 
 export type WarComparedInfo = {

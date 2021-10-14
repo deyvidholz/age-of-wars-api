@@ -29,7 +29,7 @@ export class CountryHelper {
       opinion.value = -200;
     }
 
-    if (opinion.value < 200) {
+    if (opinion.value > 200) {
       opinion.value = 200;
     }
 
@@ -122,6 +122,20 @@ export class CountryHelper {
             valueIncrementType: passive.valueType,
           });
           break;
+
+        case ProvincePassiveType.REDUCE_INCOMING:
+          incoming.production = CountryHelper.applyDecrementPassive({
+            percentage: passive.value,
+            value: incoming.production,
+            valueIncrementType: passive.valueType,
+          });
+
+          incoming.taxation = CountryHelper.applyDecrementPassive({
+            percentage: passive.value,
+            value: incoming.taxation,
+            valueIncrementType: passive.valueType,
+          });
+          break;
       }
     }
 
@@ -141,6 +155,7 @@ export class CountryHelper {
         levels: province.levels,
         oilProduction: province.oilProduction,
         mapRef: province.mapRef,
+        passives: province.passives,
       });
 
       incomings.push(incoming);
@@ -255,6 +270,14 @@ export class CountryHelper {
     return MathHelper.getPercetageValue(data.value, data.percentage, true);
   }
 
+  static applyDecrementPassive(data: ApplyIncrementPassiveParam): number {
+    if (data.valueIncrementType === CountryPassiveValueType.STATIC) {
+      return data.value - data.percentage;
+    }
+
+    return MathHelper.subtractByPercentage(data.value, data.percentage);
+  }
+
   // TODO improve performance (reduce maps)
   static sumWarMilitaryPowers(
     data: SumMilitaryPowersParam
@@ -344,7 +367,7 @@ type GetProvinceIncomingParam = {
   mapRef?: string;
   levels: ProvinceLevels;
   oilProduction: number;
-  passives?: ProvincePassive[];
+  passives: ProvincePassive[];
 };
 
 type GetIncomingParam = {

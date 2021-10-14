@@ -396,6 +396,42 @@ export class Country {
     );
   }
 
+  guaranteeIndependenceOf(country: CountrySimplified) {
+    if (this.hasFriendlyRelations(country.id, false)) {
+      return;
+    }
+
+    if (country.id === this.id) {
+      return;
+    }
+
+    this.guaranteeingIndependence.push(country);
+  }
+
+  addIndependenceGuaranteedBy(country: CountrySimplified) {
+    if (this.hasFriendlyRelations(country.id, false)) {
+      return;
+    }
+
+    if (country.id === this.id) {
+      return;
+    }
+
+    this.independenceGuaranteedBy.push(country);
+  }
+
+  removeGuaranteeIndependenceOf(countryId: string) {
+    this.guaranteeingIndependence = this.guaranteeingIndependence.filter(
+      (c) => c.id !== countryId
+    );
+  }
+
+  removeIndependenceGuaranteedBy(countryId: string) {
+    this.independenceGuaranteedBy = this.independenceGuaranteedBy.filter(
+      (c) => c.id !== countryId
+    );
+  }
+
   getCountrySimplifiedData(): CountrySimplified {
     return {
       flag: this.flag,
@@ -440,6 +476,26 @@ export class Country {
   }
 
   private beforeChange() {
+    // TODO reduce loopings
+    for (const province of this.provinces) {
+      if (!province.passives) {
+        province.passives = [];
+      }
+
+      for (const passive of province.passives) {
+        if (typeof passive.duration !== 'number') {
+          continue;
+        }
+
+        passive.duration--;
+      }
+
+      province.passives = province.passives.filter(
+        (passive) =>
+          typeof passive.duration !== 'number' || passive.duration > -1
+      );
+    }
+
     const incomings = this.getIncoming();
 
     for (const province of this.provinces) {
@@ -488,5 +544,32 @@ export class Country {
     if (this.aggressiveness.current < 0) {
       this.aggressiveness.current = 0;
     }
+  }
+
+  setNewCapital(mapRef?: string) {
+    if (!this.provinces.length) {
+      return;
+    }
+
+    if (mapRef) {
+      const province = this.provinces.find(
+        (province) => province.mapRef === mapRef
+      );
+
+      if (province) {
+        province.isCapital = true;
+      }
+    }
+
+    this.provinces.sort((a, b) => {
+      let totalLevel = {
+        a: a.levels.production + a.levels.taxation,
+        b: b.levels.production + b.levels.taxation,
+      };
+
+      return totalLevel.b - totalLevel.a;
+    });
+
+    this.provinces[0].isCapital = true;
   }
 }

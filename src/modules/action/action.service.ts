@@ -1,5 +1,9 @@
 import 'dotenv/config';
 import { v4 } from 'uuid';
+import {
+  CountryPassiveType,
+  CountryPassiveValueType,
+} from '../../data/templates/country-passives.template';
 import { MathHelper } from '../../helpers/math.helper';
 import { ErrorResponse, SuccessResponse } from '../../helpers/response.helper';
 import { AiService } from '../ai/ai.service';
@@ -7,18 +11,21 @@ import { CountryHelper } from '../country/country.helper';
 import { DecisionMakeType } from '../country/country.typing';
 import { Game } from '../game/game.entity';
 import { WarHelper } from '../war/war.helper';
-import { WarParticipantType } from '../war/war.typing';
+import { WarParticipantType, WarStage } from '../war/war.typing';
 import { ActionType } from './action.typing';
 import { acceptAllyRequestAction } from './services/accept-ally-request-action.service';
 import { acceptPeaceRequestAction } from './services/accept-peace-request-action.service';
+import { breakAllianceAction } from './services/break-alliance-action.service';
 import { changeFocusAction } from './services/change-focus-action.service';
 import { declareWarAction } from './services/declare-war-action.service';
 import { dismissArmyAction } from './services/dismiss-army-action.service';
+import { guaranteeIndependenceAction } from './services/guarantee-independence-action.service';
 import { improveProvincesAction } from './services/improve-provinces-action.service';
 import { improveRelationsAction } from './services/improve-relations-action.service';
 import { joinWarAction } from './services/join-war-action.service';
 import { nextTurnAction } from './services/next-turn-action.service';
 import { refuseAllyRequestAction } from './services/refuse-ally-request-action.service';
+import { removeIndependenceGuaranteeingAction } from './services/remove-independence-guaranteeing-action.service';
 import { requestAllyAction } from './services/request-ally-action.service';
 import { sendInsultAction } from './services/send-insult-action.service';
 import { shopAction } from './services/shop-action.service';
@@ -30,6 +37,42 @@ export class ActionService {
       +process.env.AGGRESSIVENESS_REDUCTION_PER_STAGE;
 
     for (const country of data.game.countries) {
+      const hasCapital = country.provinces.some(
+        (province) => province.isCapital
+      );
+
+      if (!hasCapital) {
+        country.setNewCapital();
+      }
+
+      for (const passive of country.passives) {
+        if (typeof passive.duration === 'undefined') {
+          continue;
+        }
+
+        passive.duration--;
+      }
+
+      country.passives = country.passives.filter(
+        (passive) =>
+          typeof passive.duration !== 'undefined' && passive.duration > -1
+      );
+
+      for (const decision of country.decisions) {
+        if (typeof decision.duration === 'undefined') {
+          continue;
+        }
+
+        decision.duration--;
+      }
+
+      country.decisions = country.decisions.filter(
+        (decision) =>
+          !decision.decided &&
+          typeof decision.duration !== 'undefined' &&
+          decision.duration > -1
+      );
+
       if (country.isAi) {
         // TODO add money verification for some generated actions
 
@@ -140,6 +183,14 @@ export class ActionService {
             });
             break;
 
+          case ActionType.BREAK_ALLIANCE:
+            response = await breakAllianceAction({
+              country,
+              game: data.game,
+              targetId: action.data?.targetId,
+            });
+            break;
+
           case ActionType.REQUEST_PEACE:
             break;
 
@@ -160,7 +211,15 @@ export class ActionService {
             break;
 
           case ActionType.GUARANTEE_INDEPENDENCE:
-            response = await requestAllyAction({
+            response = await guaranteeIndependenceAction({
+              country,
+              game: data.game,
+              targetId: action.data?.targetId,
+            });
+            break;
+
+          case ActionType.REMOVE_INDEPENDENCE_GUARANTEEING:
+            response = await removeIndependenceGuaranteeingAction({
               country,
               game: data.game,
               targetId: action.data?.targetId,
@@ -213,7 +272,11 @@ export class ActionService {
     const { game } = data;
 
     for (const war of game.wars) {
-      if (war.isOver) {
+      if (game.stageCount < war.startAtStage) {
+        continue;
+      }
+
+      if (war.stage === WarStage.OVER) {
         continue;
       }
 
@@ -245,13 +308,14 @@ export class ActionService {
         mps.victims.militaryPower.totals.total <= 0;
 
       if (!isOver) {
+        war.stage = WarStage.FIGHTING;
         continue;
       }
 
       console.log(
         `${war.details.attacker.name} x ${war.details.victim.name} is over`
       );
-      war.isOver = true;
+      war.stage = WarStage.OVER;
 
       let winner: WarParticipantType;
 
@@ -260,18 +324,33 @@ export class ActionService {
         winner = WarParticipantType.VICTIM;
 
         const provincesToFill: string[] = [];
+        const attackersIds: string[] = [];
+        const victimsIds = victims.map((c) => c.id);
+
         for (const attacker of attackers) {
+          attacker.inWarWith = attacker.inWarWith.filter(
+            (c) => !victimsIds.includes(c.id)
+          );
+
+          attackersIds.push(attacker.id);
           provincesToFill.push(
             ...attacker.provinces.map((province) => province.mapRef)
           );
         }
 
         for (const country of victims) {
+          const participant = WarHelper.getParticipant(war, country.id);
+
+          country.inWarWith = country.inWarWith.filter(
+            (c) => !attackersIds.includes(c.id)
+          );
+
           country.decisions.push({
             id: v4(),
             actionType: ActionType.DEMAND,
             types: [],
             description: `You won the war against ${war.details.attacker.name} and can demand provinces/resources.`,
+            duration: 3,
             data: {
               warId: war.id,
               winner,
@@ -285,6 +364,13 @@ export class ActionService {
                 target.getCountrySimplifiedData()
               ),
               provincesToFill,
+              participation: participant.participation,
+              maxProvincesAllowedToDemand: Math.ceil(
+                MathHelper.getPercetageValue(
+                  provincesToFill.length,
+                  participant.participation
+                )
+              ),
             },
           });
         }
@@ -293,18 +379,48 @@ export class ActionService {
         winner = WarParticipantType.ATTACKER;
 
         const provincesToFill: string[] = [];
+        const victimsIds: string[] = [];
+        const attackersIds = attackers.map((c) => c.id);
+
         for (const victim of victims) {
+          victimsIds.push(victim.id);
+
+          victim.inWarWith = victim.inWarWith.filter(
+            (c) => !attackersIds.includes(c.id)
+          );
+
+          if (victim.id === war.details.victim.id) {
+            victim.passives.push({
+              type: CountryPassiveType.INCREASE_TARGET_AGGRESSION_WHEN_ATTACKED,
+              value: 230,
+              valueType: CountryPassiveValueType.STATIC,
+              duration: 20,
+              description: `Increase attacker aggression by +230`,
+            });
+          }
+
           provincesToFill.push(
             ...victim.provinces.map((province) => province.mapRef)
           );
         }
 
         for (const country of attackers) {
+          const participant = WarHelper.getParticipant(war, country.id);
+
+          country.inWarWith = country.inWarWith.filter(
+            (c) => !victimsIds.includes(c.id)
+          );
+
+          country.enemies = country.enemies.filter(
+            (c) => c.id !== war.details.victim.id
+          );
+
           country.decisions.push({
             id: v4(),
             actionType: ActionType.DEMAND,
             types: [],
             description: `You won the war against ${war.details.victim.name}.`,
+            duration: 3,
             data: {
               warId: war.id,
               winner,
@@ -315,6 +431,13 @@ export class ActionService {
                 target.getCountrySimplifiedData()
               ),
               provincesToFill,
+              participation: participant.participation,
+              maxProvincesAllowedToDemand: Math.ceil(
+                MathHelper.getPercetageValue(
+                  provincesToFill.length,
+                  participant.participation
+                )
+              ),
             },
           });
         }
@@ -322,6 +445,10 @@ export class ActionService {
 
       war.winner = winner;
     }
+
+    // Remove inWarWith
+
+    game.wars = game.wars.filter((war) => war.stage !== WarStage.OVER);
   }
 }
 

@@ -1,20 +1,27 @@
 import 'dotenv/config';
 import { In, Raw } from 'typeorm';
 import { validate } from 'uuid';
+import { CountryPassiveValueType } from '../../data/templates/country-passives.template';
 import { focuses } from '../../data/templates/focuses.template';
 import { personalities } from '../../data/templates/personalities.template';
+import { ProvincePassiveType } from '../../data/templates/province-passive.template';
 import { countriesWorldAOWV1 } from '../../data/v1/countries.data';
 import {
   ErrorResponse,
   ResponseHelper,
   SuccessResponse,
 } from '../../helpers/response.helper';
+import { ActionType } from '../action/action.typing';
 import { Game } from '../game/game.entity';
 import { gameRepository } from '../game/game.repository';
 import { Country } from './country.entity';
 import { CountryHelper } from './country.helper';
 import { countryRepository } from './country.repository';
-import { Opinion, Province, RankingType } from './country.typing';
+import { Province, RankingType } from './country.typing';
+import {
+  CaculateAggressivenessCalcType,
+  AggressivenessHelper,
+} from './aggressiveness.helper';
 
 export class CountryService {
   static async getProvince(
@@ -435,13 +442,116 @@ export class CountryService {
       victims: [target, ...targetAllies],
     });
 
+    const aggressivenessToBeAdded =
+      AggressivenessHelper.calculateAggressiveness({
+        calcType: CaculateAggressivenessCalcType.DECLARE_WAR,
+        country: attacker,
+        target,
+      });
+
     return ResponseHelper.success({
       data: {
         simulation: {
           totals,
           participants,
+          aggressivenessToBeAdded,
         },
       },
+    });
+  }
+
+  static async demandProvince(data: DemandProvinceParam) {
+    const country = await countryRepository().findOne(data.countryId);
+
+    if (!country) {
+      return ResponseHelper.error({
+        message: 'Country not found',
+      });
+    }
+
+    const decision = country.decisions.find(
+      (decision) =>
+        decision.actionType === ActionType.DEMAND &&
+        decision.data.provincesToFill.includes(data.mapRef)
+    );
+
+    if (!decision) {
+      return ResponseHelper.error({
+        message: 'You cannot demand this province',
+      });
+    }
+
+    const target = await countryRepository().findOne(data.targetCountryId);
+
+    if (!target) {
+      return ResponseHelper.error({
+        message: 'Target Country not found',
+      });
+    }
+
+    const provinceIndex = target.provinces.findIndex(
+      (province) => province.mapRef === data.mapRef
+    );
+
+    if (provinceIndex === -1) {
+      return ResponseHelper.error({
+        message: `Province ${data.mapRef} not found`,
+        data: {
+          mapRef: data.mapRef,
+        },
+      });
+    }
+
+    const provinceDecisionIndex = decision.data.provincesToFill.indexOf(
+      data.mapRef
+    );
+    decision.data.provincesToFill.splice(provinceDecisionIndex, 1);
+
+    const province: Province = { ...target.provinces[provinceIndex] };
+    province.passives.push({
+      type: ProvincePassiveType.REDUCE_INCOMING,
+      value: 90,
+      valueType: CountryPassiveValueType.PERCENT,
+      description: `Incoming reduced by 90% due to recent wars`,
+      duration: +process.env.PROVINCE_INCOMING_REDUCTION_BY_WARS_DURATION,
+    });
+
+    let aggressiveness: number =
+      AggressivenessHelper.calculateAggressivenessTakeProvince({
+        country,
+        target,
+        isCapital: province.isCapital,
+      });
+
+    country.addAggressiveness(aggressiveness);
+
+    province.isCapital = false;
+    target.provinces.splice(provinceIndex, 1);
+    country.provinces.push(province);
+
+    const provincesToFill = [
+      ...target.provinces.map((province) => province.mapRef),
+    ];
+    decision.data.provincesToFill = provincesToFill;
+    // decision.decided = true;
+
+    await countryRepository().save([country, target]);
+
+    const payload = {
+      color: country.color,
+      provinceToFill: province.mapRef,
+      remainingProvinces: provincesToFill,
+      decisions: country.decisions,
+      message: `${country.name} claimed ${province.name} from ${target.name}`,
+      country: {
+        ...country.getCountrySimplifiedData(),
+        aggressiveness: country.aggressiveness,
+      },
+    };
+
+    return ResponseHelper.success({
+      message: 'Province taken successfully',
+      data: payload,
     });
   }
 }
@@ -482,4 +592,10 @@ type GetWarSimulationParam = {
   include?: string[];
   exclude?: string[];
   removeProvinces?: boolean;
+};
+
+type DemandProvinceParam = {
+  countryId: string;
+  targetCountryId: string;
+  mapRef: string;
 };

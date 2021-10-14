@@ -140,6 +140,8 @@ export type Decision = {
   actionType: ActionType;
   types: DecisionMakeType[];
   description: string;
+  decided?: boolean;
+  duration?: number;
   requester?: CountrySimplified;
   target?: CountrySimplified;
   data?: any;

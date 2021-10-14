@@ -47,6 +47,7 @@ export class DeclareWarActionHelper {
     requestedCountry.decisions.push({
       id: v4(),
       actionType: ActionType.JOIN_WAR,
+      duration: 3,
       types: [
         DecisionMakeType.ACCEPT_JOIN_WAR,
         DecisionMakeType.REFUSE_JOIN_WAR,
@@ -54,7 +55,7 @@ export class DeclareWarActionHelper {
       description: `Join war of ${country.name} against ${target.name}`,
       requester: country.getCountrySimplifiedData(),
       target: target.getCountrySimplifiedData(),
-      data: { warId: data.warId },
+      data: { warId: data.warId, allyCountryId: country.id },
     });
   }
 }

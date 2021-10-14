@@ -13,6 +13,7 @@ import {
   War,
   WarComparedInfo,
   WarComparedInfoCountry,
+  WarDetails,
   WarParticipant,
 } from './war.typing';
 
@@ -242,11 +243,6 @@ export class WarHelper {
       attackers: WarHelper.getMpDiff(attackers),
       victims: WarHelper.getMpDiff(victims),
     };
-
-    // console.log('a', mpDiff.attackers.mpTotal.aircrafts);
-    // console.log('v', mpDiff.victims.mpTotal.aircrafts);
-
-    // mpDiff.victims.mpTotal.aircrafts = mpDiff.attackers.mpTotal.aircrafts * 10;
 
     const attackersPowerDiff: MilitaryPower = {
       total: MathHelper.percentDiff(
@@ -656,11 +652,133 @@ export class WarHelper {
 
       losses = WarHelper.getLossesBasedOnArmy(losses, country.army);
       const keys = Object.keys(country.army);
+      const participant = WarHelper.getParticipant(war, country.id);
 
       for (const armyType of keys) {
+        participant.losses[armyType] += losses[armyType];
         country.army[armyType] -= losses[armyType];
       }
     }
+  }
+
+  static getParticipant(war: War, countryId: string): WarParticipant | null {
+    if (war.details.attacker.id === countryId) {
+      return war.details.attacker;
+    }
+
+    if (war.details.victim.id === countryId) {
+      return war.details.victim;
+    }
+
+    return (
+      war.details.attacker.allies.find((country) => country.id === countryId) ||
+      war.details.victim.allies.find((country) => country.id === countryId)
+    );
+  }
+
+  static setParticipationPercentage(warDetails: WarDetails) {
+    const attackersLosses = [warDetails.attacker.losses];
+    const victimsLosses = [warDetails.victim.losses];
+
+    if (warDetails.attacker.allies.length) {
+      attackersLosses.push(
+        ...warDetails.attacker.allies.map((ally) => ally.losses)
+      );
+    }
+
+    if (warDetails.victim.allies.length) {
+      victimsLosses.push(
+        ...warDetails.victim.allies.map((ally) => ally.losses)
+      );
+    }
+
+    const attackersTotalLossesMp =
+      WarHelper.sumLossesTotalMilitaryPower(attackersLosses);
+    const victimsTotalLossesMp =
+      WarHelper.sumLossesTotalMilitaryPower(victimsLosses);
+
+    const attackerLossesMp = WarHelper.sumLossesTotalMilitaryPower([
+      warDetails.attacker.losses,
+    ]);
+    const victimLossesMp = WarHelper.sumLossesTotalMilitaryPower([
+      warDetails.victim.losses,
+    ]);
+
+    warDetails.attacker.participation =
+      100 -
+      MathHelper.percentDiff(
+        attackersTotalLossesMp.total,
+        attackerLossesMp.total
+      );
+    warDetails.victim.participation =
+      100 -
+      MathHelper.percentDiff(victimsTotalLossesMp.total, victimLossesMp.total);
+
+    for (const ally of warDetails.attacker.allies) {
+      const allyLossesMp = WarHelper.sumLossesTotalMilitaryPower([ally.losses]);
+      ally.participation =
+        100 -
+        MathHelper.percentDiff(
+          attackersTotalLossesMp.total,
+          allyLossesMp.total
+        );
+    }
+
+    for (const ally of warDetails.victim.allies) {
+      const allyLossesMp = WarHelper.sumLossesTotalMilitaryPower([ally.losses]);
+      ally.participation =
+        100 -
+        MathHelper.percentDiff(victimsTotalLossesMp.total, allyLossesMp.total);
+    }
+  }
+
+  static sumTotalLosses(losses: Losses[]): Losses {
+    return losses.reduce(
+      (a, b) => ({
+        aircrafts: a.aircrafts + b.aircrafts,
+        balance: a.balance + b.balance,
+        divisions: a.divisions + b.divisions,
+        tanks: a.tanks + b.tanks,
+        warships: a.warships + b.warships,
+      }),
+      {
+        aircrafts: 0,
+        balance: 0,
+        divisions: 0,
+        tanks: 0,
+        warships: 0,
+      }
+    );
+  }
+
+  static sumLossesTotalMilitaryPower(mps: Losses[]): MilitaryPower {
+    const mp = mps.reduce(
+      (a, b) => ({
+        aircrafts: a.aircrafts + b.aircrafts,
+        divisions: a.divisions + b.divisions,
+        tanks: a.tanks + b.tanks,
+        warships: a.warships + b.warships,
+        total: MathHelper.sumNumbers(
+          a.aircrafts,
+          b.aircrafts,
+          a.divisions,
+          b.divisions,
+          a.tanks,
+          b.tanks,
+          a.warships,
+          b.warships
+        ),
+      }),
+      {
+        aircrafts: 0,
+        divisions: 0,
+        tanks: 0,
+        total: 0,
+        warships: 0,
+      }
+    );
+
+    return mp;
   }
 }
 

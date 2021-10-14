@@ -30,8 +30,14 @@ export const pacificPersonality: Personality = {
     {
       type: CountryPassiveType.INCREASE_TARGET_AGGRESSION_WHEN_ATTACKED,
       valueType: CountryPassiveValueType.STATIC,
-      value: 200,
-      description: 'Increase aggression of attacker by +200',
+      value: 150,
+      description: 'Increase aggression of attacker by +150',
+    },
+    {
+      type: CountryPassiveType.INCREASE_TARGET_AGGRESSION_WHEN_TAKE_PROVINCE,
+      valueType: CountryPassiveValueType.STATIC,
+      value: 3,
+      description: 'Increase aggression of attacker by +3 when take province',
     },
   ],
 };
@@ -40,7 +46,14 @@ export const neutralPersonality: Personality = {
   type: PersonalityType.NEUTRAL,
   color: '#FDD835',
   icon: 'mdi-axis-arrow',
-  passives: [],
+  passives: [
+    {
+      type: CountryPassiveType.INCREASE_AGGRESSION_WHEN_ATTACK,
+      valueType: CountryPassiveValueType.STATIC,
+      value: 5,
+      description: 'Increase aggression when attack by +5',
+    },
+  ],
 };
 
 export const aggressivePersonality: Personality = {
@@ -51,8 +64,8 @@ export const aggressivePersonality: Personality = {
     {
       type: CountryPassiveType.INCREASE_AGGRESSION_WHEN_ATTACK,
       valueType: CountryPassiveValueType.PERCENT,
-      value: 30,
-      description: 'Increase aggression when attack by +30',
+      value: 15,
+      description: 'Increase aggression when attack by +15%',
     },
   ],
 };

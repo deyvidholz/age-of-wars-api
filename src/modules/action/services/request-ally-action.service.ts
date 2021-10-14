@@ -43,6 +43,7 @@ export async function requestAllyAction(
   const decision: Decision = {
     id: v4(),
     actionType: ActionType.ACCEPT_ALLY_REQUEST,
+    duration: 3,
     types: [
       DecisionMakeType.ACCEPT_ALLY_REQUEST,
       DecisionMakeType.REFUSE_ALLY_REQUEST,

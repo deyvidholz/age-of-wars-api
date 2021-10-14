@@ -57,6 +57,7 @@ export async function requestPeaceAction(
   const decision: Decision = {
     id: v4(),
     actionType: ActionType.ACCEPT_PEACE_REQUEST,
+    duration: 1,
     types: [
       DecisionMakeType.ACCEPT_PEACE_REQUEST,
       DecisionMakeType.REFUSE_PEACE_REQUEST,

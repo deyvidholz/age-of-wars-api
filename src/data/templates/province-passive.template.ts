@@ -6,6 +6,7 @@ export enum ProvincePassiveType {
   INCREMENT_OIL = 'INCREMENT_OIL',
   INCREMENT_PRODUCTION_INCOMING = 'INCREMENT_PRODUCTION_INCOMING',
   INCREMENT_TAXATION_INCOMING = 'INCREMENT_TAXATION_INCOMING',
+  REDUCE_INCOMING = 'REDUCE_INCOMING',
 }
 
 export type ProvincePassive = {
@@ -15,4 +16,5 @@ export type ProvincePassive = {
   description?: string;
   data?: any;
   setAsCountryPassive?: boolean;
+  duration?: number;
 };
