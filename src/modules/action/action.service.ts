@@ -39,9 +39,23 @@ export class ActionService {
       (country) => !country.provinces.length
     );
 
+    const playersRemovedIds: string[] = [];
+    for (const country of countriesRemoved) {
+      if (!country.owner) {
+        continue;
+      }
+
+      playersRemovedIds.push(country.owner.id);
+    }
+
     data.game.countries = data.game.countries.filter(
       (country) => country.provinces.length
     );
+
+    data.game.players = data.game.players.filter(
+      (player) => !playersRemovedIds.includes(player.id)
+    );
+
     const countriesRemovedIds = countriesRemoved.map((country) => country.id);
 
     if (countriesRemoved.length) {

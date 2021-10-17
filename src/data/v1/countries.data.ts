@@ -867,7 +867,7 @@ export const countriesWorldAOWV1: CountryV1[] = [
     economy: {
       money: 0,
     },
-    passives: [{ type: CountryPassiveTypeV1.INCOMING, amount: 399 }],
+    passives: [{ type: CountryPassiveTypeV1.INCOMING, amount: 999 }],
     provinces: [
       {
         id: 'CA-ON',
@@ -3443,7 +3443,7 @@ export const countriesWorldAOWV1: CountryV1[] = [
     economy: {
       money: 0,
     },
-    passives: [{ type: CountryPassiveTypeV1.INCOMING, amount: 3463 }],
+    passives: [{ type: CountryPassiveTypeV1.INCOMING, amount: 5163 }],
     provinces: [
       {
         id: 'CN-11',
@@ -4608,7 +4608,7 @@ export const countriesWorldAOWV1: CountryV1[] = [
     economy: {
       money: 0,
     },
-    passives: [{ type: CountryPassiveTypeV1.INCOMING, amount: 2112 }],
+    passives: [{ type: CountryPassiveTypeV1.INCOMING, amount: 2812 }],
     provinces: [
       {
         id: '_13',
@@ -10229,8 +10229,8 @@ export const countriesWorldAOWV1: CountryV1[] = [
           population: 1000000,
         },
         development: {
-          production: 25,
-          taxation: 25,
+          production: 20,
+          taxation: 20,
         },
         passives: [],
         hasCoast: true,
@@ -10243,8 +10243,8 @@ export const countriesWorldAOWV1: CountryV1[] = [
           population: 1000000,
         },
         development: {
-          production: 25,
-          taxation: 25,
+          production: 18,
+          taxation: 18,
         },
         passives: [],
         hasCoast: true,
@@ -11184,7 +11184,7 @@ export const countriesWorldAOWV1: CountryV1[] = [
     economy: {
       money: 0,
     },
-    passives: [{ type: CountryPassiveTypeV1.INCOMING, amount: 1302 }],
+    passives: [{ type: CountryPassiveTypeV1.INCOMING, amount: 2902 }],
     provinces: [
       {
         id: 'DE-BB',
@@ -11649,7 +11649,7 @@ export const countriesWorldAOWV1: CountryV1[] = [
     economy: {
       money: 0,
     },
-    passives: [{ type: CountryPassiveTypeV1.INCOMING, amount: 771 }],
+    passives: [{ type: CountryPassiveTypeV1.INCOMING, amount: 1771 }],
     provinces: [
       {
         id: 'IT-21',
@@ -12384,7 +12384,7 @@ export const countriesWorldAOWV1: CountryV1[] = [
     economy: {
       money: 0,
     },
-    passives: [{ type: CountryPassiveTypeV1.INCOMING, amount: 2586.88 }],
+    passives: [{ type: CountryPassiveTypeV1.INCOMING, amount: 486 }],
     provinces: [
       {
         id: 'RU-KGD',
@@ -14875,7 +14875,7 @@ export const countriesWorldAOWV1: CountryV1[] = [
       money: 0,
     },
     passives: [
-      { type: CountryPassiveTypeV1.INCOMING, amount: 1048 },
+      { type: CountryPassiveTypeV1.INCOMING, amount: 2248 },
       {
         type: CountryPassiveTypeV1.DISCOUNT_WARSHIPS,
         discountType: 'Warships',
