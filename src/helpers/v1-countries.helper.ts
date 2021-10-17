@@ -53,7 +53,7 @@ export class V1CountryHelper {
       const countryLegacyDataSupport: any =
         countriesV2LegacyDataSupport[preparedCountryName] || {};
 
-      const passives: CountryPassive[] = [];
+      let passives: CountryPassive[] = [];
 
       for (const passiveV1 of country.passives || []) {
         const passive = GameHelper.getParsedCountryPassive({
@@ -65,6 +65,15 @@ export class V1CountryHelper {
         }
 
         passives.push(passive);
+      }
+
+      if (countryLegacyDataSupport.denonym) {
+        if (
+          countryLegacyDataSupport.passives &&
+          countryLegacyDataSupport.passives.length
+        ) {
+          passives = [...passives, ...countryLegacyDataSupport.passives];
+        }
       }
 
       const provinces: Province[] = GameHelper.getParsedCountryProvinces({

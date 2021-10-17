@@ -498,6 +498,12 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
         value: 10,
         description: `Add +10% of Military Power on defensive wars`,
       },
+      {
+        type: CountryPassiveType.AI_INCREASE_DEFENSIVE_FOCUS_CHANCE,
+        valueType: CountryPassiveValueType.PERCENT,
+        value: 90,
+        description: `Increase chance of choose Defensive Focus by 90%`,
+      },
     ],
     opinions: {
       'United Kingdom': {
@@ -555,6 +561,14 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   SWITZERLAND: {
     denonym: 'Swiss',
     personality: pacificPersonality,
+    passives: [
+      {
+        type: CountryPassiveType.INCREASE_DEFENSIVE_WAR_MP,
+        valueType: CountryPassiveValueType.PERCENT,
+        value: 10,
+        description: `Add +10% of Military Power on defensive wars`,
+      },
+    ],
   },
   LUXEMBOURG: {
     denonym: 'Luxembourger',
@@ -688,6 +702,20 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   CHINA: {
     denonym: 'Chineses',
+    passives: [
+      {
+        type: CountryPassiveType.AI_INCREASE_ECONOMIC_FOCUS_CHANCE,
+        valueType: CountryPassiveValueType.PERCENT,
+        value: 50,
+        description: `Increase chance of choose Economic Focus by 50%`,
+      },
+      {
+        type: CountryPassiveType.AI_INCREASE_WAR_FOCUS_CHANCE,
+        valueType: CountryPassiveValueType.PERCENT,
+        value: 50,
+        description: `Increase chance of choose War Focus by 50%`,
+      },
+    ],
     guaranteeingIndependence: [
       {
         flag: getFlag('North Korea'),
