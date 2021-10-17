@@ -203,6 +203,8 @@ export class Country {
   @ManyToOne(() => Game, (game) => game.countries)
   game?: Game;
 
+  doNotcallChangeFunctionOnSave?: boolean;
+
   getNameAsConstant?(): string {
     return GeneralHelper.getStringAsScreamingSnakeCase(this.name);
   }
@@ -462,7 +464,16 @@ export class Country {
       provinces: this.provinces,
       focus: this.focus,
       personality: this.personality,
+      army: this.army,
     });
+  }
+
+  getPassives(): CountryPassive[] {
+    return [
+      ...this.passives,
+      ...this.personality.passives,
+      ...this.focus.passives,
+    ];
   }
 
   @BeforeInsert()
@@ -476,6 +487,10 @@ export class Country {
   }
 
   private beforeChange() {
+    if (this.doNotcallChangeFunctionOnSave) {
+      return;
+    }
+
     // TODO reduce loopings
     for (const province of this.provinces) {
       if (!province.passives) {
@@ -519,6 +534,15 @@ export class Country {
     }
 
     this.incoming = incomings.incoming;
+
+    if (isNaN(this.incoming.balance)) {
+      this.incoming.balance = 0;
+    }
+
+    if (isNaN(this.incoming.oil)) {
+      this.incoming.oil = 0;
+    }
+
     this.militaryPower = this.getMilitaryPower();
     this.totalProvinces = this.provinces.length;
 

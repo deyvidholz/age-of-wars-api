@@ -116,8 +116,6 @@ export class V1CountryHelper {
       });
     }
 
-    // TODO set ID of every child object that is a CountrySimplified
-
     return countries;
   }
 }

@@ -22,6 +22,8 @@ import {
   CaculateAggressivenessCalcType,
   AggressivenessHelper,
 } from './aggressiveness.helper';
+import { WarParticipantType } from '../war/war.typing';
+import { MathHelper } from '../../helpers/math.helper';
 
 export class CountryService {
   static async getProvince(
@@ -53,6 +55,7 @@ export class CountryService {
             ...province,
             isOwner,
             country: ownerCountry,
+            ownerTotalProvinces: country.provinces.length,
           };
         })
       );
@@ -437,10 +440,43 @@ export class CountryService {
     participants.attackers.push(...attackerAllies);
     participants.victims.push(...targetAllies);
 
+    const attackerMps = CountryHelper.compareMilitaryPowers({
+      countries: [attacker, ...attackerAllies],
+      warParticipantType: WarParticipantType.ATTACKER,
+    });
+
+    const victimMps = CountryHelper.compareMilitaryPowers({
+      countries: [target, ...targetAllies],
+      warParticipantType: WarParticipantType.VICTIM,
+    });
+
     const totals = CountryHelper.sumWarMilitaryPowers({
       attackers: [attacker, ...attackerAllies],
       victims: [target, ...targetAllies],
     });
+
+    totals.attackers.militaryPower.totals = attackerMps.total;
+    totals.victims.militaryPower.totals = victimMps.total;
+
+    attacker.militaryPower = attackerMps.mps.find(
+      (mp) => mp.countryName === attacker.name
+    );
+
+    target.militaryPower = victimMps.mps.find(
+      (mp) => mp.countryName === target.name
+    );
+
+    for (const country of participants.attackers) {
+      country.militaryPower = attackerMps.mps.find(
+        (mp) => mp.countryName === country.name
+      );
+    }
+
+    for (const country of participants.victims) {
+      country.militaryPower = victimMps.mps.find(
+        (mp) => mp.countryName === country.name
+      );
+    }
 
     const aggressivenessToBeAdded =
       AggressivenessHelper.calculateAggressiveness({
@@ -478,6 +514,14 @@ export class CountryService {
     if (!decision) {
       return ResponseHelper.error({
         message: 'You cannot demand this province',
+      });
+    }
+
+    console.log(decision.data.maxProvincesAllowedToDemand);
+
+    if (decision.data.maxProvincesAllowedToDemand <= 0) {
+      return ResponseHelper.error({
+        message: 'Max demands reached',
       });
     }
 
@@ -533,14 +577,18 @@ export class CountryService {
       ...target.provinces.map((province) => province.mapRef),
     ];
     decision.data.provincesToFill = provincesToFill;
-    // decision.decided = true;
+    decision.decided = true;
 
+    decision.data.maxProvincesAllowedToDemand--;
+    country.doNotcallChangeFunctionOnSave = true;
+    target.doNotcallChangeFunctionOnSave = true;
     await countryRepository().save([country, target]);
 
     const payload = {
       color: country.color,
       provinceToFill: province.mapRef,
       remainingProvinces: provincesToFill,
+      maxProvincesAllowedToDemand: decision.data.maxProvincesAllowedToDemand,
       decisions: country.decisions,
       message: `${country.name} claimed ${province.name} from ${target.name}`,
       country: {

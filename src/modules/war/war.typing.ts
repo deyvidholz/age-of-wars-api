@@ -15,6 +15,7 @@ export type Losses = {
   warships: number;
   balance: number;
   country?: CountrySimplified;
+  isAttacker?: boolean;
 };
 
 export type WarParticipant = {

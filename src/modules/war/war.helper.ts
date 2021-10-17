@@ -1,8 +1,11 @@
+import { CountryPassiveType } from '../../data/templates/country-passives.template';
 import { MathHelper } from '../../helpers/math.helper';
+import { Operation } from '../../typing/general.typing';
 import { Country } from '../country/country.entity';
 import { CountryHelper } from '../country/country.helper';
 import { Army, MilitaryPower } from '../country/country.typing';
 import { Game } from '../game/game.entity';
+import { PassiveHelper } from '../passive/passive.helper';
 import {
   DemandType,
   Losses,
@@ -15,6 +18,7 @@ import {
   WarComparedInfoCountry,
   WarDetails,
   WarParticipant,
+  WarParticipantType,
 } from './war.typing';
 
 export class WarHelper {
@@ -171,13 +175,17 @@ export class WarHelper {
     return victims.some((victim) => victim.id === countryId);
   }
 
-  static getMpDiff(countries: Country[]): {
+  static getMpDiff(
+    countries: Country[],
+    warParticipantType: WarParticipantType
+  ): {
     mpTotal: MilitaryPower;
     mpDiffByCountry: WarComparedInfoCountry[];
   } {
-    const countriesTotalMp = CountryHelper.sumMilitaryPowers(
-      countries.map((country) => country.militaryPower)
-    );
+    const countriesTotalMp = CountryHelper.compareMilitaryPowers({
+      countries,
+      warParticipantType,
+    }).total;
 
     let mps: {
       mpTotal: MilitaryPower;
@@ -240,8 +248,8 @@ export class WarHelper {
     victims = victims || WarHelper.getVictims(game, war);
 
     const mpDiff = {
-      attackers: WarHelper.getMpDiff(attackers),
-      victims: WarHelper.getMpDiff(victims),
+      attackers: WarHelper.getMpDiff(attackers, WarParticipantType.ATTACKER),
+      victims: WarHelper.getMpDiff(victims, WarParticipantType.VICTIM),
     };
 
     const attackersPowerDiff: MilitaryPower = {
@@ -560,6 +568,7 @@ export class WarHelper {
       );
 
       losses.country = country;
+      losses.isAttacker = true;
 
       if (fixLosses) {
         losses = WarHelper.roundLosses(losses);
@@ -577,6 +586,7 @@ export class WarHelper {
       );
 
       losses.country = country;
+      losses.isAttacker = false;
 
       if (fixLosses) {
         losses = WarHelper.roundLosses(losses);
@@ -654,9 +664,45 @@ export class WarHelper {
       const keys = Object.keys(country.army);
       const participant = WarHelper.getParticipant(war, country.id);
 
+      const applyOnlyIncrease: CountryPassiveType[] = [
+        CountryPassiveType.INCREASE_CASUALTIES,
+      ];
+
+      const applyOnlyDecrease: CountryPassiveType[] = [
+        CountryPassiveType.DECREASE_CASUALTIES,
+      ];
+
+      if (losses.isAttacker) {
+        applyOnlyIncrease.push(
+          CountryPassiveType.INCREASE_CASUALTIES_OFFENSIVE_WAR
+        );
+      }
+
+      if (!losses.isAttacker) {
+        applyOnlyDecrease.push(
+          CountryPassiveType.DECREASE_CASUALTIES_DEFENSIVE_WARS
+        );
+      }
+
       for (const armyType of keys) {
-        participant.losses[armyType] += losses[armyType];
-        country.army[armyType] -= losses[armyType];
+        losses[armyType] = PassiveHelper.applyPassives({
+          applyOnly: applyOnlyIncrease,
+          passives: country.getPassives(),
+          value: losses[armyType],
+          forceOperation: Operation.SUM,
+        });
+
+        losses[armyType] = PassiveHelper.applyPassives({
+          applyOnly: applyOnlyDecrease,
+          passives: country.getPassives(),
+          value: losses[armyType],
+          forceOperation: Operation.SUBTRACT,
+        });
+
+        const value = Math.ceil(losses[armyType]);
+
+        participant.losses[armyType] += value;
+        country.army[armyType] -= value;
       }
     }
   }
@@ -680,6 +726,8 @@ export class WarHelper {
     const attackersLosses = [warDetails.attacker.losses];
     const victimsLosses = [warDetails.victim.losses];
 
+    console.log('attackersLosses', attackersLosses);
+
     if (warDetails.attacker.allies.length) {
       attackersLosses.push(
         ...warDetails.attacker.allies.map((ally) => ally.losses)
@@ -697,12 +745,24 @@ export class WarHelper {
     const victimsTotalLossesMp =
       WarHelper.sumLossesTotalMilitaryPower(victimsLosses);
 
+    console.log('attackersTotalLossesMp', attackersTotalLossesMp);
+
     const attackerLossesMp = WarHelper.sumLossesTotalMilitaryPower([
       warDetails.attacker.losses,
     ]);
     const victimLossesMp = WarHelper.sumLossesTotalMilitaryPower([
       warDetails.victim.losses,
     ]);
+
+    console.log('attackerLossesMp', attackerLossesMp);
+
+    console.log(
+      '>>>>>>>>>>',
+      MathHelper.percentDiff(
+        attackersTotalLossesMp.total,
+        attackerLossesMp.total
+      )
+    );
 
     warDetails.attacker.participation =
       100 -

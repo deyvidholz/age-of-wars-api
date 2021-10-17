@@ -15,18 +15,17 @@ import { ShopService } from '../shop/shop.service';
 import { ItemType, Order, OrderItem } from '../shop/shop.typing';
 import { acceptAllianceRequestAiDecision } from './ai-decisions/accept-alliance-request.ai-decision';
 import { acceptJoinWarAiDecision } from './ai-decisions/accept-join-war.ai-decision';
+import { demandAiDecision } from './ai-decisions/demand.ai-decision';
 import { AiHelper } from './ai.helper';
 
 export class AiService {
   static async generateActions(data: GenerateActionsParam) {
     const { country, game } = data;
 
-    const possibleActions =
-      [] ||
-      AiHelper.generateActionTypes({
-        country,
-        gameStageCount: game.stageCount,
-      });
+    const possibleActions = AiHelper.generateActionTypes({
+      country,
+      gameStageCount: game.stageCount,
+    });
 
     for (const actionType of possibleActions) {
       switch (actionType) {
@@ -103,7 +102,12 @@ export class AiService {
           });
           break;
 
-        case ActionType.ACCEPT_PEACE_REQUEST:
+        case ActionType.DEMAND:
+          await demandAiDecision({
+            country,
+            game,
+            decision,
+          });
           break;
       }
     }

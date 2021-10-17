@@ -7,17 +7,19 @@ import { MathHelper } from '../../helpers/math.helper';
 import { Operation } from '../../typing/general.typing';
 
 export class PassiveHelper {
-  static setPassives(data: SetPassivesParam): number {
-    const { passives, applyOnly } = data;
+  static applyPassives(data: ApplyPassivesParam): number {
+    const { passives, applyOnly, forceOperation } = data;
     let { value } = data;
 
     const passivesFiltered = passives.filter((p) => applyOnly.includes(p.type));
 
     for (const passive of passivesFiltered) {
-      let operation: Operation = Operation.SUM;
+      let operation: Operation = forceOperation || Operation.SUM;
 
       if (
-        (passive.operation && passive.operation === Operation.SUM) ||
+        (!forceOperation &&
+          passive.operation &&
+          passive.operation === Operation.SUM) ||
         (!passive.operation && passive.type.match(/DECREASE|REDUCE|SUBTRACT/))
       ) {
         operation = Operation.SUBTRACT;
@@ -59,10 +61,11 @@ export class PassiveHelper {
   }
 }
 
-type SetPassivesParam = {
+type ApplyPassivesParam = {
   value: number;
   passives: CountryPassive[];
   applyOnly: CountryPassiveType[];
+  forceOperation?: Operation;
 };
 
 type ApplyPassiveParam = {

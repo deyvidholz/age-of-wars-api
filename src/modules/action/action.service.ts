@@ -7,9 +7,12 @@ import {
 import { MathHelper } from '../../helpers/math.helper';
 import { ErrorResponse, SuccessResponse } from '../../helpers/response.helper';
 import { AiService } from '../ai/ai.service';
+import { Country } from '../country/country.entity';
 import { CountryHelper } from '../country/country.helper';
+import { countryRepository } from '../country/country.repository';
 import { DecisionMakeType } from '../country/country.typing';
 import { Game } from '../game/game.entity';
+import { gameRepository } from '../game/game.repository';
 import { WarHelper } from '../war/war.helper';
 import { WarParticipantType, WarStage } from '../war/war.typing';
 import { ActionType } from './action.typing';
@@ -32,11 +35,43 @@ import { shopAction } from './services/shop-action.service';
 
 export class ActionService {
   static async runActions(data: RunActionsParam) {
+    const countriesRemoved: Country[] = data.game.countries.filter(
+      (country) => !country.provinces.length
+    );
+
+    data.game.countries = data.game.countries.filter(
+      (country) => country.provinces.length
+    );
+    const countriesRemovedIds = countriesRemoved.map((country) => country.id);
+
+    if (countriesRemoved.length) {
+      await countryRepository().remove(countriesRemoved);
+    }
+
     console.log('running actions');
     const aggressivenessReduction =
       +process.env.AGGRESSIVENESS_REDUCTION_PER_STAGE;
 
     for (const country of data.game.countries) {
+      country.allies = country.allies.filter(
+        (target) => !countriesRemovedIds.includes(target.id)
+      );
+      country.enemies = country.enemies.filter(
+        (target) => !countriesRemovedIds.includes(target.id)
+      );
+      country.inWarWith = country.inWarWith.filter(
+        (target) => !countriesRemovedIds.includes(target.id)
+      );
+      country.guaranteeingIndependence =
+        country.guaranteeingIndependence.filter(
+          (target) => !countriesRemovedIds.includes(target.id)
+        );
+      country.independenceGuaranteedBy =
+        country.independenceGuaranteedBy.filter(
+          (target) => !countriesRemovedIds.includes(target.id)
+        );
+
+      // Running actions
       const hasCapital = country.provinces.some(
         (province) => province.isCapital
       );
@@ -68,6 +103,7 @@ export class ActionService {
 
       country.decisions = country.decisions.filter(
         (decision) =>
+          // !decisionsToRemove.includes(decision.id) &&
           !decision.decided &&
           typeof decision.duration !== 'undefined' &&
           decision.duration > -1
@@ -304,8 +340,8 @@ export class ActionService {
       });
 
       const isOver: boolean =
-        mps.attackers.militaryPower.totals.total <= 0 ||
-        mps.victims.militaryPower.totals.total <= 0;
+        mps.attackers.militaryPower.totals.total <= 1 ||
+        mps.victims.militaryPower.totals.total <= 1;
 
       if (!isOver) {
         war.stage = WarStage.FIGHTING;
@@ -315,12 +351,13 @@ export class ActionService {
       console.log(
         `${war.details.attacker.name} x ${war.details.victim.name} is over`
       );
+
       war.stage = WarStage.OVER;
+      WarHelper.setParticipationPercentage(war.details);
 
       let winner: WarParticipantType;
 
-      if (mps.attackers.militaryPower.totals.total <= 0) {
-        console.log('victim won!');
+      if (mps.attackers.militaryPower.totals.total <= 1) {
         winner = WarParticipantType.VICTIM;
 
         const provincesToFill: string[] = [];
@@ -374,8 +411,7 @@ export class ActionService {
             },
           });
         }
-      } else if (mps.victims.militaryPower.totals.total <= 0) {
-        console.log('attacker won!');
+      } else if (mps.victims.militaryPower.totals.total <= 1) {
         winner = WarParticipantType.ATTACKER;
 
         const provincesToFill: string[] = [];

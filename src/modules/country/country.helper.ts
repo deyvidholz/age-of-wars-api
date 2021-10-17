@@ -11,6 +11,9 @@ import {
   ProvincePassiveType,
 } from '../../data/templates/province-passive.template';
 import { MathHelper } from '../../helpers/math.helper';
+import { Operation } from '../../typing/general.typing';
+import { PassiveHelper } from '../passive/passive.helper';
+import { WarParticipantType } from '../war/war.typing';
 import { Country } from './country.entity';
 import {
   Army,
@@ -62,6 +65,23 @@ export class CountryHelper {
       mp.tanks,
       mp.warships
     );
+
+    // Applying penalities
+    if (mp.divisions <= 0) {
+      mp.total = MathHelper.subtractByPercentage(mp.total, 35);
+    }
+
+    if (mp.aircrafts <= 0) {
+      mp.total = MathHelper.subtractByPercentage(mp.total, 30);
+    }
+
+    if (mp.tanks <= 0) {
+      mp.total = MathHelper.subtractByPercentage(mp.total, 10);
+    }
+
+    if (mp.warships <= 0) {
+      mp.total = MathHelper.subtractByPercentage(mp.total, 5);
+    }
 
     return mp;
   }
@@ -256,6 +276,31 @@ export class CountryHelper {
       oil: totals.oil,
     };
 
+    if (isNaN(incoming.balance)) {
+      incoming.balance = 0;
+    }
+
+    if (isNaN(incoming.oil)) {
+      incoming.oil = 0;
+    }
+
+    const expenses = {
+      divisions: data.army.divisions * 0.79,
+      tanks: data.army.tanks * 1.63,
+      aircrafts: data.army.aircrafts * 2.45,
+      warships: data.army.warships * 3.09,
+      total: 0,
+    };
+
+    expenses.total = MathHelper.sumNumbers(
+      expenses.divisions,
+      expenses.tanks,
+      expenses.aircrafts,
+      expenses.warships
+    );
+
+    incoming.balance -= expenses.total;
+
     return {
       incoming,
       provincesIncoming,
@@ -361,6 +406,106 @@ export class CountryHelper {
 
     return army;
   }
+
+  static getTotalMilitaryPower(countries: Country[]): MilitaryPower {
+    return CountryHelper.sumMilitaryPowers(
+      countries.map((country) => country.militaryPower)
+    );
+  }
+
+  static compareMilitaryPowers(data: GetMpOnWar): {
+    total: MilitaryPower;
+    mps: MilitaryPower[];
+  } {
+    const { countries, warParticipantType } = data;
+    const mps: MilitaryPower[] = [];
+    const totalMp: MilitaryPower = {
+      aircrafts: 0,
+      divisions: 0,
+      tanks: 0,
+      total: 0,
+      warships: 0,
+    };
+
+    let allowedPassives: {
+      total: CountryPassiveType[];
+      divisions: CountryPassiveType[];
+      tanks: CountryPassiveType[];
+      aircrafts: CountryPassiveType[];
+      warships: CountryPassiveType[];
+    };
+
+    if (warParticipantType === WarParticipantType.ATTACKER) {
+      allowedPassives = {
+        total: [
+          CountryPassiveType.INCREASE_MP,
+          CountryPassiveType.INCREASE_AGGRESSIVE_WAR_MP,
+        ],
+        divisions: [CountryPassiveType.INCREASE_DIVISIONS_POWER],
+        tanks: [CountryPassiveType.INCREASE_TANKS_POWER],
+        aircrafts: [CountryPassiveType.INCREASE_AIRCRAFTS_POWER],
+        warships: [CountryPassiveType.INCREASE_WARSHIPS_POWER],
+      };
+    } else if (warParticipantType === WarParticipantType.VICTIM) {
+      allowedPassives = {
+        total: [
+          CountryPassiveType.INCREASE_MP,
+          CountryPassiveType.INCREASE_DEFENSIVE_WAR_MP,
+        ],
+        divisions: [CountryPassiveType.INCREASE_DIVISIONS_POWER],
+        tanks: [CountryPassiveType.INCREASE_TANKS_POWER],
+        aircrafts: [CountryPassiveType.INCREASE_AIRCRAFTS_POWER],
+        warships: [CountryPassiveType.INCREASE_WARSHIPS_POWER],
+      };
+    }
+
+    for (const country of countries) {
+      const mp: MilitaryPower = { ...country.militaryPower };
+      const passives = country.getPassives();
+
+      mp.countryName = country.name;
+
+      mp.total = PassiveHelper.applyPassives({
+        applyOnly: allowedPassives.total,
+        passives,
+        value: mp.total,
+      });
+
+      mp.divisions = PassiveHelper.applyPassives({
+        applyOnly: allowedPassives.divisions,
+        passives,
+        value: mp.divisions,
+      });
+
+      mp.aircrafts = PassiveHelper.applyPassives({
+        applyOnly: allowedPassives.aircrafts,
+        passives,
+        value: mp.aircrafts,
+      });
+
+      mp.tanks = PassiveHelper.applyPassives({
+        applyOnly: allowedPassives.tanks,
+        passives,
+        value: mp.tanks,
+      });
+
+      mp.warships = PassiveHelper.applyPassives({
+        applyOnly: allowedPassives.warships,
+        passives,
+        value: mp.warships,
+      });
+
+      totalMp.total += mp.total;
+      totalMp.divisions += mp.divisions;
+      totalMp.tanks += mp.tanks;
+      totalMp.aircrafts += mp.aircrafts;
+      totalMp.warships += mp.warships;
+
+      mps.push(mp);
+    }
+
+    return { total: totalMp, mps };
+  }
 }
 
 type GetProvinceIncomingParam = {
@@ -375,6 +520,7 @@ type GetIncomingParam = {
   passives: CountryPassive[];
   focus: Focus;
   personality: Personality;
+  army: Army;
 };
 
 type ApplyIncrementPassiveParam = {
@@ -405,4 +551,9 @@ type SumMilitaryPowersReturn = {
       totals: MilitaryPower;
     };
   };
+};
+
+type GetMpOnWar = {
+  countries: Country[];
+  warParticipantType: WarParticipantType;
 };

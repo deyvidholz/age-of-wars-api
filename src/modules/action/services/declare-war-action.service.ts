@@ -10,6 +10,7 @@ import {
   ResponseHelper,
   SuccessResponse,
 } from '../../../helpers/response.helper';
+import { AggressivenessHelper } from '../../country/aggressiveness.helper';
 import { Country } from '../../country/country.entity';
 import { SetOpinionOfActionParam } from '../../country/country.typing';
 import { Game } from '../../game/game.entity';
@@ -208,6 +209,14 @@ export async function declareWarAction(
       country.personality = neutralPersonality;
     }
   }
+
+  let aggressivenessToAdd =
+    AggressivenessHelper.calculateAggressivenessDeclareWar({
+      country,
+      target,
+    });
+
+  country.addAggressiveness(aggressivenessToAdd);
 
   country.messages.push({
     stage: data.game.stageCount,

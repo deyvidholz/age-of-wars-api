@@ -22,19 +22,16 @@ export class AiHelper {
         if (!country.inWarWith.length) {
           availableActions.push(ActionType.SEND_INSULT);
           // TODO bots are declaring to many wars
-          if (!country.inWarWith.length) {
-            // availableActions.push(
-            //   ActionType.DECLARE_WAR,
-            //   ActionType.DECLARE_WAR
-            // );
+          if (!country.inWarWith.length && MathHelper.chanceOf(20)) {
+            availableActions.push(ActionType.DECLARE_WAR);
           }
         }
         break;
       case PersonalityType.NEUTRAL:
         if (!country.inWarWith.length) {
           availableActions.push(ActionType.SEND_INSULT);
-          if (!country.inWarWith.length) {
-            // availableActions.push(ActionType.DECLARE_WAR);
+          if (!country.inWarWith.length && MathHelper.chanceOf(7)) {
+            availableActions.push(ActionType.DECLARE_WAR);
           }
         }
         break;

@@ -1,4 +1,4 @@
-import { Operation } from "../../typing/general.typing";
+import { Operation } from '../../typing/general.typing';
 
 export enum CountryPassiveType {
   // Economic
@@ -27,6 +27,7 @@ export enum CountryPassiveType {
   INCREASE_AGGRESSIVE_WAR_MP = 'INCREASE_AGGRESSIVE_WAR_MP',
   INCREASE_CASUALTIES = 'INCREASE_CASUALTIES',
   DECREASE_CASUALTIES = 'DECREASE_CASUALTIES',
+  INCREASE_CASUALTIES_OFFENSIVE_WAR = 'INCREASE_CASUALTIES_OFFENSIVE_WAR',
   DECREASE_CASUALTIES_DEFENSIVE_WARS = 'DECREASE_CASUALTIES_DEFENSIVE_WARS',
 
   // Aggressiveness
