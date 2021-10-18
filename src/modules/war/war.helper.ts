@@ -399,7 +399,6 @@ export class WarHelper {
 
     if (attackersAreWinning) {
       // Attackers are winning
-      console.log('attackers are winning');
 
       // Inverting losses based on MP
       const [
@@ -446,7 +445,6 @@ export class WarHelper {
       lossesBySide.victims = loserLosses;
     } else {
       // Victims are winning
-      console.log('victims are winning');
 
       // Inverting losses based on MP
       const [
@@ -726,8 +724,6 @@ export class WarHelper {
     const attackersLosses = [warDetails.attacker.losses];
     const victimsLosses = [warDetails.victim.losses];
 
-    console.log('attackersLosses', attackersLosses);
-
     if (warDetails.attacker.allies.length) {
       attackersLosses.push(
         ...warDetails.attacker.allies.map((ally) => ally.losses)
@@ -745,24 +741,12 @@ export class WarHelper {
     const victimsTotalLossesMp =
       WarHelper.sumLossesTotalMilitaryPower(victimsLosses);
 
-    console.log('attackersTotalLossesMp', attackersTotalLossesMp);
-
     const attackerLossesMp = WarHelper.sumLossesTotalMilitaryPower([
       warDetails.attacker.losses,
     ]);
     const victimLossesMp = WarHelper.sumLossesTotalMilitaryPower([
       warDetails.victim.losses,
     ]);
-
-    console.log('attackerLossesMp', attackerLossesMp);
-
-    console.log(
-      '>>>>>>>>>>',
-      MathHelper.percentDiff(
-        attackersTotalLossesMp.total,
-        attackerLossesMp.total
-      )
-    );
 
     warDetails.attacker.participation =
       100 -

@@ -21,10 +21,7 @@ export async function acceptPeaceRequestAction(
   );
 
   if (!decision) {
-    return ResponseHelper.error({
-      message: 'Decision not found',
-      data: { decisionId },
-    });
+    return;
   }
 
   if (!decision.types.includes(DecisionMakeType.ACCEPT_PEACE_REQUEST)) {

@@ -118,6 +118,7 @@ export type Message = {
   title: string;
   description?: string;
   data?: any;
+  hasDecision?: boolean;
 };
 
 export enum SetOpinionOfActionParam {
@@ -127,7 +128,7 @@ export enum SetOpinionOfActionParam {
 }
 
 export enum DecisionMakeType {
-  ACCEPT_JOIN_WAR = 'ACCEPT_JOIN_WAR',
+  JOIN_WAR = 'JOIN_WAR',
   REFUSE_JOIN_WAR = 'REFUSE_JOIN_WAR',
   ACCEPT_PEACE_REQUEST = 'ACCEPT_PEACE_REQUEST',
   REFUSE_PEACE_REQUEST = 'REFUSE_PEACE_REQUEST',

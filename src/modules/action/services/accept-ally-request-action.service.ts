@@ -21,10 +21,7 @@ export async function acceptAllyRequestAction(
   );
 
   if (!decision) {
-    return ResponseHelper.error({
-      message: 'Decision not found',
-      data: { decisionId },
-    });
+    return;
   }
 
   if (!decision.types.includes(DecisionMakeType.ACCEPT_ALLY_REQUEST)) {

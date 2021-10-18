@@ -21,13 +21,16 @@ import { AiHelper } from './ai.helper';
 export class AiService {
   static async generateActions(data: GenerateActionsParam) {
     const { country, game } = data;
+    const forceChangeFocus = game.stageCount < 2;
 
-    const possibleActions = AiHelper.generateActionTypes({
+    const actionTypes = AiHelper.generateActionTypes({
+      game,
       country,
       gameStageCount: game.stageCount,
+      forceChangeFocus,
     });
 
-    for (const actionType of possibleActions) {
+    for (const actionType of actionTypes) {
       switch (actionType) {
         case ActionType.CHANGE_FOCUS:
           AiService.changeFocus({ country });
@@ -54,37 +57,12 @@ export class AiService {
           break;
       }
     }
-
-    // Changing focus*
-
-    // Improving provinces*
-
-    // Buying army*
-
-    // Buying resources*
-
-    // Declaring war
-
-    // Improving relations*
-
-    // Requesting ally*
-
-    // Accepting alliance
-
-    // Accepting peace request
-
-    // if (country.actions.length) {
-    //   console.log(`${country.name} actions (${country.actions.length}):`);
-    //   console.log(country.actions);
-    //   console.log('');
-    // }
   }
 
   static async runDecisions(data: RunDecisionsParam) {
     const { country, game } = data;
 
     for (const decision of country.decisions) {
-      console.log('decision:actionType', country.name, decision.actionType);
       switch (decision.actionType) {
         case ActionType.ACCEPT_ALLY_REQUEST:
           await acceptAllianceRequestAiDecision({
@@ -492,6 +470,14 @@ export class AiService {
     const chance = randomTarget.opinionValue / 20;
 
     if (!MathHelper.chanceOf(chance)) {
+      return;
+    }
+
+    const targetHasCoalitions = game.coalitions.some(
+      (coalition) => coalition.against.id === randomTarget.country.id
+    );
+
+    if (targetHasCoalitions) {
       return;
     }
 

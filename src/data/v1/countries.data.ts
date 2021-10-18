@@ -140,8 +140,8 @@ export const countriesWorldAOWV1: CountryV1[] = [
     img: 'united_states.png',
     owner: 'IA',
     colour: null,
-    aggressiveness: 248,
-    totalAggressiveness: 1248,
+    aggressiveness: 199,
+    totalAggressiveness: 199,
     personality: CountryPersonalityV1.NEUTRAL,
     army: {
       divisions: 234,

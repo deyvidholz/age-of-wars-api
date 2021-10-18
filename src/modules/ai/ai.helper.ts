@@ -1,12 +1,15 @@
 import 'dotenv/config';
 import { PersonalityType } from '../../data/templates/personalities.template';
+import { GameHelper } from '../../helpers/game.helper';
 import { MathHelper } from '../../helpers/math.helper';
 import { ActionType } from '../action/action.typing';
+import { CoalitionHelper } from '../coalition/coalition.helper';
 import { Country } from '../country/country.entity';
+import { Game } from '../game/game.entity';
 
 export class AiHelper {
   static generateActionTypes(data: GenerateActionTypes): ActionType[] {
-    const { country, gameStageCount } = data;
+    const { country, game, gameStageCount, forceChangeFocus } = data;
     const availableActions: ActionType[] = [
       ActionType.IMPROVE_PROVINCES,
       ActionType.SHOP,
@@ -14,8 +17,6 @@ export class AiHelper {
 
     let maxGeneratedActions: number = +process.env.MAX_GENERATED_ACTIONS;
     let maxAiAlliesAllowed: number = +process.env.MAX_AI_ALLIES_ALLOWED;
-    let allowChangeFocusEveryStage: number =
-      +process.env.ALLOW_CHANGE_FOCUS_EVERY_STAGE;
 
     switch (country.personality.type) {
       case PersonalityType.AGGRESSIVE:
@@ -23,7 +24,11 @@ export class AiHelper {
           availableActions.push(ActionType.SEND_INSULT);
           // TODO bots are declaring to many wars
           if (!country.inWarWith.length && MathHelper.chanceOf(20)) {
-            availableActions.push(ActionType.DECLARE_WAR);
+            if (
+              !CoalitionHelper.isParticipatingOfAnyCoalition({ game, country })
+            ) {
+              availableActions.push(ActionType.DECLARE_WAR);
+            }
           }
         }
         break;
@@ -31,7 +36,11 @@ export class AiHelper {
         if (!country.inWarWith.length) {
           availableActions.push(ActionType.SEND_INSULT);
           if (!country.inWarWith.length && MathHelper.chanceOf(7)) {
-            availableActions.push(ActionType.DECLARE_WAR);
+            if (
+              !CoalitionHelper.isParticipatingOfAnyCoalition({ game, country })
+            ) {
+              availableActions.push(ActionType.DECLARE_WAR);
+            }
           }
         }
         break;
@@ -41,14 +50,17 @@ export class AiHelper {
       availableActions.push(ActionType.REQUEST_ALLY);
     }
 
-    const canChangeFocus =
-      gameStageCount <= 3 || gameStageCount % allowChangeFocusEveryStage === 0;
+    const canChangeFocus = GameHelper.canChangeFocus(game.stageCount);
 
-    if (canChangeFocus) {
+    if (canChangeFocus && !forceChangeFocus) {
       availableActions.push(ActionType.CHANGE_FOCUS);
     }
 
     const possibleActions: ActionType[] = [];
+
+    if (forceChangeFocus) {
+      possibleActions.push(ActionType.CHANGE_FOCUS);
+    }
 
     for (let i = 0; i < maxGeneratedActions; i++) {
       if (!availableActions.length) {
@@ -73,6 +85,8 @@ export class AiHelper {
 }
 
 type GenerateActionTypes = {
+  game: Game;
   country: Country;
   gameStageCount: number;
+  forceChangeFocus: boolean;
 };

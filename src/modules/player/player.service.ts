@@ -316,6 +316,30 @@ export class PlayerService {
       });
     }
 
+    console.log('oia data', data);
+
+    if (data.targetId) {
+      const target = game.countries.find(
+        (country) => country.id === data.targetId
+      );
+
+      if (target) {
+        if (!target.isAi) {
+          return ResponseHelper.error({
+            message: 'Color already taken',
+            data: {
+              targetId: data.targetId,
+            },
+          });
+        }
+
+        const countryColor = country.color;
+        country.color = target.color;
+        target.color = countryColor;
+      }
+    }
+
+    player.currentGameCountryFlag = country.flag;
     player.alreadyPlayed = true;
     country.isAi = false;
     country.owner = player;
@@ -396,6 +420,7 @@ type JoinGameParam = {
 
 type PickCountryParam = {
   countryId: string;
+  targetId?: string;
   gameId: string;
   playerId: string;
 };

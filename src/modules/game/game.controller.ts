@@ -88,10 +88,12 @@ export class GameController {
             owner: {
               id: game.owner.id,
               nickname: game.owner.nickname,
+              currentGameCountryFlag: game.owner.currentGameCountryFlag,
             },
             players: game.players.map((player) => ({
               id: player.id,
               nickname: player.nickname,
+              currentGameCountryFlag: player.currentGameCountryFlag,
             })),
             countries: game.countries.map((country) => country.name),
             wars: game.wars,

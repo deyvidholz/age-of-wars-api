@@ -1,5 +1,4 @@
 import {
-  AfterLoad,
   Column,
   Entity,
   JoinTable,
@@ -51,6 +50,12 @@ export class Game {
     type: 'json',
     default: '[]',
   })
+  log?: string[];
+
+  @Column({
+    type: 'json',
+    default: '[]',
+  })
   wars: War[];
 
   @Column({
@@ -92,6 +97,10 @@ export class Game {
     });
 
     await ActionService.runWars({
+      game: this,
+    });
+
+    await ActionService.runCoalitions({
       game: this,
     });
   }

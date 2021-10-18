@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import {
   CountryPassive,
   CountryPassiveType,
@@ -217,6 +218,12 @@ export class GameHelper {
           ? `Add +${data.passive.amount}% incoming`
           : '',
     };
+  }
+
+  static canChangeFocus(stageCount: number): boolean {
+    const restOfDivision =
+      stageCount % +process.env.ALLOW_CHANGE_FOCUS_EVERY_STAGE;
+    return stageCount < 3 || [0, 1].includes(restOfDivision);
   }
 }
 

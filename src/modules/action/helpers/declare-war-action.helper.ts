@@ -41,17 +41,15 @@ export class DeclareWarActionHelper {
     }
 
     requestedCountry.messages.push({
-      title: `${country.name} is requested us to join their war against ${target.name}`,
+      title: `${country.name} is requesting us to join their war against ${target.name}`,
+      hasDecision: true,
     });
 
     requestedCountry.decisions.push({
       id: v4(),
       actionType: ActionType.JOIN_WAR,
       duration: 3,
-      types: [
-        DecisionMakeType.ACCEPT_JOIN_WAR,
-        DecisionMakeType.REFUSE_JOIN_WAR,
-      ],
+      types: [DecisionMakeType.JOIN_WAR, DecisionMakeType.REFUSE_JOIN_WAR],
       description: `Join war of ${country.name} against ${target.name}`,
       requester: country.getCountrySimplifiedData(),
       target: target.getCountrySimplifiedData(),

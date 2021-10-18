@@ -14,7 +14,13 @@ export type GameOptions = {
 };
 
 export type Coalition = {
+  id: string;
   owner: CountrySimplified;
   against: CountrySimplified;
   allies: CountrySimplified[];
+  createdAtStage: number;
+  totalMp: number;
+  targetTotalMp: number;
+  warId?: string;
+  isOver?: boolean;
 };

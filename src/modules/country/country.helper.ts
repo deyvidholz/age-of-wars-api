@@ -4,14 +4,13 @@ import {
   CountryPassiveType,
   CountryPassiveValueType,
 } from '../../data/templates/country-passives.template';
-import { Focus, FocusType } from '../../data/templates/focuses.template';
+import { Focus } from '../../data/templates/focuses.template';
 import { Personality } from '../../data/templates/personalities.template';
 import {
   ProvincePassive,
   ProvincePassiveType,
 } from '../../data/templates/province-passive.template';
 import { MathHelper } from '../../helpers/math.helper';
-import { Operation } from '../../typing/general.typing';
 import { PassiveHelper } from '../passive/passive.helper';
 import { WarParticipantType } from '../war/war.typing';
 import { Country } from './country.entity';
@@ -87,15 +86,11 @@ export class CountryHelper {
   }
 
   static getProvinceIncoming(data: GetProvinceIncomingParam): ProvinceIncoming {
-    const incomingPerProductionLevel =
-      +process.env.INCOMING_PER_PRODUCTION_LEVEL;
-    const incomingPerTaxationLevel = +process.env.INCOMING_PER_TAXATION_LEVEL;
-
     const incoming: ProvinceIncoming = {
       balance: 0,
       oil: data.oilProduction,
-      production: data.levels.production * incomingPerProductionLevel,
-      taxation: data.levels.taxation * incomingPerTaxationLevel,
+      production: Math.pow(data.levels.production, 1.75),
+      taxation: Math.pow(data.levels.taxation, 1.5),
     };
 
     if (data.mapRef) {

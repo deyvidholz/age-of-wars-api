@@ -102,6 +102,7 @@ export type War = {
   stage: WarStage;
   startAtStage: number;
   details: WarDetails;
+  isByCoalition?: boolean;
   winner?: WarParticipantType;
 };
 

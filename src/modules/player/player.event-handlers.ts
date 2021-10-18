@@ -76,6 +76,7 @@ const playerEventHandlers = (io: Server, socket: Socket) => {
       gameId: payload.gameId,
       playerId: player.id,
       countryId: payload.countryId,
+      targetId: payload.targetId,
     });
 
     if (serviceData.error) {
@@ -117,6 +118,11 @@ const playerEventHandlers = (io: Server, socket: Socket) => {
 
     if (serviceData.data.isNextTurn) {
       socket.to(payload.gameId).emit('player:next-turn', serviceData.data);
+    } else {
+      socket.to(payload.gameId).emit('player:player-list', {
+        owner: serviceData.data.game.owner,
+        players: [...serviceData.data.game.players],
+      });
     }
   };
 
@@ -144,6 +150,7 @@ type PickCountryPayload = {
   gameId: string;
   playerId: string;
   countryId: string;
+  targetId: string;
 };
 
 type NextTurnPayload = {

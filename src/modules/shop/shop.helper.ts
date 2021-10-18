@@ -126,10 +126,6 @@ export class ShopHelper {
     let totalPrice: number = 0;
 
     for (const provinceOrderItem of data.order.items) {
-      let productionIncomingPerLevel =
-        +process.env.PRODUCTION_INCOMING_PER_LEVEL;
-      let taxationIncomingPerLevel = +process.env.TAXATION_INCOMING_PER_LEVEL;
-
       const preOrder: ImproveProvincePreOrder = {
         provinceMapRef: provinceOrderItem.province.mapRef,
         currentLevels: {
@@ -137,12 +133,11 @@ export class ShopHelper {
           taxation: provinceOrderItem.province.levels.taxation,
         },
         currentIncoming: {
-          production:
-            provinceOrderItem.province.levels.production *
-            productionIncomingPerLevel,
-          taxation:
-            provinceOrderItem.province.levels.taxation *
-            taxationIncomingPerLevel,
+          production: Math.pow(
+            provinceOrderItem.province.levels.production,
+            1.75
+          ),
+          taxation: Math.pow(provinceOrderItem.province.levels.taxation, 1.5),
         },
         production: {
           qty: 0,
@@ -167,14 +162,12 @@ export class ShopHelper {
       preOrder.production.qty = provinceOrderItem.qty.production;
       preOrder.production.price = newProductionLevel * unityPrices.production;
 
-      preOrder.production.newIncomingValue =
-        newProductionLevel * productionIncomingPerLevel;
+      preOrder.production.newIncomingValue = Math.pow(newProductionLevel, 1.75);
 
       preOrder.taxation.qty = provinceOrderItem.qty.taxation;
       preOrder.taxation.price = newTaxationLevel * unityPrices.taxation;
 
-      preOrder.taxation.newIncomingValue =
-        newTaxationLevel * taxationIncomingPerLevel;
+      preOrder.taxation.newIncomingValue = Math.pow(newTaxationLevel, 1.5);
 
       preOrder.totalPrice =
         ShopHelper.sumTotalProvinceImprovementPrice(preOrder);

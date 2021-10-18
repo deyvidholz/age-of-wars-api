@@ -32,6 +32,15 @@ export async function demandAiDecision(data: DemandAiDecisionParam) {
       return;
     }
 
+    /**
+     * AI will never take all provinces of a country
+     * that is controlled by a player.
+     */
+    if (!target.isAi && target.provinces.length <= 1) {
+      maxProvincesAllowedToDemand--;
+      continue;
+    }
+
     const provinceIndex = MathHelper.getRandomIndex(target.provinces);
     const province = target.provinces[provinceIndex];
 

@@ -28,6 +28,9 @@ export class Player {
   @Column({ nullable: true })
   currentGameId: string;
 
+  @Column({ nullable: true })
+  currentGameCountryFlag: string;
+
   @Column({ default: false })
   alreadyPlayed: boolean;
 

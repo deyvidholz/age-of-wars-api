@@ -186,6 +186,7 @@ export class GameService {
       if (player.currentGameId === game.id) {
         player.alreadyPlayed = false;
         player.currentGameId = null;
+        player.currentGameCountryFlag = null;
       }
 
       player.countries = player.countries?.filter(

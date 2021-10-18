@@ -65,6 +65,16 @@ export async function declareWarAction(
     country.removeIndependenceGuaranteeingRelations(target.id);
   }
 
+  for (const ally of country.independenceGuaranteedBy) {
+    const allyCountry = game.countries.find((c) => c.id === ally.id);
+
+    if (allyCountry) {
+      allyCountry.removeIndependenceGuaranteeingRelations(country.id);
+    }
+
+    country.removeIndependenceGuaranteeingRelations(ally.id);
+  }
+
   country.setOpinionOf(
     target.name,
     +process.env.SUBTRACT_OPINION_WHEN_DECLARE_WAR,

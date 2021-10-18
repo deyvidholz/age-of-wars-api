@@ -4,15 +4,16 @@ import {
   CountryPassiveType,
   CountryPassiveValueType,
 } from '../../data/templates/country-passives.template';
+import { ProvincePassiveType } from '../../data/templates/province-passive.template';
+import { GameHelper } from '../../helpers/game.helper';
 import { MathHelper } from '../../helpers/math.helper';
 import { ErrorResponse, SuccessResponse } from '../../helpers/response.helper';
 import { AiService } from '../ai/ai.service';
+import { CoalitionHelper } from '../coalition/coalition.helper';
 import { Country } from '../country/country.entity';
 import { CountryHelper } from '../country/country.helper';
 import { countryRepository } from '../country/country.repository';
-import { DecisionMakeType } from '../country/country.typing';
 import { Game } from '../game/game.entity';
-import { gameRepository } from '../game/game.repository';
 import { WarHelper } from '../war/war.helper';
 import { WarParticipantType, WarStage } from '../war/war.typing';
 import { ActionType } from './action.typing';
@@ -62,6 +63,10 @@ export class ActionService {
       await countryRepository().remove(countriesRemoved);
     }
 
+    const canChangeFocus = GameHelper.canChangeFocus(data.game.stageCount);
+
+    console.log('canChangeFocus', canChangeFocus);
+
     console.log('running actions');
     const aggressivenessReduction =
       +process.env.AGGRESSIVENESS_REDUCTION_PER_STAGE;
@@ -84,6 +89,37 @@ export class ActionService {
         country.independenceGuaranteedBy.filter(
           (target) => !countriesRemovedIds.includes(target.id)
         );
+
+      // Coalitions
+      if (country.name === 'United States') {
+        country.aggressiveness.current = 230;
+      }
+
+      if (!country.isAi && country.aggressiveness.current > 200) {
+        const chanceOfFormingCoalition = country.aggressiveness.current / 5;
+
+        const alreadyHasCoalitionAgainst = data.game.coalitions.some(
+          (coalition) => coalition.against.id === country.id
+        );
+
+        if (
+          !alreadyHasCoalitionAgainst &&
+          MathHelper.chanceOf(chanceOfFormingCoalition)
+        ) {
+          const coalition = CoalitionHelper.create({
+            game: data.game,
+            against: country,
+          });
+
+          country.messages.push({
+            title: `${coalition.owner.name} created a coalition against us`,
+            stage: data.game.stageCount + 1,
+            data: { coalition },
+          });
+
+          data.game.coalitions.push(coalition);
+        }
+      }
 
       // Running actions
       const hasCapital = country.provinces.some(
@@ -124,8 +160,6 @@ export class ActionService {
       );
 
       if (country.isAi) {
-        // TODO add money verification for some generated actions
-
         await AiService.runDecisions({
           country,
           game: data.game,
@@ -153,6 +187,13 @@ export class ActionService {
 
       if (!country.actions.length) {
         continue;
+      }
+
+      if (canChangeFocus) {
+        country.messages.push({
+          title: `Change focus is allowed`,
+          stage: data.game.stageCount + 1,
+        });
       }
 
       for (const action of country.actions) {
@@ -332,6 +373,9 @@ export class ActionService {
 
       const attackers = WarHelper.getAttackers(game, war);
       const victims = WarHelper.getVictims(game, war);
+      const victim = game.countries.find(
+        (country) => country.id === war.details.victim.id
+      );
 
       const comparedInfo = WarHelper.getComparedInfo(
         game,
@@ -362,12 +406,31 @@ export class ActionService {
         continue;
       }
 
-      console.log(
-        `${war.details.attacker.name} x ${war.details.victim.name} is over`
-      );
-
       war.stage = WarStage.OVER;
       WarHelper.setParticipationPercentage(war.details);
+
+      if (war.isByCoalition) {
+        victim.aggressiveness.current = 0;
+
+        const coalition = game.coalitions.find(
+          (coalition) => coalition.warId === war.id
+        );
+
+        if (coalition) {
+          coalition.isOver = true;
+        }
+
+        for (const province of victim.provinces) {
+          province.passives.push({
+            type: ProvincePassiveType.REDUCE_INCOMING,
+            value: 95,
+            valueType: CountryPassiveValueType.PERCENT,
+            description: `Incoming reduced by 95% due to recent wars`,
+            duration:
+              +process.env.PROVINCE_INCOMING_REDUCTION_BY_COALITION_DURATION,
+          });
+        }
+      }
 
       let winner: WarParticipantType;
 
@@ -378,16 +441,40 @@ export class ActionService {
         const attackersIds: string[] = [];
         const victimsIds = victims.map((c) => c.id);
 
+        let balanceToSubtractMultiplier = 0;
+
+        if (war.isByCoalition) {
+          balanceToSubtractMultiplier = 30;
+        } else {
+          balanceToSubtractMultiplier = 14;
+        }
+
+        let attackersBalanceLost: number = 0;
+
         for (const attacker of attackers) {
+          let balanceToSubtract =
+            attacker.incoming.balance * balanceToSubtractMultiplier;
+          attacker.economy.balance -= Math.abs(balanceToSubtract);
+
+          attackersBalanceLost += Math.abs(balanceToSubtract);
+
           attacker.inWarWith = attacker.inWarWith.filter(
             (c) => !victimsIds.includes(c.id)
           );
+
+          attacker.messages.push({
+            title: `We lost the war against ${war.details.victim.name}`,
+          });
 
           attackersIds.push(attacker.id);
           provincesToFill.push(
             ...attacker.provinces.map((province) => province.mapRef)
           );
         }
+
+        const victimsCanDemandProvincesWhenWinWars = Boolean(
+          process.env.VICTIMS_CAN_DEMAND_PROVINCES_WHEN_WIN_WARS
+        );
 
         for (const country of victims) {
           const participant = WarHelper.getParticipant(war, country.id);
@@ -396,34 +483,43 @@ export class ActionService {
             (c) => !attackersIds.includes(c.id)
           );
 
-          country.decisions.push({
-            id: v4(),
-            actionType: ActionType.DEMAND,
-            types: [],
-            description: `You won the war against ${war.details.attacker.name} and can demand provinces/resources.`,
-            duration: 3,
-            data: {
-              warId: war.id,
-              winner,
-              allies: victims
-                .filter((ally) => ally.id !== country.id)
-                .map(
-                  (ally) =>
-                    ally.getCountrySimplifiedData() && ally.id !== country.id
-                ),
-              targets: attackers.map((target) =>
-                target.getCountrySimplifiedData()
-              ),
-              provincesToFill,
-              participation: participant.participation,
-              maxProvincesAllowedToDemand: Math.ceil(
-                MathHelper.getPercetageValue(
-                  provincesToFill.length,
-                  participant.participation
-                )
-              ),
-            },
+          country.messages.push({
+            title: `You won the war against ${war.details.attacker.name}`,
           });
+
+          country.economy.balance += Math.abs(attackersBalanceLost);
+
+          if (victimsCanDemandProvincesWhenWinWars) {
+            country.decisions.push({
+              id: v4(),
+              actionType: ActionType.DEMAND,
+              types: [],
+              description: `You won the war against ${war.details.attacker.name} and can demand provinces/resources.`,
+              duration: 3,
+              data: {
+                warId: war.id,
+                winner,
+                allies: victims
+                  .filter((ally) => ally.id !== country.id)
+                  .map(
+                    (ally) =>
+                      ally.getCountrySimplifiedData() && ally.id !== country.id
+                  ),
+                targets: attackers.map((target) =>
+                  target.getCountrySimplifiedData()
+                ),
+                isByCoalition: war.isByCoalition,
+                provincesToFill,
+                participation: participant.participation,
+                maxProvincesAllowedToDemand: Math.ceil(
+                  MathHelper.getPercetageValue(
+                    provincesToFill.length,
+                    participant.participation
+                  )
+                ),
+              },
+            });
+          }
         }
       } else if (mps.victims.militaryPower.totals.total <= 1) {
         winner = WarParticipantType.ATTACKER;
@@ -433,19 +529,34 @@ export class ActionService {
         const attackersIds = attackers.map((c) => c.id);
 
         for (const victim of victims) {
+          const balanceToSubtract = victim.incoming.balance * 3;
+          victim.economy.balance -= Math.abs(balanceToSubtract);
+
           victimsIds.push(victim.id);
+
+          victim.messages.push({
+            title: `We lost the war against ${war.details.attacker.name}`,
+          });
 
           victim.inWarWith = victim.inWarWith.filter(
             (c) => !attackersIds.includes(c.id)
           );
 
           if (victim.id === war.details.victim.id) {
+            let duration: number = 20;
+            let value: number = 230;
+
+            if (war.isByCoalition) {
+              duration = 30;
+              value = 800;
+            }
+
             victim.passives.push({
               type: CountryPassiveType.INCREASE_TARGET_AGGRESSION_WHEN_ATTACKED,
-              value: 230,
+              value,
               valueType: CountryPassiveValueType.STATIC,
-              duration: 20,
-              description: `Increase attacker aggression by +230`,
+              duration,
+              description: `Increase attacker aggression by +${value}`,
             });
           }
 
@@ -465,6 +576,10 @@ export class ActionService {
             (c) => c.id !== war.details.victim.id
           );
 
+          country.messages.push({
+            title: `You won the war against ${war.details.victim.name}`,
+          });
+
           country.decisions.push({
             id: v4(),
             actionType: ActionType.DEMAND,
@@ -480,6 +595,7 @@ export class ActionService {
               targets: victims.map((target) =>
                 target.getCountrySimplifiedData()
               ),
+              isByCoalition: war.isByCoalition,
               provincesToFill,
               participation: participant.participation,
               maxProvincesAllowedToDemand: Math.ceil(
@@ -500,6 +616,65 @@ export class ActionService {
 
     game.wars = game.wars.filter((war) => war.stage !== WarStage.OVER);
   }
+
+  static async runCoalitions(data: RunCoalitionsParam) {
+    const { game } = data;
+
+    console.log('running coalitions');
+    for (const coalition of game.coalitions) {
+      if (coalition.warId) {
+        continue;
+      }
+
+      const target = game.countries.find(
+        (country) => country.id === coalition.against.id
+      );
+
+      if (target.aggressiveness.current < 20) {
+        target.messages.push({
+          title: `${coalition.owner.name} ended his coalition against us`,
+        });
+        coalition.isOver = true;
+        continue;
+      }
+
+      if (target.aggressiveness.current < 200) {
+        continue;
+      }
+
+      const alliesIds = coalition.allies.map((ally) => ally.id);
+      CoalitionHelper.calculateMilitaryPower({ coalition, game });
+
+      const chanceOfDeclareWar = target.aggressiveness.current / 7;
+      const mpDiff = MathHelper.percentDiff(
+        coalition.totalMp,
+        coalition.targetTotalMp
+      );
+
+      if (!MathHelper.chanceOf(chanceOfDeclareWar)) {
+        continue;
+      }
+
+      const availableCountries = game.countries.filter(
+        (country) =>
+          country.isAi &&
+          country.id !== target.id &&
+          !country.hasFriendlyRelations(target.id) &&
+          !alliesIds.includes(country.id)
+      );
+
+      const randomAlly: Country = MathHelper.getRandomItem(availableCountries);
+      coalition.allies.push(randomAlly.getCountrySimplifiedData());
+
+      if (mpDiff < 40) {
+        continue;
+      }
+
+      CoalitionHelper.declareWar({ coalition, game });
+    }
+
+    game.coalitions = game.coalitions.filter((coalition) => !coalition.isOver);
+  }
 }
 
 type RunActionsParam = {
@@ -507,5 +682,8 @@ type RunActionsParam = {
 };
 
 type RunWarsParam = {
+  game: Game;
+};
+type RunCoalitionsParam = {
   game: Game;
 };

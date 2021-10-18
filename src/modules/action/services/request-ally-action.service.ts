@@ -61,6 +61,7 @@ export async function requestAllyAction(
   target.messages.push({
     stage: data.game.stageCount,
     title: `${country.name} wants to be our ally`,
+    hasDecision: true,
     data: {
       country: {
         flag: country.flag,
