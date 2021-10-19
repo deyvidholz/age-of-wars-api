@@ -501,6 +501,10 @@ export class CountryHelper {
 
     return { total: totalMp, mps };
   }
+
+  static countryHasNoArmy(army: Army): boolean {
+    return !(army.aircrafts && army.divisions && army.tanks && army.warships);
+  }
 }
 
 type GetProvinceIncomingParam = {

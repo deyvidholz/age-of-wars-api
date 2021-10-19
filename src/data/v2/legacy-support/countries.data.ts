@@ -11,6 +11,7 @@ import {
 } from '../../templates/country-passives.template';
 import {
   aggressivePersonality,
+  neutralPersonality,
   pacificPersonality,
   Personality,
 } from '../../templates/personalities.template';
@@ -181,6 +182,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   CANADA: {
     denonym: 'Canadians',
+    personality: pacificPersonality,
     independenceGuaranteedBy: [
       {
         flag: getFlag('United States'),
@@ -259,6 +261,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   UKRAINE: {
     denonym: 'Ukranian',
+    personality: neutralPersonality,
     independenceGuaranteedBy: [
       {
         flag: getFlag('Russia'),
@@ -275,6 +278,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   SPAIN: {
     denonym: 'Spanish',
+    personality: aggressivePersonality,
     opinions: {
       Portugal: {
         flag: getFlag('Portugal'),
@@ -298,8 +302,13 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
       },
     },
   },
+  ROMANIA: {
+    denonym: 'Romanian',
+    personality: aggressivePersonality,
+  },
   AUSTRIA: {
     denonym: 'Austrian',
+    personality: neutralPersonality,
     opinions: {
       Germany: {
         flag: getFlag('Germany'),
@@ -315,6 +324,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   GERMANY: {
     denonym: 'German',
+    personality: aggressivePersonality,
     opinions: {
       Russia: {
         flag: getFlag('Russia'),
@@ -323,8 +333,46 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
       },
     },
   },
+  ITALY: {
+    denonym: 'Italians',
+    personality: aggressivePersonality,
+    opinions: {
+      Slovenia: {
+        flag: getFlag('Slovenia'),
+        name: 'Slovenia',
+        value: -200,
+      },
+      Croatia: {
+        flag: getFlag('Croatia'),
+        name: 'Croatia',
+        value: -200,
+      },
+      Montenegro: {
+        flag: getFlag('Montenegro'),
+        name: 'Montenegro',
+        value: -200,
+      },
+      'Bosnia and Herzegovina': {
+        flag: getFlag('Bosnia and Herzegovina'),
+        name: 'Bosnia and Herzegovina',
+        value: -200,
+      },
+    },
+  },
+  FRANCE: {
+    denonym: 'French',
+    personality: aggressivePersonality,
+    opinions: {
+      Brazil: {
+        flag: getFlag('Brazil'),
+        name: 'Brazil',
+        value: [-200, 0],
+      },
+    },
+  },
   POLAND: {
     denonym: 'Polish',
+    personality: neutralPersonality,
     opinions: {
       Russia: {
         flag: getFlag('Russia'),
@@ -335,6 +383,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   LITHUANIA: {
     denonym: 'Lithuanian',
+    personality: neutralPersonality,
     opinions: {
       Russia: {
         flag: getFlag('Russia'),
@@ -345,6 +394,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   LATVIA: {
     denonym: 'Latvian',
+    personality: neutralPersonality,
     opinions: {
       Russia: {
         flag: getFlag('Russia'),
@@ -418,6 +468,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   UNITED_KINGDOM: {
     denonym: 'English',
+    personality: aggressivePersonality,
     guaranteeingIndependence: [
       {
         flag: getFlag('Ireland'),
@@ -485,6 +536,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   PORTUGAL: {
     denonym: 'Portugueses',
+    personality: pacificPersonality,
     allies: [
       {
         flag: getFlag('United Kingdom'),
@@ -520,6 +572,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   IRELAND: {
     denonym: 'Irish',
+    personality: pacificPersonality,
     independenceGuaranteedBy: [
       {
         flag: getFlag('United Kingdom'),
@@ -529,7 +582,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   SWEDEN: {
     denonym: 'Swedish',
-    personality: pacificPersonality,
+    personality: neutralPersonality,
     opinions: {
       Denmark: {
         flag: getFlag('Denmark'),
@@ -592,7 +645,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   NORWAY: {
     denonym: 'Norwegian',
-    personality: pacificPersonality,
+    personality: neutralPersonality,
     opinions: {
       Sweden: {
         flag: getFlag('Sweden'),
@@ -662,6 +715,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   TAIWAN: {
     denonym: 'Taiwanese',
+    personality: pacificPersonality,
     independenceGuaranteedBy: [
       {
         flag: getFlag('United States'),
@@ -670,7 +724,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
     ],
   },
   SOUTH_KOREA: {
-    denonym: 'Korean',
+    denonym: 'Koreans',
     independenceGuaranteedBy: [
       {
         flag: getFlag('United States'),
@@ -702,6 +756,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   CHINA: {
     denonym: 'Chineses',
+    personality: aggressivePersonality,
     passives: [
       {
         type: CountryPassiveType.AI_INCREASE_ECONOMIC_FOCUS_CHANCE,
@@ -762,6 +817,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   NORTH_KOREA: {
     denonym: 'Korean',
+    personality: aggressivePersonality,
     independenceGuaranteedBy: [
       {
         flag: getFlag('China'),
@@ -788,6 +844,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   ARMENIA: {
     denonym: 'Armenian',
+    personality: aggressivePersonality,
     opinions: {
       Azerbaijan: {
         flag: getFlag('Azerbaijan'),
@@ -798,6 +855,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   AZERBAIJAN: {
     denonym: 'Azerbaijani',
+    personality: aggressivePersonality,
     opinions: {
       Armenia: {
         flag: getFlag('Armenia'),
@@ -808,6 +866,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   TURKEY: {
     denonym: 'Turkish',
+    personality: aggressivePersonality,
     opinions: {
       Azerbaijan: {
         flag: getFlag('Azerbaijan'),
@@ -842,7 +901,8 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
     },
   },
   INDIA: {
-    denonym: 'Indian',
+    denonym: 'Indians',
+    personality: aggressivePersonality,
     opinions: {
       Pakistan: {
         flag: getFlag('Pakistan'),
@@ -852,7 +912,8 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
     },
   },
   MEXICO: {
-    denonym: 'Mexican',
+    denonym: 'Mexicans',
+    personality: aggressivePersonality,
     opinions: {
       'United States': {
         flag: getFlag('United States'),
@@ -868,6 +929,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   ARGENTINA: {
     denonym: 'Argentinian',
+    personality: aggressivePersonality,
     opinions: {
       Brazil: {
         flag: getFlag('Brazil'),
@@ -893,6 +955,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   BRAZIL: {
     denonym: 'Brazilian',
+    personality: pacificPersonality,
     opinions: {
       Russia: {
         flag: getFlag('Russia'),
@@ -943,6 +1006,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   VENEZUELA: {
     denonym: 'Venezuelan',
+    personality: aggressivePersonality,
     opinions: {
       'United States': {
         flag: getFlag('United States'),
@@ -968,6 +1032,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   SERBIA: {
     denonym: 'Serbian',
+    personality: aggressivePersonality,
     opinions: {
       Croatia: {
         flag: getFlag('Croatia'),
@@ -1003,6 +1068,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   BOSNIA_AND_HERZEGOVINA: {
     denonym: 'Bosnian',
+    personality: aggressivePersonality,
     opinions: {
       Croatia: {
         flag: getFlag('Croatia'),
@@ -1038,6 +1104,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   CROATIA: {
     denonym: 'Croatian',
+    personality: aggressivePersonality,
     opinions: {
       'Bosnia and Herzegovina': {
         flag: getFlag('Bosnia and Herzegovina'),
@@ -1073,6 +1140,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   KOSOVO: {
     denonym: 'Kosovan',
+    personality: neutralPersonality,
     opinions: {
       'Bosnia and Herzegovina': {
         flag: getFlag('Bosnia and Herzegovina'),
@@ -1108,6 +1176,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   SLOVENIA: {
     denonym: 'Slovene',
+    personality: aggressivePersonality,
     opinions: {
       'Bosnia and Herzegovina': {
         flag: getFlag('Bosnia and Herzegovina'),
@@ -1143,6 +1212,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   MONTENEGRO: {
     denonym: 'Montenegrin',
+    personality: neutralPersonality,
     opinions: {
       'Bosnia and Herzegovina': {
         flag: getFlag('Bosnia and Herzegovina'),
@@ -1178,6 +1248,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   NORTH_MACEDONIA: {
     denonym: 'Macedonian',
+    personality: neutralPersonality,
     opinions: {
       'Bosnia and Herzegovina': {
         flag: getFlag('Bosnia and Herzegovina'),
@@ -1259,6 +1330,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   EGYPT: {
     denonym: 'Egyptians',
+    personality: aggressivePersonality,
     allies: [
       {
         flag: getFlag('Saudi Arabia'),
@@ -1275,6 +1347,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   SAUDI_ARABIA: {
     denonym: 'Saudi Arabians',
+    personality: aggressivePersonality,
     allies: [
       {
         flag: getFlag('Egypt'),
@@ -1291,6 +1364,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   SYRIA: {
     denonym: 'Syrians',
+    personality: aggressivePersonality,
     allies: [
       {
         flag: getFlag('Iran'),
@@ -1312,6 +1386,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   IRAQ: {
     denonym: 'Iraqis',
+    personality: aggressivePersonality,
     opinions: {
       Israel: {
         flag: getFlag('Israel'),
@@ -1327,6 +1402,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   IRAN: {
     denonym: 'Persian',
+    personality: aggressivePersonality,
     allies: [
       {
         flag: getFlag('Syria'),
@@ -1348,6 +1424,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   AUSTRALIA: {
     denonym: 'Australian',
+    personality: neutralPersonality,
     allies: [
       {
         flag: getFlag('New Zealand'),
@@ -1436,6 +1513,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   AFGHANISTAN: {
     denonym: 'Afghan',
+    personality: aggressivePersonality,
     opinions: {
       'United States': {
         flag: getFlag('United States'),
@@ -1456,6 +1534,7 @@ export const countriesV2LegacyDataSupport: CountryV2LegacyDataSupport = {
   },
   LIBYA: {
     denonym: 'Libyan',
+    personality: aggressivePersonality,
     opinions: {
       'United States': {
         flag: getFlag('United States'),

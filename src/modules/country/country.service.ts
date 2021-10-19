@@ -593,6 +593,8 @@ export class CountryService {
       message: `${country.name} claimed ${province.name} from ${target.name}`,
       country: {
         ...country.getCountrySimplifiedData(),
+        isAi: country.isAi,
+        owner: country.owner,
         aggressiveness: country.aggressiveness,
       },
     };

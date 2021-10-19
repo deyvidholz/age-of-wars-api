@@ -50,21 +50,21 @@ export const warFocus: Focus = {
   passives: [
     {
       type: CountryPassiveType.INCREASE_AGGRESSIVE_WAR_MP,
-      value: 5,
+      value: 7,
       valueType: CountryPassiveValueType.PERCENT,
-      description: 'Add +5% of Military Power (MP) in offensive wars',
+      description: 'Add +7% of Military Power (MP) in offensive wars',
     },
     {
       type: CountryPassiveType.DECREASE_CASUALTIES,
-      value: 3,
+      value: 5,
       valueType: CountryPassiveValueType.PERCENT,
-      description: 'Reduce 3% of casualties in offensive wars',
+      description: 'Reduce 5% of casualties in offensive wars',
     },
     {
       type: CountryPassiveType.DECREASE_AGGRESSIVENESS_OFFENSIVE_WARS,
-      value: 15,
+      value: 20,
       valueType: CountryPassiveValueType.PERCENT,
-      description: 'Reduce 15% of aggressiveness gain in offensive wars',
+      description: 'Reduce 20% of aggressiveness gain in offensive wars',
     },
   ],
 };
@@ -84,9 +84,9 @@ export const defensiveFocus: Focus = {
     },
     {
       type: CountryPassiveType.DECREASE_CASUALTIES_DEFENSIVE_WARS,
-      value: 10,
+      value: 15,
       valueType: CountryPassiveValueType.PERCENT,
-      description: 'Reduce 10% of casualties on defensive wars',
+      description: 'Reduce 15% of casualties on defensive wars',
     },
   ],
 };
@@ -99,9 +99,9 @@ export const strategicFocus: Focus = {
   description: '',
   passives: [
     {
-      description: 'Add +2.5% military power',
+      description: 'Add +3% military power',
       type: CountryPassiveType.INCREASE_MP,
-      value: 2.5,
+      value: 3,
       valueType: CountryPassiveValueType.PERCENT,
     },
     {

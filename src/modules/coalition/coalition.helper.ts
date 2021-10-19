@@ -213,6 +213,24 @@ export class CoalitionHelper {
 
     return false;
   }
+
+  static removeCountriesFromCoalitionsByIds(
+    data: RemoveCountriesFromCoalitionsByIdsParam
+  ) {
+    const { game, countryIds } = data;
+
+    game.coalitions = game.coalitions.filter(
+      (coalition) =>
+        !countryIds.includes(coalition.against.id) &&
+        !countryIds.includes(coalition.owner.id)
+    );
+
+    for (const coalition of game.coalitions) {
+      coalition.allies = coalition.allies.filter(
+        (ally) => !countryIds.includes(ally.id)
+      );
+    }
+  }
 }
 
 type CreateParam = {
@@ -238,4 +256,9 @@ type CalculateMilitaryPowerParam = {
 type IsParticipatingOfAnyCoalitionParam = {
   game: Game;
   country: Country;
+};
+
+type RemoveCountriesFromCoalitionsByIdsParam = {
+  countryIds: string[];
+  game: Game;
 };

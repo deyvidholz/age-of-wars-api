@@ -59,13 +59,16 @@ export class ActionService {
 
     const countriesRemovedIds = countriesRemoved.map((country) => country.id);
 
+    CoalitionHelper.removeCountriesFromCoalitionsByIds({
+      countryIds: countriesRemovedIds,
+      game: data.game,
+    });
+
     if (countriesRemoved.length) {
       await countryRepository().remove(countriesRemoved);
     }
 
     const canChangeFocus = GameHelper.canChangeFocus(data.game.stageCount);
-
-    console.log('canChangeFocus', canChangeFocus);
 
     console.log('running actions');
     const aggressivenessReduction =
@@ -373,6 +376,9 @@ export class ActionService {
 
       const attackers = WarHelper.getAttackers(game, war);
       const victims = WarHelper.getVictims(game, war);
+      const attacker = game.countries.find(
+        (country) => country.id === war.details.attacker.id
+      );
       const victim = game.countries.find(
         (country) => country.id === war.details.victim.id
       );
@@ -396,6 +402,15 @@ export class ActionService {
         attackers,
         victims,
       });
+
+      const attackerHasNoArmy = CountryHelper.countryHasNoArmy(attacker.army);
+      const victimHasNoArmy = CountryHelper.countryHasNoArmy(victim.army);
+
+      if (attackerHasNoArmy && !victimHasNoArmy) {
+        mps.victims.militaryPower.totals.total = 0;
+      } else if (!attackerHasNoArmy && victimHasNoArmy) {
+        mps.attackers.militaryPower.totals.total = 0;
+      }
 
       const isOver: boolean =
         mps.attackers.militaryPower.totals.total <= 1 ||
@@ -473,7 +488,7 @@ export class ActionService {
         }
 
         const victimsCanDemandProvincesWhenWinWars = Boolean(
-          process.env.VICTIMS_CAN_DEMAND_PROVINCES_WHEN_WIN_WARS
+          +process.env.VICTIMS_CAN_DEMAND_PROVINCES_WHEN_WIN_WARS
         );
 
         for (const country of victims) {
@@ -559,11 +574,11 @@ export class ActionService {
               description: `Increase attacker aggression by +${value}`,
             });
           }
-
-          provincesToFill.push(
-            ...victim.provinces.map((province) => province.mapRef)
-          );
         }
+
+        provincesToFill.push(
+          ...victim.provinces.map((province) => province.mapRef)
+        );
 
         for (const country of attackers) {
           const participant = WarHelper.getParticipant(war, country.id);
@@ -579,6 +594,17 @@ export class ActionService {
           country.messages.push({
             title: `You won the war against ${war.details.victim.name}`,
           });
+
+          let maxProvincesAllowedToDemand: number = Math.ceil(
+            MathHelper.getPercetageValue(
+              provincesToFill.length,
+              participant.participation
+            )
+          );
+
+          if (maxProvincesAllowedToDemand <= 0) {
+            maxProvincesAllowedToDemand = 1;
+          }
 
           country.decisions.push({
             id: v4(),
@@ -598,12 +624,7 @@ export class ActionService {
               isByCoalition: war.isByCoalition,
               provincesToFill,
               participation: participant.participation,
-              maxProvincesAllowedToDemand: Math.ceil(
-                MathHelper.getPercetageValue(
-                  provincesToFill.length,
-                  participant.participation
-                )
-              ),
+              maxProvincesAllowedToDemand,
             },
           });
         }

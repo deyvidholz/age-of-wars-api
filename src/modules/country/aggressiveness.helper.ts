@@ -119,6 +119,10 @@ export class AggressivenessHelper {
       target,
     });
 
+    if (country.inWarWith.length) {
+      aggressiveness *= country.inWarWith.length + 1;
+    }
+
     return aggressiveness;
   }
 

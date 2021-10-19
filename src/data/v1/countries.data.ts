@@ -158,7 +158,7 @@ export const countriesWorldAOWV1: CountryV1[] = [
     economy: {
       money: 0,
     },
-    passives: [{ type: CountryPassiveTypeV1.INCOMING, amount: 4191 }],
+    passives: [{ type: CountryPassiveTypeV1.INCOMING, amount: 1 }],
     provinces: [
       {
         id: 'US-VA',
