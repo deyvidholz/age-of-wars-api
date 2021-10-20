@@ -31,7 +31,7 @@ These tecnologies listed below are required to run the project properly:
 
 In order to install the dependencies, use `yarn`.
 
-# Setting up PostgreSQL database
+# 🔨 Setting up PostgreSQL database
 
 Start docker then use `docker-compose up` to set up the database.
 You can access the database using `pgAdmin` by accessing the app url and the port configured in `.env` file.
@@ -40,7 +40,7 @@ You can access the database using `pgAdmin` by accessing the app url and the por
 
 After install the dependencies and set up the database, you can run the app by running `yarn serve`
 
-# Game Images
+# 🖼️ Game Images
 
 <h2 align="center"> 
 	Left Sidebar (Player Actions)
