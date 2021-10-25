@@ -16,7 +16,7 @@
 # 📜 Description
 
 Age of Wars is a single/multiplayer strategy game that uses `Node`, `Vue` and `Socket.io`.
-You start by choosing a country and then you can conquer all the world or make your contry
+You start by choosing a country and then you can conquer all the world or make your country
 the richest/strongest.
 
 There are currently 149 countries available to play with.
