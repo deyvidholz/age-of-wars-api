@@ -3,7 +3,7 @@
 </h1>
 
 <h1 align="center">
-  <img alt="In game" src="https://i.imgur.com/LlE2voA.png" />
+  <img alt="In game" src="https://raw.githubusercontent.com/deyvidholz/age-of-wars-frontend/main/screenshots/declaring-war.png?raw=true" />
 </h1>
 
 # 📝 TL;DR
@@ -47,7 +47,7 @@ After install the dependencies and set up the database, you can run the app by r
 </h2>
 
 <h1 align="center">
-  <img alt="Player Actions" src="https://imgur.com/klOXRrt.png" />
+  <img alt="Player Actions" src="https://github.com/deyvidholz/age-of-wars-frontend/blob/main/screenshots/left-sidebar.png?raw=true" />
 </h1>
 
 <h2 align="center"> 
@@ -55,7 +55,7 @@ After install the dependencies and set up the database, you can run the app by r
 </h2>
 
 <h1 align="center">
-  <img alt="Target Information" src="https://imgur.com/jcRkXKi.png" />
+  <img alt="Target Information" src="https://github.com/deyvidholz/age-of-wars-frontend/blob/main/screenshots/right-sidebar.png?raw=true" />
 </h1>
 
 <h2 align="center"> 
@@ -63,7 +63,7 @@ After install the dependencies and set up the database, you can run the app by r
 </h2>
 
 <h1 align="center">
-  <img alt="Province Information Card" src="https://imgur.com/swDNpRo.png" />
+  <img alt="Province Information Card" src="https://github.com/deyvidholz/age-of-wars-frontend/blob/main/screenshots/province-info.png?raw=true" />
 </h1>
 
 <h2 align="center"> 
@@ -71,11 +71,11 @@ After install the dependencies and set up the database, you can run the app by r
 </h2>
 
 <h1 align="center">
-  <img alt="Economy Ranking" src="https://imgur.com/BbnBYAE.png" />
+  <img alt="Economy Ranking" src="https://github.com/deyvidholz/age-of-wars-frontend/blob/main/screenshots/economy-ranking.png?raw=true" />
 </h1>
 
 <h1 align="center">
-  <img alt="Military Ranking" src="https://imgur.com/nCtG70X.png" />
+  <img alt="Military Ranking" src="https://github.com/deyvidholz/age-of-wars-frontend/blob/main/screenshots/military-ranking.png?raw=true" />
 </h1>
 
 <h2 align="center"> 
@@ -83,7 +83,7 @@ After install the dependencies and set up the database, you can run the app by r
 </h2>
 
 <h1 align="center">
-  <img alt="Focus Card" src="https://imgur.com/kxhgxCZ.png" />
+  <img alt="Focus Card" src="https://github.com/deyvidholz/age-of-wars-frontend/blob/main/screenshots/focus.png?raw=true" />
 </h1>
 
 <h2 align="center"> 
@@ -91,7 +91,7 @@ After install the dependencies and set up the database, you can run the app by r
 </h2>
 
 <h1 align="center">
-  <img alt="Relations Card - Declare War" src="https://imgur.com/ZhJKCMD.png" />
+  <img alt="Relations Card - Declare War" src="https://github.com/deyvidholz/age-of-wars-frontend/blob/main/screenshots/declaring-war.png?raw=true" />
 </h1>
 
 <h2 align="center"> 
@@ -99,7 +99,7 @@ After install the dependencies and set up the database, you can run the app by r
 </h2>
 
 <h1 align="center">
-  <img alt="Send Ally Request" src="https://imgur.com/YxQYj9Y.png" />
+  <img alt="Send Ally Request" src="https://github.com/deyvidholz/age-of-wars-frontend/blob/main/screenshots/sending-ally-request.png?raw=true" />
 </h1>
 
 <h2 align="center"> 
@@ -107,9 +107,8 @@ After install the dependencies and set up the database, you can run the app by r
 </h2>
 
 <h1 align="center">
-  <img alt="Provinces Conquered" src="https://imgur.com/WV0FWEb.png" />
+  <img alt="Provinces Conquered" src="https://github.com/deyvidholz/age-of-wars-frontend/blob/main/screenshots/provinces-conquered.jpeg?raw=true" />
 </h1>
-
 # Glossary
 
 | Term                | Meaning                                                                                                                                               |
