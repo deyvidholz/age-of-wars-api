@@ -6,7 +6,7 @@
   <img alt="In game" src="https://raw.githubusercontent.com/deyvidholz/age-of-wars-frontend/main/screenshots/declaring-war.png?raw=true" />
 </h1>
 
-# 📝 TL;DR
+# 📝 Quick Start
 
 - Use `docker-compose up` to set up the database.
 - Go to `.env` file and change the database connection information.
