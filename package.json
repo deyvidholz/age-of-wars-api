@@ -4,7 +4,7 @@
   "description": "Age of Wars API",
   "main": "server.ts",
   "repository": "https://github.com/DeyvidHolz/aow-backend.git",
-  "author": "Deyvid Holz",
+  "author": "Deyvid Holz <deyvidholzt@gmail.com>",
   "license": "MIT",
   "scripts": {
     "serve": "nodemon src/server.ts",
