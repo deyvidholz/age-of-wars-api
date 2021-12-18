@@ -376,6 +376,7 @@ export class ActionService {
 
       const attackers = WarHelper.getAttackers(game, war);
       const victims = WarHelper.getVictims(game, war);
+
       const attacker = game.countries.find(
         (country) => country.id === war.details.attacker.id
       );
@@ -403,13 +404,16 @@ export class ActionService {
         victims,
       });
 
-      const attackerHasNoArmy = CountryHelper.countryHasNoArmy(attacker.army);
-      const victimHasNoArmy = CountryHelper.countryHasNoArmy(victim.army);
+      // Attacker or victim may be already conquered by other enemies
+      if (attacker && victim) {
+        const attackerHasNoArmy = CountryHelper.countryHasNoArmy(attacker.army);
+        const victimHasNoArmy = CountryHelper.countryHasNoArmy(victim.army);
 
-      if (attackerHasNoArmy && !victimHasNoArmy) {
-        mps.victims.militaryPower.totals.total = 0;
-      } else if (!attackerHasNoArmy && victimHasNoArmy) {
-        mps.attackers.militaryPower.totals.total = 0;
+        if (attackerHasNoArmy && !victimHasNoArmy) {
+          mps.attackers.militaryPower.totals.total = 0;
+        } else if (!attackerHasNoArmy && victimHasNoArmy) {
+          mps.victims.militaryPower.totals.total = 0;
+        }
       }
 
       const isOver: boolean =
@@ -482,9 +486,13 @@ export class ActionService {
           });
 
           attackersIds.push(attacker.id);
-          provincesToFill.push(
-            ...attacker.provinces.map((province) => province.mapRef)
-          );
+
+          // Attacker may be already conquered by other enemies
+          if (attacker && attacker.provinces.length) {
+            provincesToFill.push(
+              ...attacker.provinces.map((province) => province.mapRef)
+            );
+          }
         }
 
         const victimsCanDemandProvincesWhenWinWars = Boolean(
@@ -576,9 +584,12 @@ export class ActionService {
           }
         }
 
-        provincesToFill.push(
-          ...victim.provinces.map((province) => province.mapRef)
-        );
+        // Victim may be already conquered by other enemies
+        if (victim && victim.provinces.length) {
+          provincesToFill.push(
+            ...victim.provinces.map((province) => province.mapRef)
+          );
+        }
 
         for (const country of attackers) {
           const participant = WarHelper.getParticipant(war, country.id);
