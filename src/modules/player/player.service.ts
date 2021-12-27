@@ -222,6 +222,25 @@ export class PlayerService {
       });
     }
 
+    const totalPlayers = 1 + game.players.length;
+    const totalCountries =
+      game.countries.length - game.options.blacklistedCountries.length;
+
+    const maxPlayersReached =
+      game.options.maxPlayers !== -1 && totalPlayers >= game.options.maxPlayers;
+
+    if (maxPlayersReached) {
+      return ResponseHelper.error({
+        message: 'This game reached the max of players allowed',
+      });
+    }
+
+    if (totalPlayers === totalCountries) {
+      return ResponseHelper.error({
+        message: 'There are no more slots available for this game',
+      });
+    }
+
     player.alreadyPlayed = false;
     player.currentGameId = game.id;
     game.players.push(player);
