@@ -134,6 +134,3 @@ This project still under development, bugs can be faced while playing, however, 
 - [ ] Add Missions
 - [ ] Add Pathways (AI)
 - [ ] Add Game Event Log
-- [ ] Add Cheats (Console)
-- [ ] Add Send Resources action
-- [ ] Add Sound Effects

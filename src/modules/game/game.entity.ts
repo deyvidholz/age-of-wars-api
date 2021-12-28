@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { ActionService } from '../action/action.service';
 import { Country } from '../country/country.entity';
+import { Province, TradingProvince } from '../country/country.typing';
 import { Player } from '../player/player.entity';
 import { War } from '../war/war.typing';
 import { Coalition, GameOptions, GameStage } from './game.typing';
@@ -64,6 +65,12 @@ export class Game {
   })
   coalitions: Coalition[];
 
+  @Column({
+    type: 'json',
+    default: '[]',
+  })
+  tradingProvinces?: TradingProvince[];
+
   @Column({ type: 'json', default: '{}' })
   options: GameOptions;
 
@@ -103,5 +110,32 @@ export class Game {
     await ActionService.runCoalitions({
       game: this,
     });
+
+    this.handler();
+  }
+
+  getAllProvinces(): Province[] {
+    const provinces: Province[] = [];
+
+    for (const country of this.countries) {
+      provinces.push(...country.provinces);
+    }
+
+    return provinces;
+  }
+
+  /**
+   * Will be executed every stage change, after all actions
+   */
+  private handler() {
+    for (const index in this.tradingProvinces) {
+      const tradingProvince = this.tradingProvinces[index];
+
+      tradingProvince.duration--;
+
+      if (tradingProvince.duration < 1) {
+        this.tradingProvinces.splice(+index, 1);
+      }
+    }
   }
 }

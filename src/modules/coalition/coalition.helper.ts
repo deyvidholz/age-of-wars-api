@@ -54,7 +54,6 @@ export class CoalitionHelper {
   }
 
   static declareWar(data: DeclareWarParam): War {
-    console.log('declaring war');
     const { game, coalition } = data;
     const owner = game.countries.find(
       (country) => country.id === coalition.owner.id

@@ -10,6 +10,7 @@ import { MathHelper } from '../../helpers/math.helper';
 import { ErrorResponse, SuccessResponse } from '../../helpers/response.helper';
 import { AiService } from '../ai/ai.service';
 import { CoalitionHelper } from '../coalition/coalition.helper';
+import { ConsoleService } from '../console/console.service';
 import { Country } from '../country/country.entity';
 import { CountryHelper } from '../country/country.helper';
 import { countryRepository } from '../country/country.repository';
@@ -19,6 +20,7 @@ import { WarParticipantType, WarStage } from '../war/war.typing';
 import { ActionType } from './action.typing';
 import { acceptAllyRequestAction } from './services/accept-ally-request-action.service';
 import { acceptPeaceRequestAction } from './services/accept-peace-request-action.service';
+import { acceptSellOfferAction } from './services/accept-sell-offer-action.service';
 import { breakAllianceAction } from './services/break-alliance-action.service';
 import { changeFocusAction } from './services/change-focus-action.service';
 import { declareWarAction } from './services/declare-war-action.service';
@@ -32,6 +34,7 @@ import { refuseAllyRequestAction } from './services/refuse-ally-request-action.s
 import { removeIndependenceGuaranteeingAction } from './services/remove-independence-guaranteeing-action.service';
 import { requestAllyAction } from './services/request-ally-action.service';
 import { sendInsultAction } from './services/send-insult-action.service';
+import { sendResourcesAction } from './services/send-resources-action.service';
 import { shopAction } from './services/shop-action.service';
 
 export class ActionService {
@@ -70,11 +73,12 @@ export class ActionService {
 
     const canChangeFocus = GameHelper.canChangeFocus(data.game.stageCount);
 
-    console.log('running actions');
     const aggressivenessReduction =
       +process.env.AGGRESSIVENESS_REDUCTION_PER_STAGE;
 
     for (const country of data.game.countries) {
+      // TODO create method to do these filters
+      // TODO do this when the last province of a country is demanded
       country.allies = country.allies.filter(
         (target) => !countriesRemovedIds.includes(target.id)
       );
@@ -94,10 +98,6 @@ export class ActionService {
         );
 
       // Coalitions
-      if (country.name === 'United States') {
-        country.aggressiveness.current = 230;
-      }
-
       if (!country.isAi && country.aggressiveness.current > 200) {
         const chanceOfFormingCoalition = country.aggressiveness.current / 5;
 
@@ -156,7 +156,6 @@ export class ActionService {
 
       country.decisions = country.decisions.filter(
         (decision) =>
-          // !decisionsToRemove.includes(decision.id) &&
           !decision.decided &&
           typeof decision.duration !== 'undefined' &&
           decision.duration > -1
@@ -173,6 +172,25 @@ export class ActionService {
           game: data.game,
         });
       }
+
+      // Refunds
+      for (const refundItem of country.refunds) {
+        refundItem.validFor--;
+
+        if (refundItem.validFor > 0) {
+          continue;
+        }
+
+        ConsoleService.give({
+          game: data.game,
+          target: country,
+          order: { items: [refundItem.resource] },
+        });
+      }
+
+      country.refunds = country.refunds.filter(
+        (refundItem) => refundItem.validFor > 0
+      );
 
       country.economy.balance += country.incoming.balance || 0;
       country.resources.oil += country.incoming.oil || 0;
@@ -333,6 +351,7 @@ export class ActionService {
               decisionId: action.data.decisionId,
               game: data.game,
             });
+            break;
 
           case ActionType.REFUSE_ALLY_REQUEST:
             response = await refuseAllyRequestAction({
@@ -340,6 +359,24 @@ export class ActionService {
               decisionId: action.data.decisionId,
               game: data.game,
             });
+            break;
+
+          case ActionType.SEND_RESOURCES:
+            response = await sendResourcesAction({
+              resources: action.data.resources,
+              country,
+              targetId: action.data?.targetId,
+              game: data.game,
+            });
+            break;
+
+          case ActionType.ACCEPT_SELL_OFFER:
+            response = await acceptSellOfferAction({
+              country,
+              decisionId: action.data.decisionId,
+              game: data.game,
+            });
+            break;
         }
 
         if (!response) {

@@ -335,8 +335,6 @@ export class PlayerService {
       });
     }
 
-    console.log('oia data', data);
-
     if (data.targetId) {
       const target = game.countries.find(
         (country) => country.id === data.targetId

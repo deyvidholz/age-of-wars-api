@@ -1,5 +1,6 @@
 import { ProvincePassive } from '../../data/templates/province-passive.template';
 import { ActionType } from '../action/action.typing';
+import { ResourceItem, ResourceOrder } from '../console/console.typing';
 
 export type Army = {
   aircrafts: number;
@@ -134,6 +135,8 @@ export enum DecisionMakeType {
   REFUSE_PEACE_REQUEST = 'REFUSE_PEACE_REQUEST',
   ACCEPT_ALLY_REQUEST = 'ACCEPT_ALLY_REQUEST',
   REFUSE_ALLY_REQUEST = 'REFUSE_ALLY_REQUEST',
+  ACCEPT_SELL_OFFER = 'ACCEPT_SELL_OFFER',
+  REFUSE_SELL_OFFER = 'REFUSE_SELL_OFFER',
 }
 
 export type Decision = {
@@ -146,7 +149,32 @@ export type Decision = {
   requester?: CountrySimplified;
   target?: CountrySimplified;
   data?: any;
+  events?: DecisionEvent[];
 };
+
+export type DecisionEvent = {
+  type: DecisionMakeType;
+  action: DecisionEventAction;
+  sender: CountrySimplified;
+  targetId?: string;
+  refundId?: string;
+  resources: ResourceItem[];
+};
+
+export enum DecisionEventAction {
+  GIVE = 'GIVE',
+  DELETE_REFUND = 'DELETE_REFUND',
+}
+
+export type ResourceRefundItem = {
+  id: string;
+  validFor: number;
+  resource: ResourceItem;
+};
+
+export enum ResourceRefundItemConditionType {
+  NOT_ACCEPTED = 'NOT_ACCEPTED',
+}
 
 export enum RankingType {
   INCOMING_BALANCE = 'INCOMING_BALANCE',
@@ -159,3 +187,11 @@ export enum RankingType {
   OPINION = 'OPINION',
   CURRENT_AGGRESSIVENESS = 'CURRENT_AGGRESSIVENESS',
 }
+
+export type TradingProvince = {
+  owner: CountrySimplified;
+  buyer: CountrySimplified;
+  provinceMapRef: string;
+  decisionId: string;
+  duration: number;
+};

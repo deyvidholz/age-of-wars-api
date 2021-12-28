@@ -31,12 +31,6 @@ export async function changeFocusAction(
 
   const canChangeFocus = GameHelper.canChangeFocus(game.stageCount);
 
-  console.log('=================');
-  console.log('process.env', +process.env.ALLOW_CHANGE_FOCUS_EVERY_STAGE);
-  console.log('game', +game.stageCount);
-  console.log('canChangeFocus', canChangeFocus);
-  console.log('=================');
-
   if (!canChangeFocus) {
     return ResponseHelper.error({
       message: 'Cannot change focus now',

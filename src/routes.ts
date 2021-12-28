@@ -1,5 +1,6 @@
 import express from 'express';
 import passport from 'passport';
+import { ConsoleController } from './modules/console/console.controller';
 import { CountryController } from './modules/country/country.controller';
 import { GameController } from './modules/game/game.controller';
 import { PlayerController } from './modules/player/player.controller';
@@ -133,6 +134,13 @@ router.post(
   '/countries',
   passport.authenticate('jwt', { session: false }),
   CountryController.getCountries
+);
+
+// Console
+router.post(
+  '/console/command',
+  passport.authenticate('jwt', { session: false }),
+  ConsoleController.executeCommand
 );
 
 // Others

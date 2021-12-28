@@ -44,6 +44,7 @@ const countryEventHandlers = (io: Server, socket: Socket) => {
     const serviceData = await CountryService.demandProvince({
       mapRef: payload.mapRef,
       countryId: payload.countryId,
+      gameId: payload.gameId,
       targetCountryId: payload.targetCountryId,
     });
 

@@ -37,6 +37,7 @@ import {
   ProvinceIncoming,
   Resource,
   SetOpinionOfActionParam,
+  ResourceRefundItem,
 } from './country.typing';
 
 @Entity({ name: 'countries' })
@@ -193,6 +194,12 @@ export class Country {
     default: '{}',
   })
   incoming?: Incoming;
+
+  @Column({
+    type: 'json',
+    default: '[]',
+  })
+  refunds?: ResourceRefundItem[];
 
   @Column({ default: 0 })
   totalProvinces?: number;
@@ -493,6 +500,8 @@ export class Country {
 
     // TODO reduce loopings
     for (const province of this.provinces) {
+      province.owner = this.id;
+
       if (!province.passives) {
         province.passives = [];
       }

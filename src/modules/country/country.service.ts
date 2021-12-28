@@ -498,6 +498,9 @@ export class CountryService {
 
   static async demandProvince(data: DemandProvinceParam) {
     const country = await countryRepository().findOne(data.countryId);
+    const game = await gameRepository().findOne(data.gameId, {
+      select: ['id', 'tradingProvinces'],
+    });
 
     if (!country) {
       return ResponseHelper.error({
@@ -516,8 +519,6 @@ export class CountryService {
         message: 'You cannot demand this province',
       });
     }
-
-    console.log(decision.data.maxProvincesAllowedToDemand);
 
     if (decision.data.maxProvincesAllowedToDemand <= 0) {
       return ResponseHelper.error({
@@ -549,6 +550,7 @@ export class CountryService {
     const provinceDecisionIndex = decision.data.provincesToFill.indexOf(
       data.mapRef
     );
+
     decision.data.provincesToFill.splice(provinceDecisionIndex, 1);
 
     const province: Province = { ...target.provinces[provinceIndex] };
@@ -576,13 +578,43 @@ export class CountryService {
     const provincesToFill = [
       ...target.provinces.map((province) => province.mapRef),
     ];
+
     decision.data.provincesToFill = provincesToFill;
     decision.decided = true;
+
+    const tradingProvinceIndex = game.tradingProvinces.findIndex(
+      (tradingProvinces) => tradingProvinces.provinceMapRef === province.mapRef
+    );
+
+    const countriesToSave = [country, target];
+
+    if (tradingProvinceIndex !== -1) {
+      const tradingProvince = game.tradingProvinces[tradingProvinceIndex];
+      let countryWithDecision: Country;
+
+      if (tradingProvince.buyer.id === target.id) {
+        countryWithDecision = target;
+      } else {
+        countryWithDecision = await countryRepository().findOne(
+          tradingProvince.buyer.id
+        );
+
+        countriesToSave.push(countryWithDecision);
+      }
+
+      countryWithDecision.decisions = countryWithDecision.decisions.filter(
+        (decision) => decision.id !== tradingProvince.decisionId
+      );
+
+      game.tradingProvinces.splice(tradingProvinceIndex, 1);
+      await gameRepository().save(game);
+    }
 
     decision.data.maxProvincesAllowedToDemand--;
     country.doNotcallChangeFunctionOnSave = true;
     target.doNotcallChangeFunctionOnSave = true;
-    await countryRepository().save([country, target]);
+
+    await countryRepository().save(countriesToSave);
 
     const payload = {
       color: country.color,
@@ -645,6 +677,7 @@ type GetWarSimulationParam = {
 };
 
 type DemandProvinceParam = {
+  gameId: string;
   countryId: string;
   targetCountryId: string;
   mapRef: string;
