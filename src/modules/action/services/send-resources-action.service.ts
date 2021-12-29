@@ -45,7 +45,7 @@ export async function sendResourcesAction(
   for (const index in resources) {
     const resource = resources[index];
 
-    // Duration is defined as 6 because when it runs it will subtract 1 firstly.
+    // Adding +1 to duration because when it runs it will subtract 1 firstly.
     let [decisionId, duration] = [
       v4(),
       +process.env.TRADING_DECISION_DURATION + 1,
