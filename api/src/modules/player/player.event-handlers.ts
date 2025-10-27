@@ -1,6 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import { GeneralHelper } from '../../helpers/general.helper';
 import { SocketResponse } from '../../helpers/socket-response.helper';
+import { SerializationHelper } from '../../helpers/serialization.helper';
 import { Action } from '../action/action.typing';
 import { GameService } from '../game/game.service';
 import { PlayerService } from './player.service';
@@ -28,11 +29,14 @@ const playerEventHandlers = (io: Server, socket: Socket) => {
       });
     }
 
-    socket.emit('player:start-picking-phase', serviceData.data);
+    // BUGFIX: Serialize data to prevent circular reference errors
+    const serializedData = SerializationHelper.serializeGameData(serviceData.data);
+
+    socket.emit('player:start-picking-phase', serializedData);
 
     socket
       .to(payload.gameId)
-      .emit('player:start-picking-phase', serviceData.data);
+      .emit('player:start-picking-phase', serializedData);
   };
 
   const joinGame = async (payload: JoinGamePayload) => {
@@ -58,8 +62,11 @@ const playerEventHandlers = (io: Server, socket: Socket) => {
       });
     }
 
-    socket.emit('player:join-game', serviceData.data);
-    socket.to(payload.gameId).emit('player:join-game', serviceData.data);
+    // BUGFIX: Serialize data to prevent circular reference errors
+    const serializedData = SerializationHelper.serializeGameData(serviceData.data);
+
+    socket.emit('player:join-game', serializedData);
+    socket.to(payload.gameId).emit('player:join-game', serializedData);
   };
 
   const pickCountry = async (payload: PickCountryPayload) => {
@@ -86,8 +93,11 @@ const playerEventHandlers = (io: Server, socket: Socket) => {
       });
     }
 
-    socket.emit('player:pick-country', serviceData.data);
-    socket.to(payload.gameId).emit('player:pick-country', serviceData.data);
+    // BUGFIX: Serialize data to prevent circular reference errors
+    const serializedData = SerializationHelper.serializeGameData(serviceData.data);
+
+    socket.emit('player:pick-country', serializedData);
+    socket.to(payload.gameId).emit('player:pick-country', serializedData);
   };
 
   const nextTurn = async (payload: NextTurnPayload) => {
@@ -114,14 +124,17 @@ const playerEventHandlers = (io: Server, socket: Socket) => {
       });
     }
 
-    socket.emit('player:next-turn', serviceData.data);
+    // BUGFIX: Serialize data to prevent circular reference errors
+    const serializedData = SerializationHelper.serializeGameData(serviceData.data);
+
+    socket.emit('player:next-turn', serializedData);
 
     if (serviceData.data.isNextTurn) {
-      socket.to(payload.gameId).emit('player:next-turn', serviceData.data);
+      socket.to(payload.gameId).emit('player:next-turn', serializedData);
     } else {
       socket.to(payload.gameId).emit('player:player-list', {
-        owner: serviceData.data.game.owner,
-        players: [...serviceData.data.game.players],
+        owner: serializedData.game.owner,
+        players: [...serializedData.game.players],
       });
     }
   };

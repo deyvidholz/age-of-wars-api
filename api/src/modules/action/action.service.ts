@@ -184,6 +184,10 @@ export class ActionService {
           country,
           game: data.game,
         });
+
+        // BUGFIX: Clean up temporary AI properties to prevent circular references
+        delete (country as any)._strategicAnalysis;
+        delete (country as any)._budget;
       }
 
       // Refunds

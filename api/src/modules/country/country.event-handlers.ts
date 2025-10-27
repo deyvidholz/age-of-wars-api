@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { Server, Socket } from 'socket.io';
 import { GeneralHelper } from '../../helpers/general.helper';
 import { SocketResponse } from '../../helpers/socket-response.helper';
+import { SerializationHelper } from '../../helpers/serialization.helper';
 import { CountryService } from './country.service';
 
 const countryEventHandlers = (io: Server, socket: Socket) => {
@@ -28,7 +29,9 @@ const countryEventHandlers = (io: Server, socket: Socket) => {
       });
     }
 
-    socket.emit('country:get@province', serviceData.data);
+    // BUGFIX: Serialize data to prevent circular reference errors
+    const serializedData = SerializationHelper.serializeGameData(serviceData.data);
+    socket.emit('country:get@province', serializedData);
   };
 
   const demandProvince = async (payload: DemandProvincePayload) => {
@@ -55,8 +58,10 @@ const countryEventHandlers = (io: Server, socket: Socket) => {
       });
     }
 
-    socket.emit('country:demand-province', serviceData.data);
-    socket.to(payload.gameId).emit('country:demand-province', serviceData.data);
+    // BUGFIX: Serialize data to prevent circular reference errors
+    const serializedData = SerializationHelper.serializeGameData(serviceData.data);
+    socket.emit('country:demand-province', serializedData);
+    socket.to(payload.gameId).emit('country:demand-province', serializedData);
   };
 
   socket.on('country:get@province', getProvince);
