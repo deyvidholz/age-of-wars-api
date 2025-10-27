@@ -43,28 +43,27 @@ export class CountryService {
       });
     }
 
-    const allProvinces: any[] = [];
+    // Optimize: Find province directly without building intermediate array
+    const lowerMapRef = data.provinceMapRef?.toLowerCase();
+    let province = null;
 
     for (const country of game.countries) {
-      const isOwner = !country.isAi && country.owner?.id === data.playerId;
-      const ownerCountry = { ...country, provinces: [] };
+      for (const prov of country.provinces) {
+        if (prov?.mapRef?.toLowerCase() === lowerMapRef) {
+          const isOwner = !country.isAi && country.owner?.id === data.playerId;
+          const ownerCountry = { ...country, provinces: [] };
 
-      allProvinces.push(
-        ...country.provinces.map((province) => {
-          return {
-            ...province,
+          province = {
+            ...prov,
             isOwner,
             country: ownerCountry,
             ownerTotalProvinces: country.provinces.length,
           };
-        })
-      );
+          break;
+        }
+      }
+      if (province) break;
     }
-
-    const province = allProvinces.find(
-      (province) =>
-        province?.mapRef?.toLowerCase() === data.provinceMapRef?.toLowerCase()
-    );
 
     if (!province) {
       return ResponseHelper.error({
@@ -109,6 +108,7 @@ export class CountryService {
     let countries: any = game.countries;
     const opinions = [];
 
+    // Optimize: Reduce code duplication by combining map and sort logic
     switch (rankingType) {
       case RankingType.INCOMING_BALANCE:
         countries = countries.map((country) => ({
@@ -116,9 +116,7 @@ export class CountryService {
           flag: country.flag,
           name: country.name,
           incoming: country.incoming,
-        }));
-
-        countries.sort(
+        })).sort(
           (a: any, b: any) =>
             b.incoming.balance - a.incoming.balance ||
             a.name.localeCompare(b.name)
@@ -131,9 +129,7 @@ export class CountryService {
           flag: country.flag,
           name: country.name,
           incoming: country.incoming,
-        }));
-
-        countries.sort(
+        })).sort(
           (a: any, b: any) =>
             b.incoming.oil - a.incoming.oil || a.name.localeCompare(b.name)
         );
@@ -145,9 +141,7 @@ export class CountryService {
           flag: country.flag,
           name: country.name,
           militaryPower: country.militaryPower,
-        }));
-
-        countries.sort(
+        })).sort(
           (a: any, b: any) =>
             b.militaryPower.total - a.militaryPower.total ||
             a.name.localeCompare(b.name)
@@ -160,9 +154,7 @@ export class CountryService {
           flag: country.flag,
           name: country.name,
           militaryPower: country.militaryPower,
-        }));
-
-        countries.sort(
+        })).sort(
           (a: any, b: any) =>
             b.militaryPower.aircrafts - a.militaryPower.aircrafts ||
             a.name.localeCompare(b.name)
@@ -175,9 +167,7 @@ export class CountryService {
           flag: country.flag,
           name: country.name,
           militaryPower: country.militaryPower,
-        }));
-
-        countries.sort(
+        })).sort(
           (a: any, b: any) =>
             b.militaryPower.divisions - a.militaryPower.divisions ||
             a.name.localeCompare(b.name)
@@ -190,9 +180,7 @@ export class CountryService {
           flag: country.flag,
           name: country.name,
           militaryPower: country.militaryPower,
-        }));
-
-        countries.sort(
+        })).sort(
           (a: any, b: any) =>
             b.militaryPower.tanks - a.militaryPower.tanks ||
             a.name.localeCompare(b.name)
@@ -205,9 +193,7 @@ export class CountryService {
           flag: country.flag,
           name: country.name,
           militaryPower: country.militaryPower,
-        }));
-
-        countries.sort(
+        })).sort(
           (a: any, b: any) =>
             b.militaryPower.warships - a.militaryPower.warships ||
             a.name.localeCompare(b.name)
@@ -373,7 +359,6 @@ export class CountryService {
     });
   }
 
-  // TODO improve performance (reduce maps)
   static async getWarSimulation(data: GetWarSimulationParam) {
     const game = data.game || (await gameRepository().findOne(data.gameId));
 
@@ -384,12 +369,11 @@ export class CountryService {
       });
     }
 
-    // Removing provinces to reduce payload size
+    // Optimize: Removing provinces to reduce payload size (in-place modification)
     if (data.removeProvinces) {
-      game.countries = game.countries.map((country) => {
+      for (const country of game.countries) {
         country.provinces = [];
-        return country;
-      });
+      }
     }
 
     const attacker: Country = game.countries.find(
@@ -412,15 +396,18 @@ export class CountryService {
       ...target.independenceGuaranteedBy.map((ally) => ally.name),
     ];
 
+    // Optimize: Use Sets for O(1) lookup instead of includes()
     if (data.exclude) {
+      const excludeSet = new Set(data.exclude);
       attackerAlliesNames = attackerAlliesNames.filter(
-        (countryName) => !data.exclude.includes(countryName)
+        (countryName) => !excludeSet.has(countryName)
       );
     }
 
     if (data.include) {
+      const includeSet = new Set(data.include);
       attackerAlliesNames = attackerAlliesNames.filter((countryName) =>
-        data.include.includes(countryName)
+        includeSet.has(countryName)
       );
     }
 
@@ -429,12 +416,16 @@ export class CountryService {
       victims: [],
     };
 
+    // Optimize: Use Sets for O(1) lookup when filtering countries
+    const attackerAlliesSet = new Set(attackerAlliesNames);
+    const targetAlliesSet = new Set(targetAlliesNames);
+
     const attackerAllies = game.countries.filter((country) =>
-      attackerAlliesNames.includes(country.name)
+      attackerAlliesSet.has(country.name)
     );
 
     const targetAllies = game.countries.filter((country) =>
-      targetAlliesNames.includes(country.name)
+      targetAlliesSet.has(country.name)
     );
 
     participants.attackers.push(...attackerAllies);

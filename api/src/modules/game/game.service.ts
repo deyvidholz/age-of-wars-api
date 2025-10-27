@@ -58,47 +58,40 @@ export class GameService {
 
     await gameRepository().save(game);
 
+    // Optimize: Create Map for O(1) country lookup by name instead of find() which is O(n)
+    // This prevents O(n²) complexity in the loop below
+    const countriesByName = new Map<string, Country>();
+    for (const country of game.countries) {
+      countriesByName.set(country.name, country);
+    }
+
     // Setting countries ids (allies, enemies, etc)
     for (const country of game.countries) {
-      country.allies.map((target) => {
-        target.id = game.countries.find(
-          (country) => country.name === target.name
-        ).id;
+      // Optimize: Use for...of instead of map (map creates unnecessary array)
+      for (const target of country.allies) {
+        const foundCountry = countriesByName.get(target.name);
+        if (foundCountry) target.id = foundCountry.id;
+      }
 
-        return target;
-      });
+      for (const target of country.enemies) {
+        const foundCountry = countriesByName.get(target.name);
+        if (foundCountry) target.id = foundCountry.id;
+      }
 
-      country.enemies.map((target) => {
-        target.id = game.countries.find(
-          (country) => country.name === target.name
-        ).id;
+      for (const target of country.inWarWith) {
+        const foundCountry = countriesByName.get(target.name);
+        if (foundCountry) target.id = foundCountry.id;
+      }
 
-        return target;
-      });
+      for (const target of country.guaranteeingIndependence) {
+        const foundCountry = countriesByName.get(target.name);
+        if (foundCountry) target.id = foundCountry.id;
+      }
 
-      country.inWarWith.map((target) => {
-        target.id = game.countries.find(
-          (country) => country.name === target.name
-        ).id;
-
-        return target;
-      });
-
-      country.guaranteeingIndependence.map((target) => {
-        target.id = game.countries.find(
-          (country) => country.name === target.name
-        ).id;
-
-        return target;
-      });
-
-      country.independenceGuaranteedBy.map((target) => {
-        target.id = game.countries.find(
-          (country) => country.name === target.name
-        ).id;
-
-        return target;
-      });
+      for (const target of country.independenceGuaranteedBy) {
+        const foundCountry = countriesByName.get(target.name);
+        if (foundCountry) target.id = foundCountry.id;
+      }
     }
 
     await gameRepository().save(game);

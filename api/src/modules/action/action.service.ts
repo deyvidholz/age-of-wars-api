@@ -39,31 +39,36 @@ import { shopAction } from './services/shop-action.service';
 
 export class ActionService {
   static async runActions(data: RunActionsParam) {
-    const countriesRemoved: Country[] = data.game.countries.filter(
-      (country) => !country.provinces.length
-    );
+    // Optimize: Single pass to separate countries with/without provinces
+    const countriesRemoved: Country[] = [];
+    const countriesActive: Country[] = [];
+    const playersRemovedIdsSet = new Set<string>();
 
-    const playersRemovedIds: string[] = [];
-    for (const country of countriesRemoved) {
-      if (!country.owner) {
-        continue;
+    for (const country of data.game.countries) {
+      if (!country.provinces.length) {
+        countriesRemoved.push(country);
+        if (country.owner) {
+          playersRemovedIdsSet.add(country.owner.id);
+        }
+      } else {
+        countriesActive.push(country);
       }
-
-      playersRemovedIds.push(country.owner.id);
     }
 
-    data.game.countries = data.game.countries.filter(
-      (country) => country.provinces.length
-    );
+    data.game.countries = countriesActive;
 
-    data.game.players = data.game.players.filter(
-      (player) => !playersRemovedIds.includes(player.id)
-    );
+    // Optimize: Use Set for O(1) lookup
+    if (playersRemovedIdsSet.size > 0) {
+      data.game.players = data.game.players.filter(
+        (player) => !playersRemovedIdsSet.has(player.id)
+      );
+    }
 
-    const countriesRemovedIds = countriesRemoved.map((country) => country.id);
+    // Optimize: Use Set for O(1) lookups in subsequent operations
+    const countriesRemovedIdsSet = new Set(countriesRemoved.map((country) => country.id));
 
     CoalitionHelper.removeCountriesFromCoalitionsByIds({
-      countryIds: countriesRemovedIds,
+      countryIds: Array.from(countriesRemovedIdsSet),
       game: data.game,
     });
 
@@ -76,34 +81,40 @@ export class ActionService {
     const aggressivenessReduction =
       +process.env.AGGRESSIVENESS_REDUCTION_PER_STAGE;
 
+    // Optimize: Create Set of coalition targets for O(1) lookup
+    const coalitionTargetIds = new Set(
+      data.game.coalitions.map((coalition) => coalition.against.id)
+    );
+
     for (const country of data.game.countries) {
-      // TODO create method to do these filters
-      // TODO do this when the last province of a country is demanded
-      country.allies = country.allies.filter(
-        (target) => !countriesRemovedIds.includes(target.id)
-      );
-      country.enemies = country.enemies.filter(
-        (target) => !countriesRemovedIds.includes(target.id)
-      );
-      country.inWarWith = country.inWarWith.filter(
-        (target) => !countriesRemovedIds.includes(target.id)
-      );
-      country.guaranteeingIndependence =
-        country.guaranteeingIndependence.filter(
-          (target) => !countriesRemovedIds.includes(target.id)
+      // Optimize: Use Set for O(1) lookup instead of includes() which is O(n)
+      // Combine multiple filters into one operation per array
+      if (countriesRemovedIdsSet.size > 0) {
+        country.allies = country.allies.filter(
+          (target) => !countriesRemovedIdsSet.has(target.id)
         );
-      country.independenceGuaranteedBy =
-        country.independenceGuaranteedBy.filter(
-          (target) => !countriesRemovedIds.includes(target.id)
+        country.enemies = country.enemies.filter(
+          (target) => !countriesRemovedIdsSet.has(target.id)
         );
+        country.inWarWith = country.inWarWith.filter(
+          (target) => !countriesRemovedIdsSet.has(target.id)
+        );
+        country.guaranteeingIndependence =
+          country.guaranteeingIndependence.filter(
+            (target) => !countriesRemovedIdsSet.has(target.id)
+          );
+        country.independenceGuaranteedBy =
+          country.independenceGuaranteedBy.filter(
+            (target) => !countriesRemovedIdsSet.has(target.id)
+          );
+      }
 
       // Coalitions
       if (country.aggressiveness.current > 230) {
         const chanceOfFormingCoalition = country.aggressiveness.current / 5;
 
-        const alreadyHasCoalitionAgainst = data.game.coalitions.some(
-          (coalition) => coalition.against.id === country.id
-        );
+        // Optimize: Use Set for O(1) lookup instead of some() which is O(n)
+        const alreadyHasCoalitionAgainst = coalitionTargetIds.has(country.id);
 
         if (
           !alreadyHasCoalitionAgainst &&
@@ -121,6 +132,8 @@ export class ActionService {
           });
 
           data.game.coalitions.push(coalition);
+          // Optimize: Update the Set so subsequent countries can check it
+          coalitionTargetIds.add(country.id);
         }
       }
 
@@ -402,6 +415,12 @@ export class ActionService {
   static async runWars(data: RunWarsParam) {
     const { game } = data;
 
+    // Optimize: Create Map for O(1) country lookup by ID
+    const countriesById = new Map<string, Country>();
+    for (const country of game.countries) {
+      countriesById.set(country.id, country);
+    }
+
     for (const war of game.wars) {
       if (game.stageCount < war.startAtStage) {
         continue;
@@ -414,12 +433,9 @@ export class ActionService {
       const attackers = WarHelper.getAttackers(game, war);
       const victims = WarHelper.getVictims(game, war);
 
-      const attacker = game.countries.find(
-        (country) => country.id === war.details.attacker.id
-      );
-      const victim = game.countries.find(
-        (country) => country.id === war.details.victim.id
-      );
+      // Optimize: Use Map for O(1) lookup instead of find() which is O(n)
+      const attacker = countriesById.get(war.details.attacker.id);
+      const victim = countriesById.get(war.details.victim.id);
 
       const comparedInfo = WarHelper.getComparedInfo(
         game,
@@ -689,15 +705,20 @@ export class ActionService {
   static async runCoalitions(data: RunCoalitionsParam) {
     const { game } = data;
 
+    // Optimize: Create Map for O(1) country lookup by ID
+    const countriesById = new Map<string, Country>();
+    for (const country of game.countries) {
+      countriesById.set(country.id, country);
+    }
+
     console.log('running coalitions');
     for (const coalition of game.coalitions) {
       if (coalition.warId) {
         continue;
       }
 
-      const target = game.countries.find(
-        (country) => country.id === coalition.against.id
-      );
+      // Optimize: Use Map for O(1) lookup instead of find() which is O(n)
+      const target = countriesById.get(coalition.against.id);
 
       if (target.aggressiveness.current < 20) {
         target.messages.push({
@@ -711,7 +732,8 @@ export class ActionService {
         continue;
       }
 
-      const alliesIds = coalition.allies.map((ally) => ally.id);
+      // Optimize: Use Set for O(1) lookup instead of array includes()
+      const alliesIdsSet = new Set(coalition.allies.map((ally) => ally.id));
       CoalitionHelper.calculateMilitaryPower({ coalition, game });
 
       const chanceOfDeclareWar = target.aggressiveness.current / 7;
@@ -724,12 +746,13 @@ export class ActionService {
         continue;
       }
 
+      // Optimize: Use Set for faster lookup
       const availableCountries = game.countries.filter(
         (country) =>
           country.isAi &&
           country.id !== target.id &&
           !country.hasFriendlyRelations(target.id) &&
-          !alliesIds.includes(country.id)
+          !alliesIdsSet.has(country.id)
       );
 
       const randomAlly: Country = MathHelper.getRandomItem(availableCountries);

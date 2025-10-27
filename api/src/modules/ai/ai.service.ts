@@ -184,23 +184,20 @@ export class AiService {
 
     let availableMoneyToSpend = country.economy.balance;
 
+    // Optimize: Calculate total shop costs in single pass
     if (country.actions.length) {
-      const shopActions = country.actions.filter(
-        (action) => action.type === ActionType.SHOP
-      );
+      for (const action of country.actions) {
+        if (action.type === ActionType.SHOP) {
+          const response = await ShopService.getOrderPrice({
+            items: action.data.order.items,
+            countryId: country.id,
+            country,
+          });
 
-      for (const shopAction of shopActions) {
-        const response = await ShopService.getOrderPrice({
-          items: shopAction.data.order.items,
-          countryId: country.id,
-          country,
-        });
-
-        if (response.error) {
-          continue;
+          if (!response.error) {
+            availableMoneyToSpend -= response.data.totalPrice;
+          }
         }
-
-        availableMoneyToSpend -= response.data.totalPrice;
       }
     }
 
@@ -346,22 +343,19 @@ export class AiService {
     let hasEnoughMoney: boolean = true;
     let availabeMoneyToSpend = country.economy.balance;
 
+    // Optimize: Calculate total improvement costs in single pass
     if (country.actions.length) {
-      let improveProvincesActions = country.actions.filter(
-        (action) => action.type === ActionType.IMPROVE_PROVINCES
-      );
+      for (const action of country.actions) {
+        if (action.type === ActionType.IMPROVE_PROVINCES) {
+          const response = await ShopService.getProvincesImprovementPrice({
+            countryId: country.id,
+            provincesToImprove: [...action.data.provincesToImprove],
+            country,
+          });
 
-      for (const improveProvincesAction of improveProvincesActions) {
-        const response = await ShopService.getProvincesImprovementPrice({
-          countryId: country.id,
-          provincesToImprove: [
-            ...improveProvincesAction.data.provincesToImprove,
-          ],
-          country,
-        });
-
-        if (!response.error) {
-          availabeMoneyToSpend -= response.data.totalPrice;
+          if (!response.error) {
+            availabeMoneyToSpend -= response.data.totalPrice;
+          }
         }
       }
     }
@@ -439,16 +433,19 @@ export class AiService {
 
     const opinionRanking = response.data.opinions;
 
-    // Getting the first 10 countries with best opinion
-    const availableCountries = game.countries.filter(
-      (c) => c.id !== country.id && !country.hasFriendlyRelations(c.id, false)
-    );
-    let max = availableCountries.length < 10 ? availableCountries.length : 10;
+    // Optimize: Create Map for O(1) country lookup
+    const availableCountriesMap = new Map<string, Country>();
+    for (const c of game.countries) {
+      if (c.id !== country.id && !country.hasFriendlyRelations(c.id, false)) {
+        availableCountriesMap.set(c.id, c);
+      }
+    }
+
+    let max = availableCountriesMap.size < 10 ? availableCountriesMap.size : 10;
 
     for (let i = 0; i < max; i++) {
-      const target = availableCountries.find(
-        (country) => country.id === opinionRanking[i].id
-      );
+      // Optimize: Use Map for O(1) lookup instead of find()
+      const target = availableCountriesMap.get(opinionRanking[i].id);
 
       if (!target) {
         return;
@@ -532,7 +529,7 @@ export class AiService {
       return;
     }
 
-    const possibleTargets: string[] = [];
+    // Optimize: Filter and reverse in single operation, limit results
     const opinionRanking = response.data.opinions
       .filter(
         (c) => !country.hasFriendlyRelations(c.id) && !country.isAtWarWith(c.id)
@@ -541,12 +538,17 @@ export class AiService {
 
     let max = opinionRanking.length < 10 ? opinionRanking.length : 10;
 
-    for (let i = 0; i < max; i++) {
-      possibleTargets.push(opinionRanking[i].id);
-    }
+    // Optimize: Build possibleTargets directly from slice
+    const possibleTargets = opinionRanking.slice(0, max).map(c => c.id);
 
     const targetId: string = MathHelper.getRandomItem(possibleTargets);
-    const target = game.countries.find((target) => target.id === targetId);
+
+    // Optimize: Create Map for O(1) country lookup
+    const countriesById = new Map<string, Country>();
+    for (const c of game.countries) {
+      countriesById.set(c.id, c);
+    }
+    const target = countriesById.get(targetId);
 
     if (!target) {
       return;
