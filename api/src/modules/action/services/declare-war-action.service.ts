@@ -87,6 +87,14 @@ export async function declareWarAction(
     SetOpinionOfActionParam.SUBTRACT
   );
 
+  // BUGFIX: Calculate aggressiveness BEFORE adding to inWarWith
+  // This ensures the calculation matches the pre-war simulation
+  let aggressivenessToAdd =
+    AggressivenessHelper.calculateAggressivenessDeclareWar({
+      country,
+      target,
+    });
+
   // Adding as enemy and inWarWith
   country.addEnemy({
     flag: target.flag,
@@ -220,12 +228,8 @@ export async function declareWarAction(
     }
   }
 
-  let aggressivenessToAdd =
-    AggressivenessHelper.calculateAggressivenessDeclareWar({
-      country,
-      target,
-    });
-
+  // BUGFIX: Aggressiveness is now calculated earlier (before adding to inWarWith)
+  // to match the pre-war simulation. Just apply it here.
   country.addAggressiveness(aggressivenessToAdd);
 
   country.messages.push({

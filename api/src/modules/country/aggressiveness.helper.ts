@@ -106,28 +106,78 @@ export class AggressivenessHelper {
 
     let aggressiveness: number = 50;
 
-    // Target
+    // IMPROVEMENT: Consider target characteristics
     if (target) {
+      // Cross-continental wars are seen as more aggressive (expansion beyond borders)
       if (target.info.continent !== country.info.continent) {
-        aggressiveness += 0;
+        aggressiveness += 15;
+      }
+
+      // Declaring war on smaller/weaker nations is less aggressive
+      const targetMP = target.militaryPower?.total || 0;
+      const ownMP = country.militaryPower?.total || 0;
+
+      if (ownMP > 0 && targetMP > 0) {
+        const powerRatio = targetMP / ownMP;
+
+        if (powerRatio > 1.5) {
+          // Attacking stronger nation (defensive/bold move)
+          aggressiveness += 25;
+        } else if (powerRatio < 0.5) {
+          // Bullying weaker nation (opportunistic)
+          aggressiveness += 10;
+        }
+      }
+
+      // Attacking allied/friendly nations is more aggressive
+      if (country.isAlliedWith(target.id)) {
+        aggressiveness += 40; // Backstabbing
+      }
+
+      const opinion = country.getOpinionOf(target.name);
+      if (opinion && opinion.value > 0) {
+        // Attacking nations you have positive relations with
+        aggressiveness += Math.min(30, Math.floor(opinion.value / 10));
       }
     }
 
+    // Apply personality/focus passives
     aggressiveness = AggressivenessHelper.applyAggressivenessPassives({
       aggressiveness,
       country,
       target,
     });
 
-    if (country.inWarWith.length) {
-      aggressiveness *= country.inWarWith.length + 1;
+    // IMPROVEMENT: Multiple wars increase aggressiveness additively, not multiplicatively
+    // This prevents exponential growth that made values unpredictable
+    if (country.inWarWith.length > 0) {
+      // Each additional war adds aggressiveness (warmongering)
+      const additionalWars = country.inWarWith.length;
+      aggressiveness += additionalWars * 30; // +30 per war
     }
 
-    if (aggressiveness > 220) {
-      aggressiveness = 220;
+    // IMPROVEMENT: Pacific personalities have reduced aggressiveness
+    if (country.personality.type === PersonalityType.PACIFIC) {
+      aggressiveness = Math.floor(aggressiveness * 0.6); // 40% reduction
     }
 
-    return aggressiveness;
+    // IMPROVEMENT: Dynamic cap based on personality and current wars
+    let maxAggressiveness = 220;
+
+    if (country.personality.type === PersonalityType.AGGRESSIVE) {
+      maxAggressiveness = 300; // Aggressive countries can go higher
+    } else if (country.personality.type === PersonalityType.PACIFIC) {
+      maxAggressiveness = 150; // Pacific countries capped lower
+    }
+
+    // Countries at war can accumulate more aggressiveness
+    if (country.inWarWith.length >= 2) {
+      maxAggressiveness += 50; // Allow higher for warmongers
+    }
+
+    aggressiveness = Math.min(aggressiveness, maxAggressiveness);
+
+    return Math.ceil(aggressiveness);
   }
 
   static calculateAggressivenessTakeProvince(
