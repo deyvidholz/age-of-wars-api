@@ -1,0 +1,131 @@
+#app {
+  background: #212121;
+}
+
+.txt-light {
+  color: #f5f5f5;
+}
+
+.toolbar {
+  position: fixed;
+  width: 100%;
+  z-index: 999;
+}
+
+.toolbar-margin-fix {
+  padding-top: 64px;
+}
+
+.right-sidebar {
+  position: fixed;
+  z-index: 998;
+  margin-top: 64px;
+}
+
+.left-sidebar {
+  z-index: 1000;
+}
+
+.notification {
+  margin-top: 90px;
+}
+
+.flag-bordered {
+  border: 1px solid #f5f5f5;
+}
+
+.flag-bordered-2 {
+  border: 2px solid #f5f5f5;
+}
+
+.border-green {
+  border-color: #2ad346 !important;
+}
+
+.w100 {
+  width: 100%;
+}
+
+.h100 {
+  height: 100vh;
+}
+
+.w90 {
+  width: 90%;
+}
+
+.province-info {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+}
+
+img {
+  max-width: 100%;
+}
+
+.centralized-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.notification {
+  position: fixed;
+  top: 6rem;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: fit-content;
+  z-index: 999;
+}
+
+.loader {
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+}
+
+.next-turn {
+  position: fixed;
+  bottom: 1rem;
+  right: 86px;
+  z-index: 1001;
+}
+
+.demand-province,
+.pick-color {
+  position: fixed;
+  bottom: 4.2rem;
+  right: 86px;
+  z-index: 1001;
+}
+
+.selected-focus {
+  border: 2px solid #ffeb3b;
+}
+
+.no-selection {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+}
+
+.list {
+  width: fit-content;
+  max-width: 300px;
+}
+
+.v-input__control {
+  justify-content: center !important;
+}
