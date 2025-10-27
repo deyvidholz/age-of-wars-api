@@ -5,6 +5,7 @@ import { CountryController } from './modules/country/country.controller';
 import { GameController } from './modules/game/game.controller';
 import { PlayerController } from './modules/player/player.controller';
 import { ShopController } from './modules/shop/shop.controller';
+import { TemplateController } from './modules/template/template.controller';
 
 const router = express.Router();
 
@@ -141,6 +142,43 @@ router.post(
   '/console/command',
   passport.authenticate('jwt', { session: false }),
   ConsoleController.executeCommand
+);
+
+// Template routes
+router.get(
+  '/templates/base-game-data',
+  passport.authenticate('jwt', { session: false }),
+  TemplateController.getBaseGameData
+);
+
+router.get(
+  '/templates',
+  passport.authenticate('jwt', { session: false }),
+  TemplateController.findAll
+);
+
+router.get(
+  '/templates/:templateId',
+  passport.authenticate('jwt', { session: false }),
+  TemplateController.findOne
+);
+
+router.post(
+  '/templates',
+  passport.authenticate('jwt', { session: false }),
+  TemplateController.create
+);
+
+router.put(
+  '/templates/:templateId',
+  passport.authenticate('jwt', { session: false }),
+  TemplateController.update
+);
+
+router.delete(
+  '/templates/:templateId',
+  passport.authenticate('jwt', { session: false }),
+  TemplateController.delete
 );
 
 // Others

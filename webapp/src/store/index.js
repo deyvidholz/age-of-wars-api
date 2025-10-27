@@ -174,6 +174,9 @@ export default new Vuex.Store({
         settings: {
           show: false,
         },
+        templateManager: {
+          show: false,
+        },
       },
     },
 

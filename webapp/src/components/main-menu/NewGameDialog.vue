@@ -6,9 +6,7 @@
   >
     <v-card color="grey darken-3" dark>
       <v-card-title>
-        <v-icon color="green accent-3" class="mr-2">
-          mdi-earth-box-plus
-        </v-icon>
+        <v-icon color="green accent-3" class="mr-2">mdi-earth-box-plus</v-icon>
 
         Create New Game
       </v-card-title>
@@ -62,7 +60,7 @@
           label="Reset All Alliances"
           color="orange"
           value="true"
-          hint="Start game with no pre-existing alliances (sandbox mode)"
+          hint="Start game with no pre-existing alliances"
           persistent-hint
         ></v-switch>
 
@@ -79,14 +77,36 @@
           multiple
           chips
         ></v-combobox>
+
+        <v-select
+          v-model="fieldValues.templateId"
+          label="Template (optional)"
+          :items="templateSelectValues"
+          item-text="name"
+          item-value="id"
+          clearable
+          hint="Apply a custom template to modify starting conditions"
+          persistent-hint
+          class="mt-4"
+        >
+          <template v-slot:prepend-item>
+            <v-list-item @click="openTemplateManager()">
+              <v-list-item-icon>
+                <v-icon color="purple">mdi-palette</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title>Manage Templates</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-divider class="mt-2"></v-divider>
+          </template>
+        </v-select>
       </v-card-text>
 
       <v-divider></v-divider>
 
       <v-card-actions class="justify-end">
-        <v-btn color="red" text @click="cancel()">
-          Cancel
-        </v-btn>
+        <v-btn color="red" text @click="cancel()">Cancel</v-btn>
 
         <v-btn
           :disabled="!canSubmit"
@@ -109,15 +129,17 @@ export default {
       password: null,
       allowCheats: null,
       resetAlliances: null,
-      maxPlayers: "Max",
+      maxPlayers: 'Max',
       blacklistedCountries: [],
+      templateId: null,
     },
     validFields: {
       name: false,
       password: true,
     },
-    maxPlayersSelectValues: ["Max", 2, 4, 8, 10, 16, 24, 48, 64, 100],
+    maxPlayersSelectValues: ['Max', 2, 4, 8, 10, 16, 24, 48, 64, 100],
     blacklistedCountriesComboboxValues: [],
+    templateSelectValues: [],
   }),
 
   computed: {
@@ -136,7 +158,7 @@ export default {
       }
 
       this.http
-        .get("/available-countries")
+        .get('/available-countries')
         .then(
           (res) =>
             (this.blacklistedCountriesComboboxValues = res.data.data.countries)
@@ -145,6 +167,20 @@ export default {
           this.$store.state.dialogs.info.title = err.response.data.message;
           this.$store.state.dialogs.info.isError = true;
           this.$store.state.dialogs.info.show = true;
+        });
+
+      // Load templates
+      this.http
+        .get('/templates')
+        .then((res) => {
+          this.templateSelectValues = [
+            { id: null, name: 'None' },
+            ...res.data.data.templates,
+          ];
+        })
+        .catch((err) => {
+          console.error('Failed to load templates:', err);
+          this.templateSelectValues = [{ id: null, name: 'None' }];
         });
     },
   },
@@ -155,10 +191,14 @@ export default {
       this.fieldValues.password = null;
       this.fieldValues.allowCheats = null;
       this.fieldValues.resetAlliances = null;
-      this.fieldValues.maxPlayers = "Max";
+      this.fieldValues.maxPlayers = 'Max';
       this.fieldValues.blacklistedCountries = [];
+      this.fieldValues.templateId = null;
       this.validFields.name = false;
       this.validFields.password = true;
+    },
+    openTemplateManager() {
+      this.$store.state.mainMenu.dialogs.templateManager.show = true;
     },
     ruleValid(fieldName) {
       this.validFields[fieldName] = true;
@@ -176,11 +216,12 @@ export default {
       const payload = {
         name: this.fieldValues.name,
         password: this.fieldValues.password,
+        templateId: this.fieldValues.templateId,
         options: {
           allowCheats: Boolean(this.fieldValues.allowCheats),
           resetAlliances: Boolean(this.fieldValues.resetAlliances),
           maxPlayers:
-            this.fieldValues.maxPlayers === "Max"
+            this.fieldValues.maxPlayers === 'Max'
               ? -1
               : this.fieldValues.maxPlayers,
           blacklistedCountries: this.fieldValues.blacklistedCountries,
@@ -188,15 +229,15 @@ export default {
       };
 
       this.http
-        .post("/games", payload)
+        .post('/games', payload)
         .then((res) => {
-          localStorage.setItem("gameId", res.data.data.game.id);
+          localStorage.setItem('gameId', res.data.data.game.id);
 
           this.$store.state.dialogs.info.handler = () => {
             this.http
               .get(`/games/start/${res.data.data.game.id}`)
               .then((response) => {
-                this.$router.push({ name: "Game" });
+                this.$router.push({ name: 'Game' });
               })
               .catch((err) => {
                 this.$store.state.dialogs.info.title =

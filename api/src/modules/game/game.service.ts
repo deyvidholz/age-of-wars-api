@@ -11,6 +11,7 @@ import { Country } from '../country/country.entity';
 import { countryRepository } from '../country/country.repository';
 import { Player } from '../player/player.entity';
 import { playerRepository } from '../player/player.repository';
+import { templateRepository } from '../template/template.repository';
 import { gameOptions } from './game.defaults';
 import { gameRepository } from './game.repository';
 import { GameOptions, GameStage } from './game.typing';
@@ -49,6 +50,84 @@ export class GameService {
     // Get countries
     const countriesPrepared =
       V1CountryHelper.getPreparedCountries(countriesWorldAOWV1);
+
+    // Apply template if provided
+    if (data.game.templateId) {
+      const template = await templateRepository().findOne({
+        where: {
+          id: data.game.templateId,
+          owner: { id: data.playerId },
+        },
+      });
+
+      if (!template) {
+        return ResponseHelper.error({
+          message: 'Template not found',
+        });
+      }
+
+      console.log(`🎨 Applying template: ${template.name}`);
+
+      // Apply template data to countries
+      for (const templateCountry of template.data.countries) {
+        const country = countriesPrepared.find(
+          (c) => c.name === templateCountry.name
+        );
+
+        if (!country) {
+          continue;
+        }
+
+        // Apply army modifications
+        if (templateCountry.army) {
+          if (templateCountry.army.divisions !== undefined) {
+            country.army.divisions = templateCountry.army.divisions;
+          }
+          if (templateCountry.army.tanks !== undefined) {
+            country.army.tanks = templateCountry.army.tanks;
+          }
+          if (templateCountry.army.aircrafts !== undefined) {
+            country.army.aircrafts = templateCountry.army.aircrafts;
+          }
+          if (templateCountry.army.warships !== undefined) {
+            country.army.warships = templateCountry.army.warships;
+          }
+        }
+
+        // Apply economy modifications
+        if (templateCountry.economy) {
+          if (templateCountry.economy.balance !== undefined) {
+            country.economy.balance = templateCountry.economy.balance;
+          }
+        }
+
+        // Apply province modifications
+        if (templateCountry.provinces) {
+          for (const templateProvince of templateCountry.provinces) {
+            const province = country.provinces.find(
+              (p) => p.mapRef === templateProvince.mapRef
+            );
+
+            if (!province) {
+              continue;
+            }
+
+            if (templateProvince.levels) {
+              if (templateProvince.levels.production !== undefined) {
+                province.levels.production = templateProvince.levels.production;
+              }
+              if (templateProvince.levels.taxation !== undefined) {
+                province.levels.taxation = templateProvince.levels.taxation;
+              }
+            }
+
+            if (templateProvince.oilProduction !== undefined) {
+              province.oilProduction = templateProvince.oilProduction;
+            }
+          }
+        }
+      }
+    }
 
     // Reset alliances if option is enabled
     if (data.game.options?.resetAlliances) {
@@ -471,6 +550,7 @@ type CreateParam = {
     name: string;
     password?: string;
     options?: GameOptions;
+    templateId?: string;
   };
 };
 

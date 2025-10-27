@@ -5,6 +5,13 @@ import {
   personalities,
   personalitiesConfig,
 } from '../data/templates/personalities.template';
+import { countriesWorldAOWV1 } from '../data/v1/countries.data';
+import { V1CountryHelper } from './v1-countries.helper';
+import {
+  TemplateCountryData,
+  TemplateData,
+  TemplateProvinceData,
+} from '../modules/template/template.typing';
 
 export class TemplateHelper {
   private static getProjectRoot(): string {
@@ -53,5 +60,48 @@ export class TemplateHelper {
     const buffer = fs.readFileSync(filePath, 'utf-8');
 
     return JSON.parse(buffer);
+  }
+
+  /**
+   * Converts base game data to template format
+   * This provides users with a starting point for creating templates
+   */
+  static getBaseGameDataAsTemplate(): TemplateData {
+    const countriesPrepared =
+      V1CountryHelper.getPreparedCountries(countriesWorldAOWV1);
+
+    const templateCountries: TemplateCountryData[] = countriesPrepared.map(
+      (country) => {
+        // Convert provinces to template format
+        const templateProvinces: TemplateProvinceData[] = country.provinces.map(
+          (province) => ({
+            mapRef: province.mapRef,
+            levels: {
+              production: province.levels.production,
+              taxation: province.levels.taxation,
+            },
+            oilProduction: province.oilProduction,
+          })
+        );
+
+        return {
+          name: country.name,
+          army: {
+            divisions: country.army.divisions,
+            tanks: country.army.tanks,
+            aircrafts: country.army.aircrafts,
+            warships: country.army.warships,
+          },
+          economy: {
+            balance: country.economy.balance,
+          },
+          provinces: templateProvinces,
+        };
+      }
+    );
+
+    return {
+      countries: templateCountries,
+    };
   }
 }

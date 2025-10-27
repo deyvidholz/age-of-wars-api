@@ -31,6 +31,11 @@
               Join Game
             </v-btn>
 
+            <v-btn tile color="blue-grey darken-1 mb-2" @click="templateManager()">
+              <v-icon class="mr-2" color="blue-grey darken-4"> mdi-palette </v-icon>
+              Templates
+            </v-btn>
+
             <v-btn tile color="blue-grey darken-1 mb-2" @click="settings()">
               <v-icon class="mr-2" color="blue-grey darken-4"> mdi-cog </v-icon>
               Settings
@@ -50,6 +55,7 @@
     <LoadGameDialog />
     <JoinGameDialog />
     <SettingsDialog />
+    <TemplateManagerDialog />
   </div>
 </template>
 
@@ -58,6 +64,7 @@ import NewGameDialog from "@/components/main-menu/NewGameDialog";
 import LoadGameDialog from "@/components/main-menu/LoadGameDialog";
 import JoinGameDialog from "@/components/main-menu/JoinGameDialog";
 import SettingsDialog from "@/components/main-menu/SettingsDialog";
+import TemplateManagerDialog from "@/components/main-menu/TemplateManagerDialog";
 
 export default {
   components: {
@@ -65,6 +72,7 @@ export default {
     LoadGameDialog,
     JoinGameDialog,
     SettingsDialog,
+    TemplateManagerDialog,
   },
 
   data: () => ({}),
@@ -96,6 +104,9 @@ export default {
     },
     settings() {
       this.$store.state.mainMenu.dialogs.settings.show = true;
+    },
+    templateManager() {
+      this.$store.state.mainMenu.dialogs.templateManager.show = true;
     },
   },
 
