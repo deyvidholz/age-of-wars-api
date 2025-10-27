@@ -11,6 +11,7 @@ export type GameOptions = {
   allowCheats: boolean;
   maxPlayers: number;
   blacklistedCountries: string[];
+  resetAlliances?: boolean; // Start game with no pre-existing alliances
 };
 
 export type Coalition = {

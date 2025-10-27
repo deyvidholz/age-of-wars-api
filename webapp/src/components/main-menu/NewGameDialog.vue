@@ -57,6 +57,15 @@
           value="true"
         ></v-switch>
 
+        <v-switch
+          v-model="fieldValues.resetAlliances"
+          label="Reset All Alliances"
+          color="orange"
+          value="true"
+          hint="Start game with no pre-existing alliances (sandbox mode)"
+          persistent-hint
+        ></v-switch>
+
         <v-select
           v-model="fieldValues.maxPlayers"
           label="Max Players Allowed"
@@ -99,6 +108,7 @@ export default {
       name: null,
       password: null,
       allowCheats: null,
+      resetAlliances: null,
       maxPlayers: "Max",
       blacklistedCountries: [],
     },
@@ -144,6 +154,7 @@ export default {
       this.fieldValues.name = null;
       this.fieldValues.password = null;
       this.fieldValues.allowCheats = null;
+      this.fieldValues.resetAlliances = null;
       this.fieldValues.maxPlayers = "Max";
       this.fieldValues.blacklistedCountries = [];
       this.validFields.name = false;
@@ -167,6 +178,7 @@ export default {
         password: this.fieldValues.password,
         options: {
           allowCheats: Boolean(this.fieldValues.allowCheats),
+          resetAlliances: Boolean(this.fieldValues.resetAlliances),
           maxPlayers:
             this.fieldValues.maxPlayers === "Max"
               ? -1

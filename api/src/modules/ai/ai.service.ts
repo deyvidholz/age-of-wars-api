@@ -561,14 +561,36 @@ export class AiService {
         // Pick from top 3 strongest
         const strongAllies = possibleTargets.slice(0, 3);
         const randomTarget = MathHelper.getRandomItem(strongAllies);
+
+        // BUGFIX: Ensure random target is valid
+        if (!randomTarget) {
+          return;
+        }
+
         targetId = randomTarget.country.id;
         baseChance = 75; // Higher chance when we need allies urgently
       } else {
         // Normal: pick based on opinion
         const randomTarget = MathHelper.getRandomItem(possibleTargets);
+
+        // BUGFIX: Ensure random target is valid
+        if (!randomTarget) {
+          return;
+        }
+
         targetId = randomTarget.country.id;
         baseChance = randomTarget.opinionValue / 20;
       }
+    }
+
+    // BUGFIX: Ensure targetId is valid before proceeding
+    if (!targetId) {
+      return;
+    }
+
+    // BUGFIX: Ensure chance is a valid number
+    if (isNaN(baseChance) || baseChance < 0 || baseChance > 100) {
+      return;
     }
 
     // Apply chance
@@ -592,12 +614,34 @@ export class AiService {
       (c) => c.id !== country.id && !country.hasFriendlyRelations(c.id)
     );
 
+    // BUGFIX: No available countries to insult
+    if (!availableCountries.length) {
+      return;
+    }
+
     const randomTarget: Country = MathHelper.getRandomItem(availableCountries);
+
+    // BUGFIX: Invalid target
+    if (!randomTarget) {
+      return;
+    }
+
     const opinion = country.getOpinionOf(randomTarget.name);
+
+    // BUGFIX: Invalid opinion value
+    if (!opinion || typeof opinion.value !== 'number') {
+      return;
+    }
+
     let chance = Math.abs(opinion.value) / 20;
 
     if (country.personality.type === PersonalityType.PACIFIC) {
       chance = chance / 2;
+    }
+
+    // BUGFIX: Ensure chance is a valid number between 0-100
+    if (isNaN(chance) || chance < 0 || chance > 100) {
+      return;
     }
 
     if (!MathHelper.chanceOf(chance)) {

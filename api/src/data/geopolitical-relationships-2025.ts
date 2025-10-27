@@ -28,7 +28,7 @@ export const geopoliticalRelationships2025: GeopoliticalRelationship[] = [
   {
     country: 'United States',
     allies: ['United Kingdom', 'Canada', 'Japan', 'South Korea', 'Australia', 'Israel', 'France', 'Germany'],
-    enemies: ['North Korea', 'Iran'],
+    enemies: ['North Korea', 'Iran', 'China'],
     opinions: [
       // NATO Allies - Strong
       { name: 'United Kingdom', opinion: 200 },
@@ -259,7 +259,7 @@ export const geopoliticalRelationships2025: GeopoliticalRelationship[] = [
 
   {
     country: 'Ukraine',
-    allies: ['Poland', 'Lithuania', 'Latvia', 'Estonia', 'United Kingdom'],
+    allies: [],
     enemies: ['Russia', 'Belarus'],
     opinions: [
       { name: 'Poland', opinion: 200 },
@@ -285,8 +285,8 @@ export const geopoliticalRelationships2025: GeopoliticalRelationship[] = [
 
   {
     country: 'Poland',
-    allies: ['United States', 'United Kingdom', 'Germany', 'France', 'Ukraine', 'Lithuania'],
-    enemies: [],
+    allies: ['United States', 'United Kingdom', 'Germany', 'France', 'Lithuania'],
+    enemies: ['Russia'],
     opinions: [
       { name: 'United States', opinion: 200 },
       { name: 'United Kingdom', opinion: 190 },
@@ -372,7 +372,7 @@ export const geopoliticalRelationships2025: GeopoliticalRelationship[] = [
   {
     country: 'China',
     allies: ['Pakistan', 'Russia', 'North Korea'],
-    enemies: [],
+    enemies: ['United States', 'India'],
     opinions: [
       { name: 'Russia', opinion: 170 },
       { name: 'Pakistan', opinion: 180 },
@@ -476,7 +476,7 @@ export const geopoliticalRelationships2025: GeopoliticalRelationship[] = [
   {
     country: 'India',
     allies: ['United States', 'Japan', 'France', 'United Kingdom'],
-    enemies: [],
+    enemies: ['China'],
     opinions: [
       { name: 'United States', opinion: 170 },
       { name: 'Japan', opinion: 170 },

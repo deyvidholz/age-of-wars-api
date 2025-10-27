@@ -50,6 +50,16 @@ export class GameService {
     const countriesPrepared =
       V1CountryHelper.getPreparedCountries(countriesWorldAOWV1);
 
+    // Reset alliances if option is enabled
+    if (data.game.options?.resetAlliances) {
+      console.log('🔄 Resetting all alliances and independence guarantees');
+      for (const country of countriesPrepared) {
+        country.allies = [];
+        country.guaranteeingIndependence = [];
+        country.independenceGuaranteedBy = [];
+      }
+    }
+
     const game = gameRepository().create({
       owner,
       countries: countriesPrepared,
