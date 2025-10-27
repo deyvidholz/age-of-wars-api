@@ -7,6 +7,7 @@ import {
   countriesV2LegacyDataSupport,
   CountryV2LegacyDataSupport,
 } from '../data/v2/legacy-support/countries.data';
+import { geopoliticalRelationships2025 } from '../data/geopolitical-relationships-2025';
 import { Country } from '../modules/country/country.entity';
 import {
   Aggressiveness,
@@ -16,6 +17,7 @@ import {
   Production,
   Province,
   Resource,
+  CountrySimplified,
 } from '../modules/country/country.typing';
 import { GameHelper } from './game.helper';
 import { GeneralHelper } from './general.helper';
@@ -118,13 +120,101 @@ export class V1CountryHelper {
       return preparedCountry;
     });
 
+    // Apply realistic geopolitical relationships (2025)
+    this.applyGeopoliticalRelationships(countries);
+
+    // Fill in missing opinions with generic values
     for (const country of countries) {
-      country.opinions = GameHelper.generateOpinions({
-        country,
-        countries,
-      });
+      if (!country.opinions || Object.keys(country.opinions).length === 0) {
+        country.opinions = GameHelper.generateOpinions({
+          country,
+          countries,
+        });
+      } else {
+        // Merge geopolitical opinions with generated ones for countries not in geopolitical data
+        const generatedOpinions = GameHelper.generateOpinions({
+          country,
+          countries,
+        });
+
+        // Add generated opinions for countries not in geopolitical data
+        for (const [targetName, generatedOpinion] of Object.entries(generatedOpinions)) {
+          if (!country.opinions[targetName]) {
+            country.opinions[targetName] = generatedOpinion;
+          }
+        }
+      }
     }
 
     return countries;
+  }
+
+  /**
+   * Apply realistic geopolitical relationships based on 2025 world affairs
+   */
+  private static applyGeopoliticalRelationships(countries: Country[]): void {
+    // Create map for quick country lookup
+    const countryMap = new Map<string, Country>();
+    for (const country of countries) {
+      countryMap.set(country.name, country);
+    }
+
+    let updatedCount = 0;
+
+    // Apply geopolitical relationships
+    for (const relationship of geopoliticalRelationships2025) {
+      const country = countryMap.get(relationship.country);
+
+      if (!country) {
+        continue; // Country not in game
+      }
+
+      updatedCount++;
+
+      // Update allies
+      country.allies = relationship.allies
+        .map((allyName) => {
+          const ally = countryMap.get(allyName);
+          if (ally) {
+            return {
+              id: ally.id || '',
+              name: ally.name,
+              flag: ally.flag,
+            } as CountrySimplified;
+          }
+          return null;
+        })
+        .filter((ally) => ally !== null) as CountrySimplified[];
+
+      // Update enemies
+      country.enemies = relationship.enemies
+        .map((enemyName) => {
+          const enemy = countryMap.get(enemyName);
+          if (enemy) {
+            return {
+              id: enemy.id || '',
+              name: enemy.name,
+              flag: enemy.flag,
+            } as CountrySimplified;
+          }
+          return null;
+        })
+        .filter((enemy) => enemy !== null) as CountrySimplified[];
+
+      // Update opinions
+      const opinions: Record<string, any> = {};
+      for (const opinionData of relationship.opinions) {
+        const target = countryMap.get(opinionData.name);
+        if (target) {
+          opinions[opinionData.name] = {
+            value: opinionData.opinion,
+            reasons: ['geopolitical_relationship_2025'],
+          };
+        }
+      }
+      country.opinions = opinions;
+    }
+
+    console.log(`✅ Applied geopolitical relationships to ${updatedCount} countries`);
   }
 }
