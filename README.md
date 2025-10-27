@@ -3,7 +3,7 @@
 </h1>
 
 <h1 align="center">
-  <img alt="In game" src="./webapp/screenshots/declaring-war.png" />
+  <img alt="In game" src="./screenshots/declaring-war.png" />
 </h1>
 
 # 📜 Description
@@ -61,7 +61,7 @@ After installing the dependencies and setting up the database:
 </h2>
 
 <h1 align="center">
-  <img alt="Player Actions" src="./webapp/screenshots/left-sidebar.png" />
+  <img alt="Player Actions" src="./screenshots/left-sidebar.png" />
 </h1>
 
 <h2 align="center">
@@ -69,7 +69,7 @@ After installing the dependencies and setting up the database:
 </h2>
 
 <h1 align="center">
-  <img alt="Target Information" src="./webapp/screenshots/right-sidebar.png" />
+  <img alt="Target Information" src="./screenshots/right-sidebar.png" />
 </h1>
 
 <h2 align="center">
@@ -77,7 +77,7 @@ After installing the dependencies and setting up the database:
 </h2>
 
 <h1 align="center">
-  <img alt="Province Information Card" src="./webapp/screenshots/province-info.png" />
+  <img alt="Province Information Card" src="./screenshots/province-info.png" />
 </h1>
 
 <h2 align="center">
@@ -85,11 +85,11 @@ After installing the dependencies and setting up the database:
 </h2>
 
 <h1 align="center">
-  <img alt="Economy Ranking" src="./webapp/screenshots/economy-ranking.png" />
+  <img alt="Economy Ranking" src="./screenshots/economy-ranking.png" />
 </h1>
 
 <h1 align="center">
-  <img alt="Military Ranking" src="./webapp/screenshots/military-ranking.png" />
+  <img alt="Military Ranking" src="./screenshots/military-ranking.png" />
 </h1>
 
 <h2 align="center">
@@ -97,7 +97,7 @@ After installing the dependencies and setting up the database:
 </h2>
 
 <h1 align="center">
-  <img alt="Focus Card" src="./webapp/screenshots/focus.png" />
+  <img alt="Focus Card" src="./screenshots/focus.png" />
 </h1>
 
 <h2 align="center">
@@ -105,7 +105,7 @@ After installing the dependencies and setting up the database:
 </h2>
 
 <h1 align="center">
-  <img alt="Relations Card - Declare War" src="./webapp/screenshots/declaring-war.png" />
+  <img alt="Relations Card - Declare War" src="./screenshots/declaring-war.png" />
 </h1>
 
 <h2 align="center">
@@ -113,7 +113,7 @@ After installing the dependencies and setting up the database:
 </h2>
 
 <h1 align="center">
-  <img alt="Send Ally Request" src="./webapp/screenshots/sending-ally-request.png" />
+  <img alt="Send Ally Request" src="./screenshots/sending-ally-request.png" />
 </h1>
 
 <h2 align="center">
@@ -121,7 +121,7 @@ After installing the dependencies and setting up the database:
 </h2>
 
 <h1 align="center">
-  <img alt="Provinces Conquered" src="./webapp/screenshots/provinces-conquered.jpeg" />
+  <img alt="Provinces Conquered" src="./screenshots/provinces-conquered.jpeg" />
 </h1>
 
 # Glossary
