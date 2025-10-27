@@ -1,14 +1,10 @@
 // Environment configuration
+// These values come from .env.development or .env.production
+// Vue CLI automatically loads VUE_APP_* variables and replaces them at build time
+const API_URL = process.env.VUE_APP_API_URL || 'http://localhost:3001';
+const SOCKET_URL = process.env.VUE_APP_SOCKET_URL || 'ws://localhost:3001';
+
 const isDevelopment = process.env.NODE_ENV === 'development';
-
-// API Configuration
-const API_URL = isDevelopment
-  ? 'http://localhost:3001'
-  : 'https://aow.valkeon.com/api';
-
-const SOCKET_URL = isDevelopment
-  ? 'ws://localhost:3001'
-  : 'wss://aow.valkeon.com/api';
 
 export default {
   // Base URLs

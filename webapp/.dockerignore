@@ -4,6 +4,9 @@ dist
 .git
 .gitignore
 .DS_Store
-.env
 .env.local
 .env.*.local
+
+# Allow .env.development and .env.production for Vue CLI
+!.env.development
+!.env.production

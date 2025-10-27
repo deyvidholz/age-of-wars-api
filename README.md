@@ -20,32 +20,60 @@ There are currently 149 countries available to play with.
 
 The easiest way to run the entire application with all services:
 
-### Development Mode
+### Quick Start
 ```bash
-# Copy the example env file and configure it
+# 1. Copy the example env file
 cp .env.example .env
 
-# The .env file has NODE_ENV=development by default
-# Start all services (API, Webapp, and PostgreSQL)
-docker-compose up
+# 2. Edit .env and set NODE_ENV to either 'development' or 'production'
+# NODE_ENV=development  # For development with hot reload
+# NODE_ENV=production   # For optimized production build
+
+# 3. Start the application
+./start.sh up -d
+
+# View logs
+./start.sh logs -f
+
+# Stop the application
+./start.sh down
 ```
 
-### Production Mode
-```bash
-# Use the production env file
-cp .env.production .env
+### Development vs Production
 
-# The .env.production file has NODE_ENV=production
-# Start all services in production mode
-docker-compose up
-```
+**Development Mode** (`NODE_ENV=development`):
+- Hot reload enabled for both API and webapp
+- Source code is mounted as volumes for instant updates
+- Runs with nodemon and Vue dev server
+- Not optimized for performance
+
+**Production Mode** (`NODE_ENV=production`):
+- Optimized builds (TypeScript compiled, Vue minified)
+- No volume mounts - code is built into the container
+- Better performance and smaller bundle sizes
+- Production-ready
+
+**Simply change NODE_ENV in `.env` and restart!**
 
 **Access the application:**
 - Webapp: http://localhost:8081
 - API: http://localhost:3001
-- PostgreSQL: localhost:5434
+- PostgreSQL: localhost:5432
 
-**Note:** All environment configuration is centralized in the root `.env` file. The `NODE_ENV` variable in this file determines whether the application runs in development or production mode.
+**Note:** The `start.sh` script automatically detects NODE_ENV from `.env` and configures Docker Compose accordingly. All environment variables are centralized in the root `.env` file.
+
+### Configuring API URLs
+
+The webapp's API and Socket.io URLs are configured via environment files in `webapp/`:
+- **webapp/.env.development** - Used when NODE_ENV=development
+- **webapp/.env.production** - Used when NODE_ENV=production
+
+These files are loaded automatically by Vue CLI during the build process. By default, both point to `localhost:3001` for local testing. For production deployment, edit `webapp/.env.production`:
+
+```bash
+VUE_APP_API_URL=https://your-production-domain.com/api
+VUE_APP_SOCKET_URL=wss://your-production-domain.com/api
+```
 
 ## 📦 Manual Setup (Without Docker)
 
@@ -57,11 +85,15 @@ docker-compose up
 
 ### Webapp Setup
 1. Navigate to `webapp/` directory and use `npm install` to install dependencies
-2. Use `npm run dev` to start the webapp (development mode)
+2. Configure API URLs in `webapp/.env.development` or `webapp/.env.production`:
+   ```bash
+   VUE_APP_API_URL=http://localhost:3001
+   VUE_APP_SOCKET_URL=ws://localhost:3001
+   ```
+3. Use `npm run dev` to start the webapp (development mode)
+4. For production build: `npm run build`
 
-The webapp automatically uses the correct API URL based on the environment:
-- **Development**: `http://localhost:3001`
-- **Production**: `https://aow.valkeon.com/api`
+The webapp uses Vue CLI's environment system to configure URLs at build time based on NODE_ENV.
 
 # ➕ Installation / Requirements
 
