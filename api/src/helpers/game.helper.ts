@@ -56,7 +56,7 @@ export class GameHelper {
       let value = preDefinedValue ? preDefinedValue.value : null;
 
       if (value && typeof value === 'object') {
-        value = MathHelper.getRandomNumber(value[0], value[1]);
+        value = MathHelper.getRandomNumber(value![0], value![1]);
       }
 
       if (!value) {

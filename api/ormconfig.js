@@ -1,5 +1,8 @@
+const path = require('path');
+
+// Load .env from root directory (parent of api/)
 require('dotenv').config({
-  path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env'
+  path: path.join(__dirname, '..', process.env.NODE_ENV === 'production' ? '.env.production' : '.env')
 });
 
 const isProduction = process.env.NODE_ENV === 'production';

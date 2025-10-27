@@ -1,0 +1,45 @@
+# Development stage
+FROM node:14.17-alpine as development
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Expose port
+EXPOSE 8080
+
+# Start development server
+CMD ["npm", "run", "dev"]
+
+# Production stage
+FROM node:14.17-alpine as production
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN npm run build
+
+# Install serve to serve the built files
+RUN npm install -g serve
+
+# Expose port
+EXPOSE 8080
+
+# Serve the built files
+CMD ["serve", "-s", "dist", "-p", "8080"]

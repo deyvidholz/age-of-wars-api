@@ -1,10 +1,12 @@
 import dotenv from 'dotenv';
 import path from 'path';
 
-// Determine the project root directory
-// If running from dist/, go up one level; otherwise, go up one level from src/
-const isRunningFromDist = __dirname.includes('/dist');
-const projectRoot = path.join(__dirname, '..');
+// Determine the project root directory (parent of api/)
+// In dev mode: __dirname = /app/src -> go up one level to /app
+// In production: __dirname = /app/dist -> go up one level to /app
+// Then go up one more level to get to the project root (parent of api/)
+const apiRoot = path.join(__dirname, '..');
+const projectRoot = path.join(apiRoot, '..');
 
 // Load environment variables based on NODE_ENV
 const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env';

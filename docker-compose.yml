@@ -1,0 +1,71 @@
+services:
+  postgres:
+    image: postgres:13.2-alpine
+    container_name: aow-postgres
+    env_file:
+      - .env
+    ports:
+      - '${POSTGRES_PORT:-5434}:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - aow-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./api
+      dockerfile: ../Dockerfile.api
+    container_name: aow-api
+    env_file:
+      - .env
+    ports:
+      - '3001:3001'
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+      - ./api/src/data/json:/app/src/data/json
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - aow-network
+    command: >
+      sh -c "
+        if [ \"$$NODE_ENV\" = \"production\" ]; then
+          npm run build && npm start
+        else
+          npm run dev
+        fi
+      "
+
+  webapp:
+    build:
+      context: ./webapp
+      dockerfile: ../Dockerfile.webapp
+      target: ${NODE_ENV}
+    container_name: aow-webapp
+    env_file:
+      - .env
+    environment:
+      - PORT=8080
+    ports:
+      - '8081:8080'
+    volumes:
+      - ./webapp:/app
+      - /app/node_modules
+    depends_on:
+      - api
+    networks:
+      - aow-network
+
+networks:
+  aow-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

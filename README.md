@@ -16,13 +16,46 @@ There are currently 149 countries available to play with.
 
 # 📝 Quick Start
 
-## API Setup
+## 🐳 Using Docker (Recommended)
+
+The easiest way to run the entire application with all services:
+
+### Development Mode
+```bash
+# Copy the example env file and configure it
+cp .env.example .env
+
+# The .env file has NODE_ENV=development by default
+# Start all services (API, Webapp, and PostgreSQL)
+docker-compose up
+```
+
+### Production Mode
+```bash
+# Use the production env file
+cp .env.production .env
+
+# The .env.production file has NODE_ENV=production
+# Start all services in production mode
+docker-compose up
+```
+
+**Access the application:**
+- Webapp: http://localhost:8081
+- API: http://localhost:3001
+- PostgreSQL: localhost:5434
+
+**Note:** All environment configuration is centralized in the root `.env` file. The `NODE_ENV` variable in this file determines whether the application runs in development or production mode.
+
+## 📦 Manual Setup (Without Docker)
+
+### API Setup
 1. Navigate to `api/` directory and use `npm install` to install dependencies
-2. Use `docker-compose up` in the `api/` directory to set up the PostgreSQL database
-3. Configure `api/.env` file with your database connection information
+2. Configure `.env` file in the root directory with your database connection information
+3. Start PostgreSQL (see database setup section below)
 4. Use `npm run dev` to start the API server (development mode)
 
-## Webapp Setup
+### Webapp Setup
 1. Navigate to `webapp/` directory and use `npm install` to install dependencies
 2. Use `npm run dev` to start the webapp (development mode)
 
@@ -32,22 +65,32 @@ The webapp automatically uses the correct API URL based on the environment:
 
 # ➕ Installation / Requirements
 
-These technologies listed below are required to run the project properly:
+## Using Docker (Recommended)
+- Docker (latest version)
+- Docker Compose (latest version)
 
-- Docker (for PostgreSQL database)
+## Manual Installation
+- Docker (for PostgreSQL database only)
 - Node (tested with Node v14.17)
 - NPM (tested with v6.14+)
 
-## API Installation
+### API Installation
 Navigate to `api/` directory and run `npm install` to install dependencies.
 
-## Webapp Installation
+### Webapp Installation
 Navigate to `webapp/` directory and run `npm install` to install dependencies.
 
 # 🔨 Setting up PostgreSQL database
 
-Start docker then navigate to the `api/` directory and use `docker-compose up` to set up the database.
-You can access the database using `pgAdmin` by accessing the app url and the port configured in `api/.env` file.
+## Using Docker Compose
+The database is automatically set up when you run `docker-compose up` at the root level.
+
+If you want to run only the database:
+```bash
+docker-compose up postgres
+```
+
+You can access the database using `pgAdmin` by accessing the app url and the port configured in `.env` file (default: 5434).
 
 # 🚀 Running the app (development mode)
 
