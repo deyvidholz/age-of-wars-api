@@ -3,12 +3,13 @@ import App from "./App.vue";
 import router from "./router";
 import store from "./store";
 import vuetify from "./plugins/vuetify";
+import config from "./config/environment";
 
 /* Socket.io Extended */
 import VueSocketIOExt from "vue-socket.io-extended";
 import io from "socket.io-client";
 
-const socket = io("wss://aow.valkeon.com/api", {
+const socket = io(config.socketUrl, {
   transportOptions: {
     polling: {
       extraHeaders: {

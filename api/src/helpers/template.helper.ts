@@ -7,6 +7,14 @@ import {
 } from '../data/templates/personalities.template';
 
 export class TemplateHelper {
+  private static getProjectRoot(): string {
+    // If running from dist/, go up two levels to project root; otherwise, go up two levels from src/helpers/
+    const isRunningFromDist = __dirname.includes('/dist');
+    return isRunningFromDist
+      ? path.join(__dirname, '..', '..')
+      : path.join(__dirname, '..', '..');
+  }
+
   static saveTemplatesToJSON(): any[] {
     const data = [];
     const templates = [
@@ -20,7 +28,13 @@ export class TemplateHelper {
       },
     ];
 
-    const filePath = path.join(__dirname, '..', 'data', 'json');
+    const projectRoot = this.getProjectRoot();
+    const filePath = path.join(projectRoot, 'src', 'data', 'json');
+
+    // Ensure directory exists
+    if (!fs.existsSync(filePath)) {
+      fs.mkdirSync(filePath, { recursive: true });
+    }
 
     for (const template of templates) {
       data[template.config.propertyName] = template.data;
@@ -34,7 +48,8 @@ export class TemplateHelper {
   }
 
   static readJSONTemplate(fileName: string): any {
-    const filePath = path.join(__dirname, '..', 'data', 'json', fileName);
+    const projectRoot = this.getProjectRoot();
+    const filePath = path.join(projectRoot, 'src', 'data', 'json', fileName);
     const buffer = fs.readFileSync(filePath, 'utf-8');
 
     return JSON.parse(buffer);

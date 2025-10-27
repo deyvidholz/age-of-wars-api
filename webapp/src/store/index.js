@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import config from "../config/environment";
 
 Vue.use(Vuex);
 
@@ -17,10 +18,10 @@ export default new Vuex.Store({
     showRightSidebar: true,
     rightSidebarMini: true,
 
-    defaultCountryFlagPath: "http://localhost:3001/imgs/flags",
-    defaultCountryFlag: "http://localhost:3001/imgs/flags/default.png",
-    defaultProvinceImgPath: "http://localhost:3001/imgs/provinces/",
-    defaultProvinceFlag: "http://localhost:3001/imgs/provinces/default.jpg",
+    defaultCountryFlagPath: config.flagsPath,
+    defaultCountryFlag: config.defaultFlag,
+    defaultProvinceImgPath: config.provincesPath,
+    defaultProvinceFlag: config.defaultProvince,
 
     demandMapMode: false,
     demandingProvinces: [],

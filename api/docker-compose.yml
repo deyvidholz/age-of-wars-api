@@ -8,12 +8,12 @@ services:
       - 5434:5432
     volumes:
       - postgres_volume:/var/lib/postgresql/data
-  pgadmin:
-    image: dpage/pgadmin4:5.1
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
-      - PGADMIN_DEFAULT_PASSWORD=admin
-    ports:
-      - 5435:80
+  # pgadmin:
+  #   image: dpage/pgadmin4:5.1
+  #   environment:
+  #     - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+  #     - PGADMIN_DEFAULT_PASSWORD=admin
+  #   ports:
+  #     - 5435:80
 volumes:
   postgres_volume:

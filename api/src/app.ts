@@ -1,11 +1,22 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Determine the project root directory
+// If running from dist/, go up one level; otherwise, go up one level from src/
+const isRunningFromDist = __dirname.includes('/dist');
+const projectRoot = path.join(__dirname, '..');
+
+// Load environment variables based on NODE_ENV
+const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env';
+const envPath = path.join(projectRoot, envFile);
+dotenv.config({ path: envPath });
+
 import 'reflect-metadata';
 import cors from 'cors';
 import express, { Application } from 'express';
 import { Server } from 'http';
 import { createConnection } from 'typeorm';
 import * as socketio from 'socket.io';
-import path from 'path';
 import passport from 'passport';
 import passportJWT from 'passport-jwt';
 import { router } from './routes';

@@ -1,9 +1,10 @@
 import axios from "axios";
 import Vue from "vue";
 import store from "../store/index";
+import config from "../config/environment";
 
 export const http = axios.create({
-  baseURL: "https://aow.valkeon.com/api",
+  baseURL: config.apiUrl,
   headers: {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
     "Country-ID": `${localStorage.getItem("countryId")}`,

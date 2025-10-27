@@ -17,15 +17,18 @@ There are currently 149 countries available to play with.
 # 📝 Quick Start
 
 ## API Setup
-1. Use `docker-compose up` in the `api/` directory to set up the PostgreSQL database
-2. Go to `api/.env` file and change the database connection information
-3. Navigate to `api/` directory and use `yarn` to install dependencies
-4. Use `yarn serve` to start the API server (development mode)
+1. Navigate to `api/` directory and use `npm install` to install dependencies
+2. Use `docker-compose up` in the `api/` directory to set up the PostgreSQL database
+3. Configure `api/.env` file with your database connection information
+4. Use `npm run dev` to start the API server (development mode)
 
 ## Webapp Setup
-1. Change default API URL in `webapp/src/main.js`, `webapp/src/store/index.js` and `webapp/src/plugins/axios.js`
-2. Navigate to `webapp/` directory and use `npm install` to install dependencies
-3. Use `npm run serve` to start the webapp (development mode)
+1. Navigate to `webapp/` directory and use `npm install` to install dependencies
+2. Use `npm run dev` to start the webapp (development mode)
+
+The webapp automatically uses the correct API URL based on the environment:
+- **Development**: `http://localhost:3001`
+- **Production**: `https://aow.valkeon.com/api`
 
 # ➕ Installation / Requirements
 
@@ -33,11 +36,10 @@ These technologies listed below are required to run the project properly:
 
 - Docker (for PostgreSQL database)
 - Node (tested with Node v14.17)
-- Yarn (for API)
-- NPM (tested with v6.14, for webapp)
+- NPM (tested with v6.14+)
 
 ## API Installation
-Navigate to `api/` directory and run `yarn` to install dependencies.
+Navigate to `api/` directory and run `npm install` to install dependencies.
 
 ## Webapp Installation
 Navigate to `webapp/` directory and run `npm install` to install dependencies.
@@ -51,8 +53,27 @@ You can access the database using `pgAdmin` by accessing the app url and the por
 
 After installing the dependencies and setting up the database:
 
-1. **Start the API server**: Navigate to `api/` directory and run `yarn serve`
-2. **Start the webapp**: Navigate to `webapp/` directory and run `npm run serve`
+1. **Start the API server**: Navigate to `api/` directory and run `npm run dev`
+2. **Start the webapp**: Navigate to `webapp/` directory and run `npm run dev`
+
+# 🏗️ Building for production
+
+## Build the API
+Navigate to `api/` directory and run:
+```bash
+npm run build
+npm start
+```
+
+The build command will use `.env.production` for production environment variables.
+
+## Build the Webapp
+Navigate to `webapp/` directory and run:
+```bash
+npm run build
+```
+
+The production build will automatically use the production API URL (`https://aow.valkeon.com/api`).
 
 # 🖼️ Game Images
 

@@ -8,37 +8,46 @@
 
 # 📝 Quick Start
 
+- Use `npm install` to install dependencies.
 - Use `docker-compose up` to set up the database.
-- Go to `.env` file and change the database connection information.
-- Use `yarn` to install dependencies.
-- Use `yarn serve` to start the project (development mode).
+- Configure the `.env` file with your database connection information.
+- Use `npm run dev` to start the project (development mode).
 
 # 📜 Description
 
-Age of Wars is a single/multiplayer strategy game that uses `Node`, `Vue` and `Socket.io`.
-You start by choosing a country and then you can conquer all the world or make your country
-the richest/strongest.
-
-There are currently 149 countries available to play with.
+Age of Wars API - Backend server for the Age of Wars game, a single/multiplayer strategy game built with `Node`, `Express`, `TypeORM`, and `Socket.io`.
 
 # ➕ Installation / Requirements
 
-These tecnologies listed below are required to run the project properly:
+These technologies listed below are required to run the project properly:
 
 - Docker
 - Node (tested with Node v14.17)
-- Yarn
+- NPM (tested with v6.14+)
 
-In order to install the dependencies, use `yarn`.
+In order to install the dependencies, use `npm install`.
 
 # 🔨 Setting up PostgreSQL database
 
 Start docker then use `docker-compose up` to set up the database.
 You can access the database using `pgAdmin` by accessing the app url and the port configured in `.env` file.
 
-# 🚀 Running the app (development mode)
+# 🚀 Running the app
 
-After install the dependencies and set up the database, you can run the app by running `yarn serve`
+## Development mode
+After installing the dependencies and setting up the database, run:
+```bash
+npm run dev
+```
+
+## Production build
+To build and run in production mode:
+```bash
+npm run build
+npm start
+```
+
+The production build uses `.env.production` for environment variables.
 
 # 🖼️ Game Images
 
